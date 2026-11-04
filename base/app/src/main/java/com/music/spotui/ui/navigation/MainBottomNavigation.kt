@@ -158,8 +158,13 @@ fun MainBottomNavigation(navController: NavHostController, bottomBarState: Mutab
                                 .widthIn(max = 360.dp)
                                 .fillMaxWidth()
                                 .height(NavBarHeight)
-                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
-                                .background(com.music.spotui.ui.theme.AppShade.copy(alpha = 0.9f)),
+                                // PixelMusic's own nav bar (verified by running it): a moderate rounded
+                                // rect, not a full stadium capsule — reserve the 50% radius for small
+                                // pills (search field, chips) per its shape scale.
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(28.dp))
+                                // AppShade (surfaceContainerLowest) was nearly invisible against the dark
+                                // page behind it; a higher container tier reads clearly as a floating card.
+                                .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
