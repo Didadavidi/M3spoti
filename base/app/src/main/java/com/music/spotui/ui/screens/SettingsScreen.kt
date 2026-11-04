@@ -293,8 +293,6 @@ fun SettingsScreen(navController: NavController) {
                 checked = com.music.spotui.data.preferences.HideDjPref.on,
                 onChecked = { com.music.spotui.data.preferences.HideDjPref.set(ctx, it) },
             )
-            AccentRow(com.music.spotui.data.preferences.Look.CLASSIC)
-            LookRow()
             OrientationRow()
             LanguageRow()
             }
@@ -397,60 +395,6 @@ internal fun Section(title: Int) {
 
 @Composable
 private fun Divider() = HorizontalDivider(color = tone(0xFF2A2A2A), modifier = Modifier.padding(top = 8.dp))
-
-/** Classic or Immersive: the choice made in the onboarding, changeable here. */
-@Composable
-private fun LookRow() {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    val current = com.music.spotui.data.preferences.LookPref.look
-    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
-        Text(stringResource(R.string.settings_look_title), color = AppText, fontSize = 16.sp)
-        for (l in com.music.spotui.data.preferences.Look.entries) {
-            val classic = l == com.music.spotui.data.preferences.Look.CLASSIC
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-                    .semantics { role = Role.RadioButton }
-                    .clickable { com.music.spotui.data.preferences.LookPref.set(ctx, l) }
-                    .padding(vertical = 8.dp),
-            ) {
-                androidx.compose.material3.RadioButton(selected = current == l, onClick = null)
-                Column(Modifier.padding(start = 12.dp)) {
-                    Text(stringResource(if (classic) R.string.look_classic else R.string.look_immersive), color = AppText, fontSize = 15.sp)
-                    Text(stringResource(if (classic) R.string.look_classic_detail else R.string.look_immersive_detail), color = AppMuted, fontSize = 12.sp)
-                }
-            }
-        }
-    }
-}
-
-/** The accent colour of one look, for everyone (the same palette the supporter sheet uses). */
-@Composable
-private fun AccentRow(look: com.music.spotui.data.preferences.Look) {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
-        Text(stringResource(R.string.supporter_accent), color = AppText, fontSize = 16.sp)
-        Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp), modifier = Modifier.padding(top = 10.dp)) {
-            for (a in com.music.spotui.data.api.SupportReminder.Accent.entries) {
-                val selected = com.music.spotui.data.api.SupportReminder.accentOf(look) == a
-                val name = stringResource(when (a) {
-                    com.music.spotui.data.api.SupportReminder.Accent.GREEN -> R.string.color_green
-                    com.music.spotui.data.api.SupportReminder.Accent.BLUE -> R.string.color_blue
-                    com.music.spotui.data.api.SupportReminder.Accent.PURPLE -> R.string.color_purple
-                    com.music.spotui.data.api.SupportReminder.Accent.PINK -> R.string.color_pink
-                    com.music.spotui.data.api.SupportReminder.Accent.ORANGE -> R.string.color_orange
-                })
-                Box(
-                    Modifier.size(40.dp)
-                        .semantics { contentDescription = name; role = Role.RadioButton }
-                        .clip(CircleShape).background(a.color)
-                        .then(if (selected) Modifier.border(3.dp, AppText, CircleShape) else Modifier)
-                        .clickable { com.music.spotui.data.api.SupportReminder.setAccent(ctx, look, a) },
-                )
-            }
-        }
-    }
-}
 
 /**
  * "Crossfade": the length of the fade at the end of a song. The label says what it is: the two
