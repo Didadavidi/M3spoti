@@ -94,7 +94,6 @@ import com.music.spotui.ui.navigation.artistRoute
 import com.music.spotui.ui.navigation.playlistRoute
 import com.music.spotui.ui.theme.AppBackground
 import com.music.spotui.ui.theme.AppPalette
-import com.music.spotui.ui.theme.GridBackground
 import com.music.spotui.ui.viewmodel.HomeViewModel
 import java.time.LocalTime
 
@@ -238,7 +237,10 @@ fun HomeFeedContent(navController: NavController, feed: HomeFeedModel, facet: St
                     .statusBarsPadding()
                     .padding(bottom = 10.dp)
             ) {
-                HomeHeaderRow(navController, facet, onFacet)
+                Column {
+                    HomeGreeting()
+                    HomeHeaderRow(navController, facet, onFacet)
+                }
             }
         }
         shortcuts?.let { tiles ->
@@ -252,6 +254,29 @@ fun HomeFeedContent(navController: NavController, feed: HomeFeedModel, facet: St
         // Sections from extensions (home.sections), after Spotify's own, each under its extension's name.
         item { com.music.spotui.extensions.ExtensionBlocks(app.myspoti.extensions.Hook.HOME, app.myspoti.extensions.Surface.HOME, "{}") }
     }
+}
+
+/** A big Flex greeting, PixelMusic-style: time of day plus the account's first name. */
+@Composable
+private fun HomeGreeting() {
+    val hour = remember { LocalTime.now().hour }
+    val greeting = stringResource(
+        when {
+            hour < 5 -> R.string.home_greeting_night
+            hour < 12 -> R.string.home_greeting_morning
+            hour < 18 -> R.string.home_greeting_afternoon
+            else -> R.string.home_greeting_evening
+        },
+    )
+    val name = com.music.spotui.data.api.ProfileCache.name?.trim()?.substringBefore(' ')
+    Text(
+        text = if (name.isNullOrBlank()) greeting else "$greeting, $name",
+        style = MaterialTheme.typography.headlineSmall,
+        color = AppText,
+        maxLines = 1,
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+    )
 }
 
 /** Spotify-style top row: profile avatar on the left (opens Settings, like the
@@ -364,14 +389,14 @@ private fun HomeShortcutGrid(navController: NavController, items: List<HomeItem>
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.pressable(0.96f, onPressHint = { prefetchHomeItem(item) }) { onHomeItemClick(navController, item) }
                             .weight(1f)
-                            .height(48.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Color(GridBackground.toArgb()))
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
                             ,
                     ) {
                         GlideImage(
                             transition = CrossFade,
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop,
                             model = item.imageUrl,
                             loading = placeholder(R.drawable.placeholder),
@@ -409,9 +434,8 @@ private fun uniqueKeys(raw: List<String>): List<String> {
 private fun HomeFeedSection(navController: NavController, section: HomeSection) {
     Text(
         text = section.title,
+        style = MaterialTheme.typography.titleLarge,
         color = AppText,
-        fontSize = 21.sp,
-        fontWeight = FontWeight.Bold,
         maxLines = 2,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         modifier = Modifier.padding(16.dp, 20.dp, 16.dp, 4.dp),
@@ -446,7 +470,7 @@ private fun HomeFeedCard(item: HomeItem, onClick: () -> Unit) {
                 transition = CrossFade,
                 modifier = Modifier
                     .size(150.dp)
-                    .clip(if (isArtist) CircleShape else RoundedCornerShape(8.dp)),
+                    .clip(if (isArtist) CircleShape else RoundedCornerShape(18.dp)),
                 contentScale = ContentScale.Crop,
                 model = item.imageUrl,
                 loading = placeholder(R.drawable.placeholder),

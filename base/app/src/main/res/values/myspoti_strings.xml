@@ -47,6 +47,10 @@
     <string name="home_error">Couldn\'t load Home.\nCheck your connection and try again.</string>
     <string name="home_retry">Try again</string>
     <string name="home_empty">Nothing to show yet.</string>
+    <string name="home_greeting_night">Up late</string>
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
     <string name="spotify_account">Spotify account</string>
     <string name="spotify_user">Spotify user</string>
     <string name="list_view">Show as list</string>

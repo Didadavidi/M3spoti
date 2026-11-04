@@ -38,6 +38,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -221,9 +222,8 @@ fun SumUpSearchScreen(
                     ) {
                         Text(
                             stringResource(R.string.assisted_curation_search_search_history_title),
+                            style = MaterialTheme.typography.titleMedium,
                             color = AppText,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
                         )
                         Text(
                             stringResource(R.string.chat_content_picker_clear_recent_searches),
@@ -521,8 +521,10 @@ fun RecentItemRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.pressable(0.96f) { onClick() }
             .fillMaxWidth()
-            
-            .padding(16.dp, 8.dp),
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(10.dp, 8.dp),
     ) {
         GlideImage(
             transition = CrossFade,
@@ -786,9 +788,8 @@ fun BrowseAllSection(onCategoryClick: (genre: String, title: String) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.browse_all),
+            style = MaterialTheme.typography.titleLarge,
             color = AppText,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(16.dp, 12.dp, 16.dp, 8.dp),
         )
         // Large windows: more tiles per row (two on phones).
@@ -819,11 +820,15 @@ private fun BrowseCategoryTile(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    // Tonal: the category's own colour, blended into a surface tone rather than shown
+    // at full saturation, so the grid reads as part of the Expressive scheme.
+    val base = tone(0xFF2A2A2A)
+    val tonal = remember(color, base) { androidx.compose.ui.graphics.lerp(color, base, 0.55f) }
     Box(
         modifier = modifier
             .height(96.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(color)
+            .clip(RoundedCornerShape(20.dp))
+            .background(tonal)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -862,7 +867,7 @@ fun SearchTopBar() {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = stringResource(R.string.navigationbar_musicappitems_search_title), color = AppText, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.navigationbar_musicappitems_search_title), style = MaterialTheme.typography.headlineSmall, color = AppText)
         //Icon(imageVector = Icons.Default.Person, contentDescription = "", tint = Color.White)
     }
 
@@ -884,14 +889,14 @@ fun SearchStickyBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(50))
             .height(55.dp)
-            .background(Color.White)
-            .padding(10.dp, 0.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .padding(16.dp, 0.dp)
     ){
         Icon(
             painterResource(id = R.drawable.ic_search_big),
-            tint = Color.Black,
+            tint = AppMuted,
             contentDescription = "")
 
         TextField(
@@ -900,7 +905,7 @@ fun SearchStickyBar(
                 .focusRequester(fieldFocus)
                 .onFocusChanged { onFocusChange(it.isFocused) },
             value = text,
-            textStyle = TextStyle.Default.copy(fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight(500)),
+            textStyle = TextStyle.Default.copy(fontSize = 16.sp, color = AppText, fontWeight = FontWeight(500)),
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
@@ -908,7 +913,7 @@ fun SearchStickyBar(
                 disabledIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.Black
+                cursorColor = com.music.spotui.ui.theme.AppAccent,
 
             ),
             singleLine = true,
@@ -917,12 +922,13 @@ fun SearchStickyBar(
                 Text(
                      textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
+                    color = AppMuted,
                     text = stringResource(R.string.search_header_field_hint)
 
                 )
             },
             trailingIcon = if (text.isEmpty()) null else {
-                { SearchClearButton(fieldFocus, Color.Black) { onTextChange("") } }
+                { SearchClearButton(fieldFocus, AppMuted) { onTextChange("") } }
             },
         )
     }
