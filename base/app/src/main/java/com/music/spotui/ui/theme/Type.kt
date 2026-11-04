@@ -26,11 +26,25 @@ private fun sans(weight: Int) = Font(
 )
 
 val AppSans = FontFamily(sans(400), sans(500), sans(600), sans(700), sans(800), sans(900))
-/** Headings: the same family, heavier cuts. */
-val AppSansTitle = AppSans
 
 // Kept as an alias so existing references (Theme.kt etc.) don't break.
 val Montserrat = AppSans
+
+/**
+ * Display/headline/title typeface: Google Sans Flex (OFL-1.1, licenses/GoogleSansFlex-OFL.txt).
+ * Has no Cyrillic or Greek glyphs (issue #62), so it is used for titles only — body text stays
+ * on Manrope ([AppSans]), which covers Myspoti's Russian and Greek strings.
+ */
+@OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+private fun flex(weight: Int) = Font(
+    R.font.flex,
+    weight = FontWeight(weight),
+    variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
+        androidx.compose.ui.text.font.FontVariation.weight(weight),
+    ),
+)
+
+val AppSansTitle = FontFamily(flex(400), flex(500), flex(600), flex(700), flex(800))
 
 private val base = TextStyle(fontFamily = AppSans)
 private val title = TextStyle(fontFamily = AppSansTitle, fontWeight = FontWeight.Bold)
@@ -38,9 +52,7 @@ private val title = TextStyle(fontFamily = AppSansTitle, fontWeight = FontWeight
 val Typography = Typography(
     displayLarge = title, displayMedium = title, displaySmall = title,
     headlineLarge = title, headlineMedium = title, headlineSmall = title,
-    titleLarge = base.copy(fontWeight = FontWeight.Bold),
-    titleMedium = base.copy(fontWeight = FontWeight.Bold),
-    titleSmall = base.copy(fontWeight = FontWeight.Bold),
+    titleLarge = title, titleMedium = title, titleSmall = title,
     bodyLarge = base.copy(fontSize = 16.sp, lineHeight = 24.sp),
     bodyMedium = base, bodySmall = base,
     labelLarge = base, labelMedium = base, labelSmall = base,

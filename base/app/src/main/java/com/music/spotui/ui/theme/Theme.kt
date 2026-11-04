@@ -3,57 +3,19 @@ package com.music.spotui.ui.theme
 import android.app.Activity
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
-
-/**
- * Spotify's dark palette, so the Material components that read the scheme (switches,
- * sliders, dialogs, spinners, text fields, menus) look like the official app: accent
- * green on black, #121212 background, #1F1F1F/#282828 raised surfaces, #B3B3B3
- * secondary text, and no tonal tint on elevated surfaces.
- */
-private fun spotifyColorScheme(accent: Color) = darkColorScheme(
-    primary = accent,
-    onPrimary = Color.Black,
-    primaryContainer = accent,
-    onPrimaryContainer = Color.Black,
-    secondary = Color.White,
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF2A2A2A),
-    onSecondaryContainer = Color.White,
-    tertiary = accent,
-    onTertiary = Color.Black,
-    background = AppBackground,
-    onBackground = Color.White,
-    surface = AppBackground,
-    onSurface = Color.White,
-    surfaceVariant = Color(0xFF2A2A2A),
-    onSurfaceVariant = Color(0xFFB3B3B3),
-    surfaceTint = Color.Transparent,
-    surfaceDim = AppBackground,
-    surfaceBright = Color(0xFF2A2A2A),
-    surfaceContainerLowest = AppBackground,
-    surfaceContainerLow = Color(0xFF181818),
-    surfaceContainer = Color(0xFF1F1F1F),
-    surfaceContainerHigh = Color(0xFF282828),
-    surfaceContainerHighest = Color(0xFF3E3E3E),
-    inverseSurface = Color.White,
-    inverseOnSurface = Color.Black,
-    inversePrimary = accent,
-    outline = Color(0xFF727272),
-    outlineVariant = Color(0xFF3E3E3E),
-    error = Color(0xFFF3727F),
-    onError = Color.Black,
-    scrim = Color.Black,
-)
 
 @Composable
 fun SpotuiTheme(
@@ -65,7 +27,10 @@ fun SpotuiTheme(
         com.music.spotui.video.MusicVideoController.onEnergyPolicyChanged()
     }
     // Dark only, like Spotify: a saved choice from the withdrawn light palette is ignored.
-    val visualScheme: ColorScheme = spotifyColorScheme(AppAccent)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) { ExpressiveColor.start(context, scope) }
+    val visualScheme: ColorScheme = ExpressiveColor.scheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -88,6 +53,7 @@ fun SpotuiTheme(
 
     MaterialTheme(
         colorScheme = visualScheme,
+        motionScheme = MotionScheme.expressive(),
         typography = Typography,
     ) {
         // Bare Text() uses LocalTextStyle, which MaterialTheme does NOT derive

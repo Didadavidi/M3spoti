@@ -3,24 +3,41 @@ package com.music.spotui.ui.theme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 
+/** The Expressive colour scheme in effect: the playing cover's palette, or the fallback accent. */
+private val scheme get() = ExpressiveColor.scheme
+
 val AppBackground: Color get() =
-    if (app.myspoti.power.EnergySettings.oledBlack) Color.Black else Color(0xFF121212)
+    if (app.myspoti.power.EnergySettings.oledBlack) Color.Black else scheme.surface
 val GridBackground: Color get() = tone(0xFF2A2A2A)
-/** The accent (Spotify green, or the colour a supporter chose). */
+/** The accent: the playing cover's primary tone, or the fallback accent while nothing plays. */
 val AppPalette: Color get() = AppAccent
-val AppAccent: Color get() = com.music.spotui.data.api.SupportReminder.accentColor
+val AppAccent: Color get() = scheme.primary
 
 /** Primary text and icons. */
-val AppText: Color = Color.White
+val AppText: Color get() = scheme.onSurface
 /** Secondary text and icons. */
-val AppMuted: Color = Color(0xFFB3B3B3)
+val AppMuted: Color get() = scheme.onSurfaceVariant
 /** Destructive actions (delete, leave, block) and failures shown as text. */
 val AppDestructive = Color(0xFFF15E6C)
 /** What a tint is mixed with to make a header. */
-val AppShade: Color = Color.Black
+val AppShade: Color get() = scheme.surfaceContainerLowest
 
-/** One of the palette's raised greys (#181818 ... #3E3E3E): "a bit raised from the page". */
-fun tone(argb: Long): Color = Color(argb)
+/**
+ * One of the palette's raised greys (#181818 ... #3E3E3E): "a bit raised from the page". Each of
+ * the Classic screens' hardcoded tones maps to the nearest step of the dynamic scheme, by how
+ * light the literal grey was, so the whole page re-skins together as the cover's palette changes.
+ */
+fun tone(argb: Long): Color {
+    val grey = (argb shr 16) and 0xFF
+    return when {
+        grey <= 0x1C -> scheme.surface
+        grey <= 0x22 -> scheme.surfaceContainerLow
+        grey <= 0x27 -> scheme.surfaceContainer
+        grey <= 0x2F -> scheme.surfaceContainerHigh
+        grey <= 0x3C -> scheme.surfaceContainerHighest
+        else -> scheme.outlineVariant
+    }
+}
 
 /** The cover's colour as a page header: darkened toward black, so the title stays readable. */
 fun headerTint(tint: Color, amount: Float): Color = lerp(tint, Color.Black, amount)
