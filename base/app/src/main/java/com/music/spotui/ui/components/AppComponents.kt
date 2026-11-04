@@ -269,7 +269,7 @@ fun MiniPlayer(navController: NavHostController) {
             // Where the full player rises from and sinks back to.
             .onGloballyPositioned { com.music.spotui.ui.navigation.PlayerSheet.miniTop = it.boundsInWindow().top }
             .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(22.dp))
             // Drawn: the colour follows a crossfade frame by frame without recomposing the card.
             .drawBehind { drawRect(blend?.let { androidx.compose.ui.graphics.lerp(outgoingTint, animatedTint, it.progress()) } ?: animatedTint) }
     ) {
@@ -300,7 +300,7 @@ fun MiniPlayer(navController: NavHostController) {
                     label = "miniSong",
                 ) { m ->
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(4.dp))) {
+                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))) {
                         GlideImage(
                             transition = CrossFade,
                             modifier = Modifier.size(40.dp),
@@ -383,11 +383,19 @@ fun MiniPlayer(navController: NavHostController) {
             Spacer(modifier = Modifier.width(20.dp))
             if (SongPlayer.canLike) com.music.spotui.ui.screens.AddButton(song = { com.music.spotui.ui.screens.nowPlayingSong(vm) }, liked = liked, size = 24.dp) { vm.updateLikeState(true) }
             Spacer(modifier = Modifier.width(20.dp))
-            com.music.spotui.ui.components.PlayPauseIcon(
-                playing = songPlayingState,
-                contentDescription = if (songPlayingState) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
-                tint = Color.White,
-                modifier = Modifier.pressable(0.96f) {
+            // A tonal pill, like the full player's: primary behind, onPrimary icon, both from
+            // the Expressive theme (the playing cover's scheme), independent of the card's own
+            // per-track crossfade tint above.
+            val playPauseCorner by androidx.compose.animation.core.animateDpAsState(
+                targetValue = if (songPlayingState) 12.dp else 18.dp,
+                label = "miniPlayPauseCorner",
+            )
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(playPauseCorner))
+                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.primary)
+                    .pressable(0.96f) {
                         if (songPlayingState) {
                             SongPlayer.pause()
                             vm.updateSongState(songCoverUri, songTitle, songSinger, false, songId, vm.currentSongIndex.value, vm.currentSongAlbum.value)
@@ -395,10 +403,16 @@ fun MiniPlayer(navController: NavHostController) {
                             SongPlayer.play()
                             vm.updateSongState(songCoverUri, songTitle, songSinger, true, songId, vm.currentSongIndex.value, vm.currentSongAlbum.value)
                         }
-                    }
-                    .size(26.dp)
-                    
-            )
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                com.music.spotui.ui.components.PlayPauseIcon(
+                    playing = songPlayingState,
+                    contentDescription = if (songPlayingState) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
+                    tint = com.music.spotui.ui.theme.ExpressiveColor.scheme.onPrimary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
         }
         // Thin progress line at the bottom of the card.
         // Drawn every frame from the engine clock: smooth at the display refresh rate.

@@ -1,6 +1,5 @@
 package com.music.spotui.ui.navigation
 
-import com.music.spotui.ui.theme.AppText
 import com.music.spotui.ui.theme.AppMuted
 import com.music.spotui.ui.theme.AppShade
 
@@ -29,8 +28,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -41,9 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.music.spotui.ui.components.MiniPlayer
@@ -151,22 +149,28 @@ fun MainBottomNavigation(navController: NavHostController, bottomBarState: Mutab
                     val tabs = rememberTabNavigation(navController)
                     // Large windows: the tabs are in the rail at the side (MainNavigationRail).
                     if (!com.music.spotui.ui.components.windowSize().large) {
-                    // Official bar proportions: a 58 dp strip (the gesture inset is added by
-                    // navigationBarsPadding above), three equal thirds edge to edge, so the
-                    // tabs spread over the full width instead of clustering in the middle.
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(NavBarHeight),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        TabItems.forEach { item ->
-                            NavBarTab(
-                                iconRes = item.icon,
-                                label = if (item.labelRes != 0) stringResource(item.labelRes) else item.label,
-                                selected = tabs.selected == item.route,
-                                onClick = { tabs.open(item) },
-                            )
+                    // A floating pill, inset from both edges and clear of the gradient below it,
+                    // icon-only with a highlight behind the selected tab (M3 Expressive).
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 32.dp, vertical = 8.dp)
+                                .widthIn(max = 360.dp)
+                                .fillMaxWidth()
+                                .height(NavBarHeight)
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                                .background(com.music.spotui.ui.theme.AppShade.copy(alpha = 0.9f)),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            TabItems.forEach { item ->
+                                NavBarTab(
+                                    iconRes = item.icon,
+                                    label = if (item.labelRes != 0) stringResource(item.labelRes) else item.label,
+                                    selected = tabs.selected == item.route,
+                                    onClick = { tabs.open(item) },
+                                )
+                            }
                         }
                     }
                     }
@@ -256,14 +260,13 @@ fun MainNavigationRail(navController: NavHostController) {
     }
 }
 
-// Official app metrics. Material3's NavigationBarItem measures its icon slot at a
-// fixed 24 dp, so a 28 dp Icon there was clipped back down: the bar is drawn by hand.
-private val NavBarHeight = 58.dp
-private val NavIconSize = 28.dp
+private val NavBarHeight = 64.dp
+private val NavIconSize = 24.dp
+private val NavIndicatorSize = 48.dp
 
 /**
- * One tab of the bottom bar: a 28 dp glyph above an 11 sp medium label, the two
- * centred as a single block inside an equal third of the bar's width.
+ * One tab of the floating pill: an icon alone (the pill is too compact for a label), the
+ * selected one lifted onto a rounded highlight that scales and fades in (M3 Expressive).
  */
 @Composable
 private fun RowScope.NavBarTab(
@@ -272,13 +275,12 @@ private fun RowScope.NavBarTab(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    // Spotify's idle grey, lighter than Color.Gray which read as "disabled".
-    val tint = if (selected) AppText else AppMuted
+    val tint = if (selected) com.music.spotui.ui.theme.ExpressiveColor.scheme.onSecondaryContainer else AppMuted
     Box(
         modifier = Modifier
             .weight(1f)
             .fillMaxHeight()
-            // No ripple: the bar is a plain strip of tabs, and the tint is the feedback.
+            // No ripple: the highlight pill itself is the feedback.
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -287,26 +289,33 @@ private fun RowScope.NavBarTab(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        Box(
+            modifier = Modifier.size(NavIndicatorSize),
+            contentAlignment = Alignment.Center,
         ) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = selected,
+                enter = androidx.compose.animation.scaleIn(
+                    animationSpec = androidx.compose.animation.core.spring(
+                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
+                    ),
+                ) + androidx.compose.animation.fadeIn(),
+                exit = androidx.compose.animation.scaleOut() + androidx.compose.animation.fadeOut(),
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.secondaryContainer),
+                )
+            }
             Icon(
                 painter = painterResource(id = iconRes),
-                // The label right below already names the tab for TalkBack.
-                contentDescription = null,
+                // The pill has no visible label; TalkBack still gets one via onClickLabel above.
+                contentDescription = label,
                 tint = tint,
                 modifier = Modifier.size(NavIconSize),
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = label,
-                color = tint,
-                fontSize = 11.sp,
-                lineHeight = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.2.sp,
-                maxLines = 1,
             )
         }
     }
