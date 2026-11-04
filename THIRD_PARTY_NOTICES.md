@@ -3,6 +3,24 @@
 Myspoti is free software under the GNU General Public License v3.0 (see `LICENSE`).
 It builds on the projects below; their licences are compatible with the GPL-3.0.
 
+## PixelMusic — GPL-3.0
+https://github.com/ianshulyadav/PixelMusic (commit `991f7c5`)
+
+By Ian Shulyadav. This fork replaces Myspoti's UI with PixelMusic's Material 3
+Expressive style: colours derived from the playing album art
+(`base/app/src/main/java/com/music/spotui/ui/theme/ExpressiveColor.kt`, following the same
+QuantizerCelebi/Score/DynamicScheme pipeline as PixelMusic's `ColorRoles.kt`), the floating
+pill navigation bar, the mini player's tonal play button, and the Home and Search layouts.
+No PixelMusic code, images or brand assets are included; the screens are redrawn independently
+to match its look. Myspoti's own data, playback and extension layers are unchanged.
+
+## Google Sans Flex — SIL Open Font License 1.1
+https://fonts.google.com/specimen/Google+Sans+Flex, via PixelMusic
+
+The Expressive UI's display/headline/title typeface (`base/app/src/main/res/font/flex.ttf`).
+Used for titles only: it has no Cyrillic or Greek glyphs, so body text stays on Manrope, which
+covers Myspoti's Russian and Greek strings. Licence text in `base/licenses/GoogleSansFlex-OFL.txt`.
+
 ## Spotui — GPL-3.0
 https://github.com/Spotui/Spotui
 
