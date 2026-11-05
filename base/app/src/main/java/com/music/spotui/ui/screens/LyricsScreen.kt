@@ -131,29 +131,30 @@ import java.util.Locale
  * upcoming lines in the text colour; tapping a line seeks to it.
  */
 
-/** The three colours of a lyrics view: background, upcoming text, sung / current text. */
-private data class LyricsPalette(val background: Color, val text: Color, val highlight: Color)
+/**
+ * The colours of a lyrics view, from the album colours: the page, the lines to come, the lines
+ * sung (dimmer), the plain text colour, and the pill the current line sits on with its text.
+ */
+private data class LyricsPalette(
+    val background: Color,
+    val text: Color,
+    val highlight: Color,
+    val past: Color = text,
+    val pill: Color = highlight,
+    val onPill: Color = background,
+)
 
+@Suppress("UNUSED_PARAMETER")
 private fun paletteFor(lyrics: Lyrics?, accent: Color): LyricsPalette {
-    lyrics?.colors?.let { c ->
-        // Spotify's colours for the song, with the sung white kept readable: on some songs the
-        // background is light enough for white words to fade into it (reported on one song,
-        // fine on another). The background is darkened only as much as that takes.
-        val hi = Color(c.highlight)
-        var bg = Color(c.background)
-        var step = 0
-        while (contrast(hi, bg) < MIN_CONTRAST && step < 8) { bg = lerp(bg, if (hi.luminance() > 0.5f) Color.Black else Color.White, 0.12f); step++ }
-        // Upcoming lines (often black in Spotify's colours) stay readable on that background too.
-        val text = Color(c.text).let { t -> if (contrast(t.copy(alpha = 1f), bg) < 1.8f) hi.copy(alpha = 0.55f) else t }
-        return LyricsPalette(bg, text, hi)
-    }
-    // No Spotify colours (fallback source): the artwork colour, like Spotify's own fallback.
-    val bg = lerp(accent, Color.Black, 0.15f)
-    // B23: upcoming lines were black at 55 % — invisible on a dark (AMOLED) card. On a dark
-    // background they are drawn in a slightly dimmed white instead, the sung lines staying
-    // the full highlight colour.
-    val text = if (bg.luminance() > 0.35f) Color.Black.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.72f)
-    return LyricsPalette(bg, text, Color.White)
+    val s = com.music.spotui.ui.theme.ExpressiveColor.scheme
+    return LyricsPalette(
+        background = s.surface,
+        text = lerp(s.onSurfaceVariant, s.onSurface, 0.25f),
+        highlight = s.onSurface,
+        past = lerp(s.onSurfaceVariant, s.surface, 0.3f),
+        pill = s.primary,
+        onPill = s.onPrimary,
+    )
 }
 
 /** WCAG contrast ratio of two colours (1 = the same, 21 = black on white). */
@@ -285,8 +286,13 @@ private fun LyricLineText(
 ) {
     val target = when (state) {
         1 -> palette.text
+        -1 -> palette.past
+        0 -> palette.onPill
         else -> palette.highlight
     }
+    // The line being sung sits on the design's tilted pill, a little bigger.
+    val current by animateFloatAsState(if (state == 0) 1f else 0f, tween(260), label = "lyricCurrent")
+    val lineSize = if (state == 0) (fontSize.value * 1.14f).sp else fontSize
     val color by animateColorAsState(target, tween(220), label = "lyricColor")
     // Explained by Genius: a light dotted line under each row of the text.
     var layout by remember { mutableStateOf<androidx.compose.ui.text.TextLayoutResult?>(null) }
@@ -298,7 +304,19 @@ private fun LyricLineText(
     val align = if (duet && line.voice == 2) TextAlign.End else TextAlign.Start
     val lineModifier = modifier
         .fillMaxWidth()
+        .graphicsLayer { rotationZ = -1.5f * current }
         .drawBehind {
+            if (current > 0f) {
+                val r = 24.dp.toPx()
+                val path = androidx.compose.ui.graphics.Path().apply {
+                    addRoundRect(androidx.compose.ui.geometry.RoundRect(
+                        -12.dp.toPx(), -10.dp.toPx(), size.width + 4.dp.toPx(), size.height + 10.dp.toPx(),
+                        topLeftCornerRadius = CornerRadius(r), topRightCornerRadius = CornerRadius(r),
+                        bottomRightCornerRadius = CornerRadius(r), bottomLeftCornerRadius = CornerRadius(6.dp.toPx()),
+                    ))
+                }
+                drawPath(path, palette.pill.copy(alpha = palette.pill.alpha * current))
+            }
             if (picked > 0f) drawRoundRect(
                 palette.highlight.copy(alpha = 0.2f * picked),
                 Offset(-10.dp.toPx(), -5.dp.toPx()),
@@ -337,21 +355,23 @@ private fun LyricLineText(
             Box {
                 Text(
                     text = shown,
-                    // The words to come keep the colour of the lines to come; sung, they turn white.
-                    color = palette.text,
-                    fontSize = fontSize,
-                    lineHeight = fontSize * 1.25f,
-                    fontWeight = FontWeight.Bold,
+                    // On the pill: the words to come faint, sung, full.
+                    color = palette.onPill.copy(alpha = 0.5f),
+                    fontSize = lineSize,
+                    lineHeight = lineSize * 1.12f,
+                    fontWeight = FontWeight.Black,
+                    fontFamily = com.music.spotui.ui.theme.FlexTitle,
                     textAlign = align,
                     onTextLayout = { layout = it },
                     modifier = Modifier.fillMaxWidth().then(underline),
                 )
                 Text(
                     text = shown,
-                    color = palette.highlight,
-                    fontSize = fontSize,
-                    lineHeight = fontSize * 1.25f,
-                    fontWeight = FontWeight.Bold,
+                    color = palette.onPill,
+                    fontSize = lineSize,
+                    lineHeight = lineSize * 1.12f,
+                    fontWeight = FontWeight.Black,
+                    fontFamily = com.music.spotui.ui.theme.FlexTitle,
                     textAlign = align,
                     onTextLayout = { fill = it },
                     modifier = Modifier.fillMaxWidth().drawWithContent {
@@ -375,9 +395,10 @@ private fun LyricLineText(
             Text(
                 text = line.text,
                 color = color,
-                fontSize = fontSize,
-                lineHeight = fontSize * 1.25f,
-                fontWeight = FontWeight.Bold,
+                fontSize = lineSize,
+                lineHeight = lineSize * 1.12f,
+                fontWeight = FontWeight.Black,
+                fontFamily = com.music.spotui.ui.theme.FlexTitle,
                 textAlign = align,
                 onTextLayout = { layout = it },
                 modifier = Modifier.fillMaxWidth().then(underline),
@@ -489,12 +510,15 @@ fun LyricsScreen(
         if (meaning == null) com.music.spotui.data.api.GeniusMeaning.prefetch(trackId, title, artist, lang)
     }
 
+    DarkSystemBars()
+    Box(Modifier.fillMaxSize()) {
+    // The design's lyrics page: the album colour with a moiré of thin wavy lines over it.
+    Box(Modifier.fillMaxSize().drawBehind { drawRect(bg, alpha = if (reveal == null) 1f else (reveal() / 0.08f).coerceIn(0f, 1f)) }) {
+        com.music.spotui.ui.dots.MoireBackground(palette.pill, Modifier.revealIn(reveal, 0.1f, 0f))
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            // The background comes in over the first instants so the card's own lines
-            // dissolve under it instead of vanishing on the first frame.
-            .drawBehind { drawRect(bg, alpha = if (reveal == null) 1f else (reveal() / 0.08f).coerceIn(0f, 1f)) }
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = {})
             .statusBarsPadding()
             .navigationBarsPadding(),
@@ -504,17 +528,14 @@ fun LyricsScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp).revealIn(reveal, 0.3f, 8f),
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(48.dp).clickable(
-                    interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClose,
-                ),
-            ) {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = stringResource(R.string.lyrics_fullscreen_close_button_readout_value), tint = palette.highlight, modifier = Modifier.size(32.dp))
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                Text(title, color = palette.highlight, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(artist, color = palette.highlight.copy(alpha = 0.75f), fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.width(12.dp))
+            com.music.spotui.ui.dots.HalftoneCover(
+                com.music.spotui.di.Graph.currentSongState.coverUri.value, Modifier.size(48.dp),
+                androidx.compose.foundation.shape.CircleShape, cells = 12f, animate = true,
+            )
+            Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+                Text(title, color = palette.highlight, style = androidx.compose.material3.MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(artist, color = palette.highlight.copy(alpha = 0.8f), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             meaning?.takeIf { !it.about.isNullOrBlank() }?.let { m ->
                 Box(
@@ -551,6 +572,14 @@ fun LyricsScreen(
                     canPickSource = state !is LyricsViewModel.State.Loading,
                     onPickSource = { sourcesOpen = true },
                 )
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.padding(end = 10.dp).size(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh)
+                    .clickable(onClick = onClose),
+            ) {
+                Icon(com.music.spotui.ui.dots.DesignIcons.Close, contentDescription = stringResource(R.string.lyrics_fullscreen_close_button_readout_value), tint = palette.highlight, modifier = Modifier.size(22.dp))
             }
         }
 
@@ -595,7 +624,7 @@ fun LyricsScreen(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(24.dp, 8.dp, 24.dp, 48.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(18.dp),
                     ) {
                         if (notes.isNotEmpty() && !hintSeen) item(key = "genius-hint") {
                             Text(
@@ -617,7 +646,7 @@ fun LyricsScreen(
                                 line = line,
                                 state = lineState(l, i, active),
                                 palette = palette,
-                                fontSize = 24.sp,
+                                fontSize = 28.sp,
                                 position = position,
                                 translation = if (state.showTranslation) state.translations?.getOrNull(i) else null,
                                 romanization = if (romanizing) line.romanization?.trim()?.takeIf { it.isNotEmpty() && !it.equals(line.text.trim(), ignoreCase = true) } else null,
@@ -671,6 +700,7 @@ fun LyricsScreen(
                 )
             }
         }
+    }
     }
 }
 
