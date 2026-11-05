@@ -158,13 +158,7 @@ fun SongOptionsSheet(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth().padding(16.dp, 0.dp, 16.dp, 16.dp),
             ) {
-                GlideImage(
-                    transition = CrossFade,
-                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)),
-                    model = song.coverUri,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = "",
-                )
+                com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(song.title, color = AppText, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -367,7 +361,7 @@ private fun LikedBadge() {
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(24.dp).clip(CircleShape).background(MenuGreen),
     ) {
-        Icon(Icons.Default.Check, contentDescription = null, tint = Color.Black, modifier = Modifier.size(16.dp))
+        Icon(Icons.Default.Check, contentDescription = null, tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(16.dp))
     }
 }
 

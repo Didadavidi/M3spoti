@@ -121,7 +121,7 @@ fun WelcomeScreen(onLogin: () -> Unit) {
                         .clip(RoundedCornerShape(50))
                         .background(AppAccent),
                 ) {
-                    Text(stringResource(R.string.welcome_login), color = Color.Black, fontFamily = AppSans,
+                    Text(stringResource(R.string.welcome_login), color = com.music.spotui.ui.theme.AppOnAccent, fontFamily = AppSans,
                         fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 }
                 Text(

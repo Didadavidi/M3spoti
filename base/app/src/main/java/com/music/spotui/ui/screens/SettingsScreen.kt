@@ -500,7 +500,7 @@ private fun CrossfadeRow() {
                 Text(
                     if (v == 0) stringResource(R.string.settings_crossfade_off)
                     else stringResource(R.string.settings_crossfade_seconds, v),
-                    color = if (selected) Color.Black else AppText, fontSize = 14.sp,
+                    color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText, fontSize = 14.sp,
                     modifier = Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
                         .background(if (selected) com.music.spotui.ui.theme.AppAccent else tone(0xFF2A2A2A))
                         .clickable { pref.set(ctx, v) }
@@ -527,7 +527,7 @@ private fun OrientationRow() {
                 val selected = pref.mode == value
                 Text(
                     stringResource(label),
-                    color = if (selected) Color.Black else AppText, fontSize = 14.sp,
+                    color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText, fontSize = 14.sp,
                     modifier = Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
                         .background(if (selected) com.music.spotui.ui.theme.AppAccent else tone(0xFF2A2A2A))
                         .clickable { pref.set(ctx, value) }

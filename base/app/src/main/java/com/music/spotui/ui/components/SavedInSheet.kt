@@ -278,7 +278,7 @@ fun SavedInSheet(
             Box(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
                 Text(
                     stringResource(R.string.done),
-                    color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+                    color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 15.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier.clip(RoundedCornerShape(50)).background(SpotifyGreen)
                         .clickable(onClick = onDismiss).padding(horizontal = 36.dp, vertical = 12.dp),
                 )

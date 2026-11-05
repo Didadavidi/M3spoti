@@ -1003,11 +1003,7 @@ private fun QueueSheetRow(
             .padding(horizontal = 20.dp),
     ) {
         leading()
-        GlideImage(
-            transition = CrossFade,
-            model = song.coverUri, contentDescription = "", contentScale = ContentScale.Crop,
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)),
-        )
+        com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

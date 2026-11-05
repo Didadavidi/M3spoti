@@ -63,7 +63,7 @@ fun SwipeToQueue(song: SongsModel, modifier: Modifier = Modifier, content: @Comp
                 Icon(
                     Icons.AutoMirrored.Filled.PlaylistAdd,
                     contentDescription = stringResource(R.string.add_to_queue_action_content_description),
-                    tint = Color.Black,
+                    tint = com.music.spotui.ui.theme.AppOnAccent,
                     modifier = Modifier.padding(horizontal = 24.dp).size(26.dp),
                 )
             }

@@ -314,7 +314,7 @@ fun BlendInviteSheet(link: com.music.spotui.data.api.InviteLinks.BlendLink, navC
                         }
                     }
                 },
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.music.spotui.ui.theme.AppAccent, contentColor = Color.Black),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.music.spotui.ui.theme.AppAccent, contentColor = com.music.spotui.ui.theme.AppOnAccent),
                 modifier = Modifier.fillMaxWidth().height(48.dp),
             ) { Text(stringResource(if (busy) R.string.blend_working else R.string.blend_join_button), fontWeight = FontWeight.Bold, fontSize = 16.sp) }
             if (own) androidx.compose.material3.Button(
@@ -503,7 +503,7 @@ fun LocalPlaylistScreen(navController: NavController, id: String) {
                             LocalPlayer.play(playlist.items.map { it.toTrack() }, 0, context = playlist.name)
                         }.clip(CircleShape).background(Green),
                     ) {
-                        Icon(painterResource(R.drawable.play_svgrepo_com), stringResource(R.string.content_description_play_button), tint = Color.Black, modifier = Modifier.size(24.dp))
+                        Icon(painterResource(R.drawable.play_svgrepo_com), stringResource(R.string.content_description_play_button), tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(24.dp))
                     }
                 }
             }
@@ -575,9 +575,7 @@ private fun PickRow(name: String, detail: String, cover: String?, onClick: () ->
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 20.dp, vertical = 8.dp),
     ) {
         if (cover == null) Image(painterResource(R.drawable.local_files_cover), null, modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)))
-        else GlideImage(transition = CrossFade, model = cover, contentDescription = null, contentScale = ContentScale.Crop,
-            loading = placeholder(R.drawable.placeholder), failure = placeholder(R.drawable.placeholder),
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)))
+        else com.music.spotui.ui.dots.HalftoneCover(cover, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Column(Modifier.padding(start = 12.dp)) {
             Text(name, color = AppText, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(detail, color = AppMuted, fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)

@@ -65,10 +65,7 @@ fun HiddenSongsScreen(navController: NavController) {
         ) else LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
             items(songs, key = { it.id }) { s ->
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    GlideImage(
-                        transition = CrossFade, model = s.coverUri, contentDescription = "", contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)),
-                    )
+                    com.music.spotui.ui.dots.HalftoneCover(s.coverUri, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(s.title, color = AppText, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)

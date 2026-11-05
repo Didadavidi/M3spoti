@@ -112,7 +112,7 @@ private fun <T> Chips(items: List<T>, selected: (T) -> Boolean, label: @Composab
             val on = selected(item)
             Text(
                 label(item),
-                color = if (on) Color.Black else if (enabled) AppText else AppMuted, fontSize = 14.sp,
+                color = if (on) com.music.spotui.ui.theme.AppOnAccent else if (enabled) AppText else AppMuted, fontSize = 14.sp,
                 modifier = Modifier.clip(RoundedCornerShape(50))
                     .background(if (on && enabled) AppAccent else if (on) AppMuted else tone(0xFF2A2A2A))
                     .clickable(enabled = enabled) { onPick(item) }

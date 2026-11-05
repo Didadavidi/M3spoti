@@ -465,7 +465,7 @@ internal fun StateButton(action: StoreAction, busy: Boolean, large: Boolean = fa
     when {
         busy -> Box(mod, contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(20.dp), color = AppAccent, strokeWidth = 2.dp) }
         action == StoreAction.INSTALL -> Button(onInstall, mod, contentPadding = pad,
-            colors = ButtonDefaults.buttonColors(containerColor = AppAccent, contentColor = Color.Black)) { text(R.string.extensions_install) }
+            colors = ButtonDefaults.buttonColors(containerColor = AppAccent, contentColor = com.music.spotui.ui.theme.AppOnAccent)) { text(R.string.extensions_install) }
         action == StoreAction.UPDATE -> FilledTonalButton(onInstall, mod, contentPadding = pad,
             colors = ButtonDefaults.filledTonalButtonColors(containerColor = AppAccent.copy(alpha = 0.22f), contentColor = AppAccent)) { text(R.string.extensions_update) }
         action == StoreAction.INSTALLED -> OutlinedButton(onOpen, mod, contentPadding = pad,

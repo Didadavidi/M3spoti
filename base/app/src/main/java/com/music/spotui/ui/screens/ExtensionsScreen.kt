@@ -254,7 +254,7 @@ private fun Tabs(selected: Int, updates: Int, onSelect: (Int) -> Unit) {
                     Text(stringResource(label), color = if (i == selected) AppText else AppMuted, fontSize = 15.sp, fontWeight = if (i == selected) FontWeight.Bold else FontWeight.Normal)
                     if (i == 1 && updates > 0) {
                         Spacer(Modifier.width(6.dp))
-                        Text(updates.toString(), color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                        Text(updates.toString(), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 11.sp, fontWeight = FontWeight.Bold,
                             modifier = Modifier.clip(RoundedCornerShape(50)).background(AppAccent).padding(horizontal = 6.dp))
                     }
                 }
@@ -301,7 +301,7 @@ private fun CategoryChips(categories: List<Category>, selected: Category?, onSel
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         (listOf<Category?>(null) + categories).forEach { c ->
             val on = c == selected
-            Text(stringResource(categoryLabel(c)), color = if (on) (if (immersive) Color.White else Color.Black) else AppText, fontSize = 13.sp, maxLines = 1,
+            Text(stringResource(categoryLabel(c)), color = if (on) (if (immersive) Color.White else com.music.spotui.ui.theme.AppOnAccent) else AppText, fontSize = 13.sp, maxLines = 1,
                 modifier = Modifier.clip(RoundedCornerShape(50)).background(if (on) chipOn else chipOff)
                     .clickable { onSelect(if (on) null else c) }.padding(horizontal = 14.dp, vertical = 7.dp))
         }
@@ -328,7 +328,7 @@ private fun RepoHeader(repo: ExtensionStore.Repo, onRefresh: () -> Unit, onRemov
                     Text(repo.catalog?.name ?: runCatching { java.net.URI(repo.url).host }.getOrNull() ?: repo.url, color = AppText, fontSize = 16.sp,
                         fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                     Spacer(Modifier.width(8.dp))
-                    if (official) ExtPill(stringResource(R.string.extensions_official_badge), Color.Black, AppAccent)
+                    if (official) ExtPill(stringResource(R.string.extensions_official_badge), com.music.spotui.ui.theme.AppOnAccent, AppAccent)
                     else ExtPill(stringResource(R.string.extensions_repo_yours), Warning, Warning.copy(alpha = 0.15f))
                 }
                 Text(repo.url, color = AppMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -36,7 +36,7 @@ fun DownloadBadge(status: OfflineStatus?, size: Dp = 16.dp, modifier: Modifier =
             modifier = modifier.size(size).clip(CircleShape).background(Green),
         ) {
             Icon(Icons.Default.ArrowDownward, stringResource(R.string.download_badge_downloaded_content_description),
-                tint = Color.Black, modifier = Modifier.size(size * 0.7f))
+                tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(size * 0.7f))
         }
         OfflineStatus.Queued -> Icon(Icons.Outlined.ArrowCircleDown,
             stringResource(R.string.download_badge_downloading_content_description),

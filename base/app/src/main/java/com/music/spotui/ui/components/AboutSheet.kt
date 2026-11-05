@@ -83,7 +83,7 @@ fun AboutSheet(onDismiss: () -> Unit) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
                     .background(AppAccent).pressable(0.96f) { SupportReminder.open(context) },
-            ) { Text(stringResource(R.string.support_action), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+            ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
             GitHubSponsorButton(Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp))
         }
     }
@@ -120,7 +120,7 @@ fun SupportSheet(onDismiss: () -> Unit) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
                     .background(AppAccent).pressable(0.96f) { onDismiss(); SupportReminder.open(context) },
-            ) { Text(stringResource(R.string.support_action), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+            ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
             GitHubSponsorButton(Modifier.padding(top = 10.dp)) { onDismiss(); SupportReminder.openSponsors(context) }
         }
     }

@@ -159,7 +159,7 @@ private fun LogsDialog(onDismiss: () -> Unit) {
                 }
                 TextButton(onClick = { text?.let { copy(context, it) } }, enabled = text != null,
                     modifier = Modifier.background(AppAccent, RoundedCornerShape(20.dp))) {
-                    Text(stringResource(R.string.beta_logs_copy), color = Color.Black)
+                    Text(stringResource(R.string.beta_logs_copy), color = com.music.spotui.ui.theme.AppOnAccent)
                 }
             }
         }

@@ -163,7 +163,7 @@ fun DownloadsScreen(navController: NavController) {
                                 .clip(CircleShape).background(com.music.spotui.ui.theme.AppAccent),
                         ) {
                             Icon(painterResource(if (playingHere && SongPlayer.isPlaying()) R.drawable.ic_playing else R.drawable.play_svgrepo_com),
-                                stringResource(R.string.content_description_play_button), tint = Color.Black, modifier = Modifier.size(26.dp))
+                                stringResource(R.string.content_description_play_button), tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(26.dp))
                         }
                     }
                 }
@@ -207,12 +207,7 @@ fun DownloadsScreen(navController: NavController) {
                         .pressable(0.97f) { if (status == OfflineStatus.Failed) OfflineDownloader.retry(r.trackId) }
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
-                    GlideImage(
-                        transition = CrossFade,
-                        model = r.coverUrl, contentDescription = null, contentScale = ContentScale.Crop,
-                        loading = placeholder(R.drawable.placeholder), failure = placeholder(R.drawable.placeholder),
-                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)),
-                    )
+                    com.music.spotui.ui.dots.HalftoneCover(r.coverUrl, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                     Column(Modifier.padding(start = 12.dp).weight(1f)) {
                         Text(r.title, color = AppText.copy(alpha = 0.6f), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         val line = when (status) {
@@ -247,13 +242,7 @@ fun DownloadsScreen(navController: NavController) {
                     }.padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     val first = mine.first()
-                    GlideImage(
-                        transition = CrossFade,
-                        model = if (c.type == "album") OfflineStore.coverFile(first) ?: first.coverUrl else first.coverUrl,
-                        contentDescription = null, contentScale = ContentScale.Crop,
-                        loading = placeholder(R.drawable.placeholder), failure = placeholder(R.drawable.downloads_cover),
-                        modifier = Modifier.size(56.dp).clip(RoundedCornerShape(4.dp)),
-                    )
+                    com.music.spotui.ui.dots.HalftoneCover(if (c.type == "album") OfflineStore.coverFile(first)?.path ?: first.coverUrl else first.coverUrl, Modifier.size(56.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                     Column(Modifier.padding(start = 12.dp).weight(1f)) {
                         Text(c.name, color = AppText, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -276,12 +265,7 @@ fun DownloadsScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().pressable(0.97f) { play(i) }.padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
-                    GlideImage(
-                        transition = CrossFade,
-                        model = OfflineStore.coverFile(t) ?: t.coverUrl, contentDescription = null, contentScale = ContentScale.Crop,
-                        loading = placeholder(R.drawable.placeholder), failure = placeholder(R.drawable.downloads_cover),
-                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)),
-                    )
+                    com.music.spotui.ui.dots.HalftoneCover(OfflineStore.coverFile(t)?.path ?: t.coverUrl, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                     Column(Modifier.padding(start = 12.dp).weight(1f)) {
                         Text(t.title, color = if (current) com.music.spotui.ui.theme.AppAccent else AppText, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Row(verticalAlignment = Alignment.CenterVertically) {

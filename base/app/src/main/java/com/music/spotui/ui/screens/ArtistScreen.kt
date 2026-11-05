@@ -261,7 +261,7 @@ private fun ArtistOverviewContent(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.size(18.dp).clip(CircleShape).background(SpotifyGreen),
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = null, tint = Color.Black, modifier = Modifier.size(13.dp))
+                            Icon(Icons.Default.Check, contentDescription = null, tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(13.dp))
                         }
                         Spacer(Modifier.width(6.dp))
                         Text(stringResource(R.string.verified_artist), color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -299,16 +299,10 @@ private fun ArtistOverviewContent(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     overview.popularReleases.firstOrNull()?.let { latest ->
-                        GlideImage(
-                            transition = CrossFade,
-                            model = latest.coverUri,
-                            contentDescription = latest.name,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
+                        com.music.spotui.ui.dots.HalftoneCover(latest.coverUri, Modifier
                                 .size(width = 36.dp, height = 48.dp)
                                 .clip(RoundedCornerShape(4.dp))
-                                .clickable { navController.navigate(albumRoute(latest.name, displayName, latest.spotifyId)) },
-                        )
+                                .clickable { navController.navigate(albumRoute(latest.name, displayName, latest.spotifyId)) }, androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                         Spacer(Modifier.width(16.dp))
                     }
                     Box(modifier = Modifier.pressable(0.96f) {
@@ -372,7 +366,7 @@ private fun ArtistOverviewContent(
                         Icon(
                             painter = painterResource(id = if (isThisArtist && playingNow) R.drawable.ic_playing else R.drawable.play_svgrepo_com),
                             contentDescription = if (isThisArtist && playingNow) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
-                            tint = Color.Black,
+                            tint = com.music.spotui.ui.theme.AppOnAccent,
                             modifier = Modifier.size(26.dp),
                         )
                     }
@@ -611,18 +605,10 @@ private fun PopularTrackRow(
             fontSize = 15.sp,
             modifier = Modifier.width(24.dp),
         )
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
+        com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier
                 .padding(8.dp, 0.dp, 12.dp, 0.dp)
                 .size(48.dp)
-                .clip(RoundedCornerShape(4.dp)),
-            model = song.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+                .clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = song.title, color = titleColor, fontSize = 16.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -681,17 +667,9 @@ private fun ReleaseCard(album: AlbumsModel, onClick: () -> Unit) {
             .padding(4.dp)
             ,
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
+        com.music.spotui.ui.dots.HalftoneCover(album.coverUri, Modifier
                 .size(132.dp)
-                .clip(RoundedCornerShape(6.dp)),
-            model = album.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+                .clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Spacer(Modifier.height(6.dp))
         Text(text = album.name, color = AppText, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         Text(
@@ -713,17 +691,9 @@ private fun ReleaseRow(album: AlbumsModel, onClick: () -> Unit) {
             .padding(16.dp, 6.dp)
             ,
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
+        com.music.spotui.ui.dots.HalftoneCover(album.coverUri, Modifier
                 .size(88.dp)
-                .clip(RoundedCornerShape(4.dp)),
-            model = album.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+                .clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(text = album.name, color = AppText, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
@@ -897,7 +867,7 @@ private fun ReleaseFilterChip(label: String, selected: Boolean, onClick: () -> U
     ) {
         Text(
             text = label,
-            color = if (selected) Color.Black else AppText,
+            color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
@@ -915,17 +885,9 @@ private fun RelatedArtistCard(artist: ArtistsModel, onClick: () -> Unit) {
             .padding(4.dp)
             ,
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
+        com.music.spotui.ui.dots.HalftoneCover(artist.coverUri, Modifier
                 .size(122.dp)
-                .clip(CircleShape),
-            model = artist.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+                .clip(CircleShape), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Spacer(Modifier.height(6.dp))
         Text(text = artist.name, color = AppText, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         Text(text = stringResource(R.string.artist_subtitle), color = AppMuted, fontSize = 11.sp)

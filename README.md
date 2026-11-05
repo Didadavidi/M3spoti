@@ -4,11 +4,12 @@
 [![License: GPL-3.0](https://img.shields.io/github/license/kota-zo/myspoti)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/jXKnGVFnGS)
 
-> This is a personal fork of [Myspoti](https://github.com/kota-zo/myspoti) that replaces its UI
-> with [PixelMusic](https://github.com/ianshulyadav/PixelMusic)'s Material 3 Expressive style —
-> colours taken from the playing album art, a floating pill nav bar, Google Sans Flex titles.
-> Myspoti's features, data and playback layers are unchanged. Not the official Myspoti; for the
-> original, see the link above. Still GPL-3.0 (see [Credits](#credits) and `AGENTS.md`).
+> This is a personal fork of [Myspoti](https://github.com/kota-zo/myspoti) with a new UI: a
+> Material 3 Expressive design built on halftone dot art (every cover printed as two-ink dots or
+> wavy lines, animated while music plays), wide Roboto Flex type, wallpaper colours for the app and
+> album colours for the player, queue and lyrics. Myspoti's features, data and playback layers are
+> unchanged. Not the official Myspoti; for the original, see the link above. Still GPL-3.0 (see
+> [Credits](#credits) and `AGENTS.md`).
 
 **Spotify without ads, on a free account.** Your own Spotify account, playlists and Wrapped, in a native Android app that blocks the ads, with offline downloads through extensions you install.
 
@@ -186,12 +187,12 @@ Every push builds and tests on GitHub Actions. A `vX.Y.Z` tag publishes a stable
 ## Credits
 
 - Based on [Myspoti](https://github.com/kota-zo/myspoti) (GPL-3.0) by kota-zo.
-- The UI is restyled after [PixelMusic](https://github.com/ianshulyadav/PixelMusic) (GPL-3.0) by Ian Shulyadav: the Material 3 Expressive theme, floating pill nav bar, mini player and screen layouts. No PixelMusic code or assets are included; the screens are redrawn to match its look.
+- The halftone design is the fork owner's own. [PixelMusic](https://github.com/ianshulyadav/PixelMusic) (GPL-3.0) by Ian Shulyadav inspired the album-colour pipeline and an earlier version of this UI, and supplied the Roboto Flex font file. No PixelMusic code or assets are included.
 - UI derived from [Spotui](https://github.com/Spotui/Spotui) / [Metrolist](https://github.com/MetrolistGroup/Metrolist) (GPL-3.0); Spotui also gave the DASH-to-FLAC remux.
 - The Immersive look (player, lyrics, queue, glass tab bar and pages) is ported from [BitChord](https://github.com/kushagrasinghx/BitChord) (GPL-3.0-or-later).
 - [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) (GPL-3.0): music videos.
 - Lyrics: [LRCLIB](https://lrclib.net), LyricsPlus, lrc.red, Kugou and NetEase; song meanings: [Genius](https://genius.com).
-- [Material Icons](https://github.com/google/material-design-icons) (Apache 2.0), the [Manrope](https://github.com/googlefonts/manrope) font and [Google Sans Flex](https://fonts.google.com/specimen/Google+Sans+Flex) (SIL OFL 1.1, see `base/licenses/`).
+- [Material Icons](https://github.com/google/material-design-icons) (Apache 2.0), the [Manrope](https://github.com/googlefonts/manrope) and [Roboto Flex](https://github.com/googlefonts/roboto-flex) fonts (SIL OFL 1.1, see `base/licenses/`).
 
 Full notices: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 

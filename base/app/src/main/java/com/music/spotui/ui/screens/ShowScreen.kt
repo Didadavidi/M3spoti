@@ -268,16 +268,9 @@ private fun Header(
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.accessibility_navigate_back), tint = Color.White)
         }
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-            GlideImage(
-                transition = CrossFade,
-                model = cover,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                failure = placeholder(R.drawable.placeholder),
-                modifier = Modifier
+            com.music.spotui.ui.dots.HalftoneCover(cover, Modifier
                     .size(128.dp)
-                    .clip(RoundedCornerShape(6.dp)),
-            )
+                    .clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
             Column(Modifier.weight(1f).padding(start = 16.dp)) {
                 Text(
                     text = show?.name?.takeIf { it.isNotBlank() } ?: fallbackName,
@@ -413,14 +406,7 @@ private fun EpisodeRow(
     val minutes = episodeMinutes(episode.durationMs)
     Column(Modifier.fillMaxWidth().clickable(onClick = onOpen).padding(horizontal = 16.dp, vertical = 10.dp)) {
         Row {
-            GlideImage(
-                transition = CrossFade,
-                model = episode.coverUri,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                failure = placeholder(R.drawable.placeholder),
-                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(4.dp)),
-            )
+            com.music.spotui.ui.dots.HalftoneCover(episode.coverUri, Modifier.size(56.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
             Column(Modifier.weight(1f).padding(start = 12.dp)) {
                 Text(
                     text = episode.title,

@@ -330,7 +330,7 @@ private fun SetupButton(text: String, onClick: () -> Unit, modifier: Modifier = 
     Button(
         onClick = onClick,
         shape = if (immersive) Immersive.Button else ButtonDefaults.shape,
-        colors = ButtonDefaults.buttonColors(containerColor = if (immersive) Color.White else AppAccent, contentColor = Color.Black),
+        colors = ButtonDefaults.buttonColors(containerColor = if (immersive) Color.White else AppAccent, contentColor = com.music.spotui.ui.theme.AppOnAccent),
         modifier = modifier,
     ) {
         Text(text, fontFamily = if (immersive) com.music.spotui.ui.look.ImmersiveSans else null, fontSize = 16.sp,

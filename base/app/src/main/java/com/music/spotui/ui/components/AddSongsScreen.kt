@@ -194,8 +194,7 @@ private fun AddSongRow(song: SongsModel, added: Boolean, onPlay: () -> Unit, onA
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().clickable(onClick = onPlay).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
     ) {
-        GlideImage(model = song.coverUri, contentDescription = null, contentScale = ContentScale.Crop, transition = CrossFade,
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)))
+        com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Column(Modifier.weight(1f).padding(start = 12.dp, end = 8.dp)) {
             Text(song.title, color = AppText, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(verticalAlignment = Alignment.CenterVertically) {

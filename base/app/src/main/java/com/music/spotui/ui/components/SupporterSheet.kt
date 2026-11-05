@@ -55,7 +55,7 @@ import com.music.spotui.ui.theme.AppAccent
 @Composable
 fun SupporterBadge(modifier: Modifier = Modifier) {
     Text(
-        stringResource(R.string.supporter_badge), color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+        stringResource(R.string.supporter_badge), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 11.sp, fontWeight = FontWeight.Bold,
         modifier = modifier.clip(RoundedCornerShape(50)).background(AppAccent).padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }
@@ -119,7 +119,7 @@ fun SupporterSheet(onDismiss: () -> Unit) {
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50)).background(AppAccent)
                             .pressable(0.96f) { SupportReminder.open(context) },
-                    ) { Text(stringResource(R.string.support_action), color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+                    ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
                     GitHubSponsorButton(Modifier.padding(top = 10.dp))
                     Text(stringResource(R.string.supporter_i_supported), color = AppText, fontSize = 15.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)

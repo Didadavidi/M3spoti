@@ -140,8 +140,7 @@ fun NewReleasesScreen(navController: NavController) {
                     }
                     else -> items(list, key = { "$title:${it.id}" }) { t ->
                         Column(Modifier.clickable { navController.navigate(t.route()) }) {
-                            GlideImage(transition = CrossFade, model = t.cover, contentDescription = null, contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(6.dp)))
+                            com.music.spotui.ui.dots.HalftoneCover(t.cover, Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                             Text(t.name, color = AppText, fontSize = 13.sp, fontWeight = FontWeight.Bold, lineHeight = 16.sp, minLines = 2, maxLines = 2,
                                 overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
                             Text(t.detail.ifBlank { t.artists }, color = AppMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -193,8 +192,7 @@ fun EpisodesScreen(navController: NavController) {
                             SongPlayer.playSong(e.url)
                         }.padding(16.dp, 8.dp),
                     ) {
-                        GlideImage(transition = CrossFade, model = e.coverUri, contentDescription = null, contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)))
+                        com.music.spotui.ui.dots.HalftoneCover(e.coverUri, Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                         Column(Modifier.padding(start = 12.dp).weight(1f)) {
                             Text(e.title, color = AppText, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             Text(e.singer + " • " + formatMinutes(e.durationMs / 60_000L), color = Subtle, fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
@@ -229,8 +227,7 @@ fun NewEpisodesScreen(navController: NavController) {
                             navController.navigate(com.music.spotui.ui.navigation.episodeRoute(e.url.removePrefix("episode:"), e.title))
                         }.padding(16.dp, 8.dp),
                     ) {
-                        GlideImage(transition = CrossFade, model = e.coverUri, contentDescription = null, contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)))
+                        com.music.spotui.ui.dots.HalftoneCover(e.coverUri, Modifier.size(56.dp).clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                         Column(Modifier.padding(start = 12.dp).weight(1f)) {
                             Text(e.title, color = AppText, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             Text(e.singer + " • " + e.releaseDate.take(10), color = Subtle, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -272,7 +269,7 @@ fun RecapScreen(navController: NavController) {
                 Row(Modifier.padding(16.dp, 12.dp, 16.dp, 0.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     periods.forEachIndexed { i, (label, _) ->
                         FilterChip(selected = i == period, onClick = { period = i }, label = { Text(stringResource(label)) },
-                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = AppAccent, selectedLabelColor = Color.Black,
+                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = AppAccent, selectedLabelColor = com.music.spotui.ui.theme.AppOnAccent,
                                 labelColor = AppText, containerColor = tone(0xFF2A2A2A)))
                     }
                 }
@@ -299,8 +296,7 @@ fun RecapScreen(navController: NavController) {
                     val r = list[i]
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(16.dp, 6.dp)) {
                         Text("${i + 1}", color = Subtle, fontSize = 16.sp, modifier = Modifier.width(28.dp))
-                        GlideImage(transition = CrossFade, model = r.cover, contentDescription = null, contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)))
+                        com.music.spotui.ui.dots.HalftoneCover(r.cover, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                         Column(Modifier.padding(start = 12.dp).weight(1f)) {
                             Text(r.name, color = AppText, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(listOf(r.subtitle, stringResource(R.string.recap_plays, r.count)).filter { it.isNotBlank() }.joinToString(" • "),

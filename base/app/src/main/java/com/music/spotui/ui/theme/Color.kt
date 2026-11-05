@@ -39,5 +39,12 @@ fun tone(argb: Long): Color {
     }
 }
 
-/** The cover's colour as a page header: darkened toward black, so the title stays readable. */
-fun headerTint(tint: Color, amount: Float): Color = lerp(tint, Color.Black, amount)
+/**
+ * The cover's colour as a page header, so the title on it stays readable in the theme's text
+ * colour: darkened toward black on the dark theme, a pastel of it on the light one.
+ */
+fun headerTint(tint: Color, amount: Float): Color =
+    if (SystemColors.dark) lerp(tint, Color.Black, amount) else lerp(tint, scheme.surface, 0.72f + amount * 0.2f)
+
+/** Text and icons on the accent (buttons, selected chips, badges): readable in light and dark. */
+val AppOnAccent: Color get() = scheme.onPrimary

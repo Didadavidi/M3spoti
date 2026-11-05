@@ -1082,7 +1082,7 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
         Text(stringResource(R.string.playlist_invite_banner), color = AppText, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(end = 12.dp))
         androidx.compose.material3.Button(
             enabled = !joining,
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = SpotifyGreen, contentColor = Color.Black),
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = SpotifyGreen, contentColor = com.music.spotui.ui.theme.AppOnAccent),
             onClick = {
                 joining = true
                 com.music.spotui.data.api.InviteLinks.join(context, offered, p) { ok ->
@@ -1185,8 +1185,7 @@ private fun RecommendedRow(song: SongsModel, isCurrent: Boolean, onPlay: () -> U
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth().clickable(onClick = onPlay).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
     ) {
-        GlideImage(model = song.coverUri, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)))
+        com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Column(Modifier.weight(1f).padding(start = 12.dp, end = 8.dp)) {
             // The song playing is green, as in the playlist above.
             Text(song.title, color = if (isCurrent) SpotifyGreen else AppText, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)

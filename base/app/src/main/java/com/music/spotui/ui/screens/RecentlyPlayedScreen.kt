@@ -234,7 +234,7 @@ private fun Pill(label: String, selected: Boolean, onClick: () -> Unit) {
     ) {
         Text(
             label,
-            color = if (selected) Color.Black else AppText,
+            color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText,
             fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1,
         )
     }

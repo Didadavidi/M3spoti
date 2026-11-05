@@ -135,18 +135,11 @@ fun EpisodeScreen(navController: NavController, episodeId: String, fallbackName:
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.accessibility_navigate_back), tint = Color.White)
                     }
-                    GlideImage(
-                        transition = CrossFade,
-                        model = episode?.coverUri,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        failure = placeholder(R.drawable.placeholder),
-                        modifier = Modifier
+                    com.music.spotui.ui.dots.HalftoneCover(episode?.coverUri, Modifier
                             .fillMaxWidth(0.62f)
                             .aspectRatio(1f)
                             .align(Alignment.CenterHorizontally)
-                            .clip(RoundedCornerShape(6.dp)),
-                    )
+                            .clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                     Spacer(Modifier.height(18.dp))
                     Text(
                         text = episode?.title?.takeIf { it.isNotBlank() } ?: fallbackName,
@@ -166,13 +159,7 @@ fun EpisodeScreen(navController: NavController, episodeId: String, fallbackName:
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                                 .clickable { navController.navigate(showRoute(showId, episode?.singer.orEmpty())) },
                         ) {
-                            GlideImage(
-                                transition = CrossFade,
-                                model = episode?.coverUri,
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.size(22.dp).clip(RoundedCornerShape(3.dp)),
-                            )
+                            com.music.spotui.ui.dots.HalftoneCover(episode?.coverUri, Modifier.size(22.dp).clip(RoundedCornerShape(3.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = episode?.singer.orEmpty(),
@@ -229,11 +216,11 @@ fun EpisodeScreen(navController: NavController, episodeId: String, fallbackName:
                                 com.music.spotui.ui.components.PlayPauseIcon(
                                     playing = playing,
                                     contentDescription = null,
-                                    tint = Color.Black,
+                                    tint = com.music.spotui.ui.theme.AppOnAccent,
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Spacer(Modifier.width(6.dp))
-                                Text(stringResource(if (playing) R.string.notif_action_pause else R.string.episode_play), color = Color.Black, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(if (playing) R.string.notif_action_pause else R.string.episode_play), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -297,7 +284,7 @@ private fun SaveEpisodeButton(saved: Boolean, onClick: () -> Unit) {
                 .background(AppAccent)
                 .pressable(0.9f, onClick = onClick),
         ) {
-            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.episode_unsave), tint = Color.Black, modifier = Modifier.size(17.dp))
+            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.episode_unsave), tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(17.dp))
         }
     } else {
         Icon(

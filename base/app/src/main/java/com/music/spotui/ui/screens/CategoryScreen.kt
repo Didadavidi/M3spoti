@@ -123,18 +123,10 @@ private fun CategoryGrid(entries: List<LibraryEntry>, navController: NavControll
                 }
                     
             ) {
-                GlideImage(
-                    transition = CrossFade,
-                    modifier = Modifier
+                com.music.spotui.ui.dots.HalftoneCover(entry.coverUri, Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .clip(RoundedCornerShape(6.dp)),
-                    model = entry.coverUri,
-                    contentScale = ContentScale.Crop,
-                    failure = placeholder(R.drawable.placeholder),
-                    loading = placeholder(R.drawable.placeholder),
-                    contentDescription = "",
-                )
+                        .clip(RoundedCornerShape(6.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                 Text(
                     text = entry.name,
                     color = AppText,

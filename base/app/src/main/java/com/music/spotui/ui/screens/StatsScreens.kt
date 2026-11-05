@@ -87,7 +87,7 @@ internal val rangeLabels = listOf(
 @Composable
 private fun StatsChip(label: String, selected: Boolean, onClick: () -> Unit) =
     FilterChip(selected = selected, onClick = onClick, label = { Text(label) },
-        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = AppAccent, selectedLabelColor = Color.Black,
+        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = AppAccent, selectedLabelColor = com.music.spotui.ui.theme.AppOnAccent,
             labelColor = AppText, containerColor = tone(0xFF2A2A2A)))
 
 /** The tab switch at the top of the recap: Spotify's ranking of the account, or this phone's own counter. */
@@ -338,8 +338,7 @@ private fun FriendRow(f: FriendActivity, now: Long, navController: NavController
             }
         }
         f.trackImageUrl?.let { cover ->
-            GlideImage(transition = CrossFade, model = spotifyImageUrl(cover.replaceFirst("http://", "https://")), contentDescription = null,
-                contentScale = ContentScale.Crop, modifier = Modifier.padding(start = 10.dp).size(44.dp).clip(RoundedCornerShape(4.dp)))
+            com.music.spotui.ui.dots.HalftoneCover(spotifyImageUrl(cover.replaceFirst("http://", "https://")), Modifier.padding(start = 10.dp).size(44.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         }
     }
 }

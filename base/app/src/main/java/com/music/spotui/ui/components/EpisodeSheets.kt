@@ -121,13 +121,7 @@ fun EpisodeOptionsSheet(
     com.music.spotui.ui.components.LookSheet(onDismissRequest = onDismiss, containerColor = Sheet) {
         Column(Modifier.navigationBarsPadding().padding(bottom = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(20.dp, 4.dp, 20.dp, 16.dp)) {
-                GlideImage(
-                    transition = CrossFade,
-                    model = song.coverUri,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(52.dp).clip(RoundedCornerShape(4.dp)),
-                )
+                com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.size(52.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
                 Column(Modifier.weight(1f).padding(start = 12.dp)) {
                     Text(song.title, color = AppText, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Text(song.singer, color = AppText.copy(alpha = 0.65f), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -280,7 +274,7 @@ fun PodcastSpeedSheet(onDismiss: () -> Unit) {
                     ) {
                         Text(
                             text = speedLabel(speed),
-                            color = if (selected) Color.Black else AppText,
+                            color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                         )
