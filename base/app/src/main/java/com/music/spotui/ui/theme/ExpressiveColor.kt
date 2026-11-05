@@ -57,9 +57,14 @@ object ExpressiveColor {
         if (started) return
         started = true
         scope.launch {
-            snapshotFlow { Graph.currentSongState.coverUri.value }
+            // The cover, and the "Album colours in player" switch: turning it rebuilds at once.
+            var albumColours = ColorPrefs.albumColours
+            snapshotFlow { Graph.currentSongState.coverUri.value to ColorPrefs.albumColours }
                 .distinctUntilChanged()
-                .collect { uri -> onCoverChanged(context.applicationContext, uri, scope) }
+                .collect { (uri, on) ->
+                    if (on != albumColours) { albumColours = on; cache.clear() }
+                    onCoverChanged(context.applicationContext, uri, scope)
+                }
         }
     }
 

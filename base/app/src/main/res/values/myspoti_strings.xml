@@ -707,4 +707,14 @@
     <!-- Queue, new design -->
     <string name="queue_clear">Clear</string>
     <string name="queue_from">From %1$s</string>
+    <!-- Settings, Colours (new design) -->
+    <string name="settings_colours">Colours</string>
+    <string name="settings_album_colours">Album colours in player</string>
+    <string name="settings_album_colours_detail">Now Playing, Queue and Lyrics follow the artwork</string>
+    <string name="settings_system_colours">System colours elsewhere</string>
+    <string name="settings_system_colours_detail">Home, Library and Settings use your wallpaper colours</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
 </resources>
