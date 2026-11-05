@@ -669,4 +669,19 @@
     <string name="equalizer_skip_silence_detail">Silent stretches are skipped (long pauses in an episode, a silence before a hidden track).</string>
     <!-- The new design: the middle tab is Explore (search and browse in one). -->
     <string name="nav_explore">Explore</string>
+    <!-- Home, new design -->
+    <string name="home_keep_listening">Keep listening</string>
+    <string name="home_now_playing">Now playing</string>
+    <string name="home_last_played">Last played</string>
+    <string name="home_jump_back_in">Jump back in</string>
+    <plurals name="home_tracks_left">
+        <item quantity="one">%d track left</item>
+        <item quantity="other">%d tracks left</item>
+    </plurals>
+    <string name="home_mark_finished">Mark %1$s as finished</string>
+    <string name="home_open">Open %1$s</string>
+    <string name="home_show_queue">Show the queue</string>
+    <string name="home_play_mix">Play %1$s</string>
+    <string name="home_pause_mix">Pause %1$s</string>
+    <string name="home_profile">Profile</string>
 </resources>

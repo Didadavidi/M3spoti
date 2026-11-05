@@ -83,7 +83,21 @@ object SystemColors {
     }
 
     fun build(seedArgb: Int, dark: Boolean, oled: Boolean): ColorScheme {
-        val s = SchemeVibrant(Hct.fromInt(seedArgb), dark, 0.0).toComposeColorScheme()
+        val base = SchemeVibrant(Hct.fromInt(seedArgb), dark, 0.0).toComposeColorScheme()
+        // The design's surfaces carry the seed's hue more than Material's (a lavender card on a
+        // lilac page, not a grey one), and its soft fills are a step deeper.
+        val h = Hct.fromInt(base.primary.toArgb()).hue
+        fun hct(c: Double, t: Double) = Color(Hct.from(h, c, t).toInt())
+        val s = if (!dark) base.copy(
+            surface = hct(6.0, 97.0), background = hct(6.0, 97.0), surfaceBright = hct(6.0, 97.0), surfaceDim = hct(8.0, 88.0),
+            surfaceContainerLowest = hct(4.0, 100.0), surfaceContainerLow = hct(8.0, 95.0), surfaceContainer = hct(10.0, 93.0),
+            surfaceContainerHigh = hct(15.0, 90.0), surfaceContainerHighest = hct(18.0, 86.0),
+            primaryContainer = hct(48.0, 80.0), onPrimaryContainer = hct(60.0, 15.0),
+        ) else base.copy(
+            surface = hct(8.0, 6.0), background = hct(8.0, 6.0), surfaceDim = hct(8.0, 6.0), surfaceBright = hct(12.0, 24.0),
+            surfaceContainerLowest = hct(6.0, 4.0), surfaceContainerLow = hct(10.0, 10.0), surfaceContainer = hct(12.0, 12.0),
+            surfaceContainerHigh = hct(14.0, 17.0), surfaceContainerHighest = hct(16.0, 22.0),
+        )
         if (!oled) return s
         return s.copy(
             background = Color.Black, surface = Color.Black, surfaceDim = Color.Black,
@@ -102,10 +116,24 @@ val ColorScheme.card: Color get() = surfaceContainerHigh
 val ColorScheme.cardHigh: Color get() = surfaceContainerHighest
 val ColorScheme.soft: Color get() = primaryContainer
 val ColorScheme.onSoft: Color get() = onPrimaryContainer
-val ColorScheme.coral: Color get() = tertiaryContainer
-val ColorScheme.onCoral: Color get() = onTertiaryContainer
-val ColorScheme.pink: Color get() = secondaryContainer
-val ColorScheme.onPink: Color get() = onSecondaryContainer
+/** Coral: the scheme's hue turned ~100° warm, bright (the design's #FF8A7A next to its purple). */
+val ColorScheme.coral: Color get() = accentOf(this, 100.0, 60.0, 72.0)
+val ColorScheme.onCoral: Color get() = accentOf(this, 100.0, 40.0, 14.0)
+/** Pink: ~60° warm, pastel (the design's #FFB4C8 badges). */
+val ColorScheme.pink: Color get() = accentOf(this, 60.0, 36.0, 82.0)
+val ColorScheme.onPink: Color get() = accentOf(this, 60.0, 50.0, 16.0)
+
+private val accentCache = java.util.concurrent.ConcurrentHashMap<String, Color>()
+
+@SuppressLint("RestrictedApi")
+private fun accentOf(s: ColorScheme, turn: Double, chroma: Double, tone: Double): Color {
+    val argb = s.primary.toArgb()
+    val key = "$argb|$turn|$chroma|$tone"
+    return accentCache.getOrPut(key) {
+        val h = (Hct.fromInt(argb).hue + turn) % 360.0
+        Color(Hct.from(h, chroma, tone).toInt())
+    }
+}
 
 /**
  * The design's deep container (the mini player, the Home hero): the scheme's primary hue at

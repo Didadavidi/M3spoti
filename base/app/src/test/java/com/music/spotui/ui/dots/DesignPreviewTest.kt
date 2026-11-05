@@ -117,4 +117,52 @@ class DesignPreviewTest {
             }
         }
     }
+
+    /** Home in light and dark (system colours from the design's own seed; covers are synthetic). */
+    @Test fun homeLight() = home(dark = false)
+    @Test fun homeDark() = home(dark = true)
+
+    private fun home(dark: Boolean) {
+        assumeTrue(dirs != null)
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        com.music.spotui.di.Graph::class.java.getDeclaredField("app").apply { isAccessible = true }.set(com.music.spotui.di.Graph, app)
+        val st = com.music.spotui.di.Graph.currentSongState
+        val songs = (1..12).map { com.music.spotui.data.entity.SongsModel(it, "Song $it", "Low Tide Radio", "Marlow Vey", "", "spotify:track:$it", spotifyTrackId = "t$it") }
+        st.updateQueue(songs)
+        st.updateSongState("", "Harbor Lights", "Marlow Vey", true, 1, 3, "Low Tide Radio")
+        val mix = com.music.spotui.data.entity.HomeItem.Playlist("Daily Mix 1", "", "Marlow Vey, Juno Park, Ilse Moor and more", "mix1")
+        val others = listOf(
+            com.music.spotui.data.entity.HomeItem.Playlist("Daily Mix 2", "", "Okoro, The Ferns", "mix2"),
+            com.music.spotui.data.entity.HomeItem.Playlist("Daily Mix 3", "", "Ava Lindqvist", "mix3"),
+            com.music.spotui.data.entity.HomeItem.Album("a1", "Night Ferry", "", "Album • Ilse Moor"),
+            com.music.spotui.data.entity.HomeItem.Artist("Juno Park", "", "ar1"),
+        )
+        run {
+            val scheme = com.music.spotui.ui.theme.SystemColors.build(0xFF6B3FD4.toInt(), dark, false)
+            setScheme(scheme, dark)
+            shoot(if (dark) "home-dark" else "home-light") {
+                androidx.compose.material3.MaterialTheme(colorScheme = scheme, typography = com.music.spotui.ui.theme.Typography) {
+                    val nav = androidx.navigation.compose.rememberNavController()
+                    Column(Modifier.background(scheme.surface).size(420.dp, 1500.dp)) {
+                        com.music.spotui.ui.screens.HomeTopBar(nav) {}
+                        com.music.spotui.ui.screens.HomeHero(nav, mix, others)
+                        com.music.spotui.ui.screens.HomeKeepListening(nav, others)
+                        com.music.spotui.ui.screens.HomeShelf(nav, "Made for you", others + mix)
+                    }
+                }
+            }
+        }
+    }
+
+    /** Points SystemColors at [scheme] (its setter is private: the test sets the backing state). */
+    private fun setScheme(scheme: androidx.compose.material3.ColorScheme, dark: Boolean) {
+        val o = com.music.spotui.ui.theme.SystemColors
+        for (name in listOf("scheme\$delegate", "dark\$delegate")) {
+            val f = o.javaClass.getDeclaredField(name)
+            f.isAccessible = true
+            @Suppress("UNCHECKED_CAST")
+            val st = f.get(o) as androidx.compose.runtime.MutableState<Any>
+            st.value = if (name.startsWith("scheme")) scheme else dark
+        }
+    }
 }

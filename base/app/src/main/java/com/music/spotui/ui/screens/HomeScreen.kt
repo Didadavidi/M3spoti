@@ -122,6 +122,7 @@ fun HomeScreen(navController: NavController){
             // so the user can always switch back to "Tout".
             else -> androidx.compose.foundation.layout.Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
                 HomeHeaderRow(navController, homeViewModel.facet.value) { homeViewModel.selectFacet(it) }
+                Spacer(Modifier.height(8.dp))
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     when {
                         home is Response.Loading -> Loader(SkeletonKind.Home)
@@ -143,7 +144,7 @@ fun HomeScreen(navController: NavController){
 }
 
 /** Albums and playlists start loading under the finger (see pressHint). */
-private fun prefetchHomeItem(item: HomeItem) {
+internal fun prefetchHomeItem(item: HomeItem) {
     when (item) {
         is HomeItem.Album -> if (item.id.isNotBlank()) ContextViewModel.prefetch("album", item.id)
         is HomeItem.Playlist ->
@@ -153,7 +154,7 @@ private fun prefetchHomeItem(item: HomeItem) {
     }
 }
 
-private fun onHomeItemClick(navController: NavController, item: HomeItem) {
+internal fun onHomeItemClick(navController: NavController, item: HomeItem) {
     when (item) {
         is HomeItem.Album -> navController.navigate(albumRoute(item.name, item.artists.ifBlank { item.subtitle }, item.id))
         is HomeItem.Artist -> navController.navigate(artistRoute(item.name, item.id))
@@ -214,74 +215,38 @@ fun HomeFeedContent(navController: NavController, feed: HomeFeedModel, facet: St
         }
     }
 
+    // The hero stands for Spotify's first mix; the rest of its shelf rings it as covers.
+    val hero = remember(carousels) { pickHeroMix(carousels) }
+    val page = com.music.spotui.ui.theme.SystemColors.scheme.surface
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = com.music.spotui.ui.components.bottomBarsSpace()),
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(AppBackground.toArgb()))
+            .background(page)
     ) {
-        // Sticky filter row: content scrolls underneath it, like the official app.
-        stickyHeader {
-            // Fade (not a solid band): opaque under the status bar, transparent at the bottom.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(
-                            0f to Color(AppBackground.toArgb()),
-                            0.55f to Color(AppBackground.toArgb()).copy(alpha = 0.85f),
-                            1f to Color.Transparent,
-                        )
-                    )
-                    .statusBarsPadding()
-                    .padding(bottom = 10.dp)
-            ) {
-                Column {
-                    HomeGreeting()
-                    HomeHeaderRow(navController, facet, onFacet)
-                }
+        item(key = "top") {
+            Column(Modifier.statusBarsPadding()) {
+                HomeHeaderRow(navController, facet, onFacet)
             }
         }
-        shortcuts?.let { tiles ->
-            item {
-                HomeShortcutGrid(navController, tiles)
-            }
+        hero?.let { (mix, others) -> item(key = "hero") { HomeHero(navController, mix, others) } }
+        item(key = "keep") { HomeKeepListening(navController, shortcuts.orEmpty()) }
+        shortcuts?.takeIf { it.isNotEmpty() }?.let { tiles ->
+            item(key = "shortcuts") { HomeShelf(navController, stringResource(R.string.home_jump_back_in), tiles) }
         }
         items(carousels.size, key = { carouselKeys[it] }) { i ->
-            HomeFeedSection(navController, carousels[i])
+            HomeShelf(navController, carousels[i].title, carousels[i].items)
         }
         // Sections from extensions (home.sections), after Spotify's own, each under its extension's name.
         item { com.music.spotui.extensions.ExtensionBlocks(app.myspoti.extensions.Hook.HOME, app.myspoti.extensions.Surface.HOME, "{}") }
     }
 }
 
-/** A big Flex greeting, PixelMusic-style: time of day plus the account's first name. */
-@Composable
-private fun HomeGreeting() {
-    val hour = remember { LocalTime.now().hour }
-    val greeting = stringResource(
-        when {
-            hour < 5 -> R.string.home_greeting_night
-            hour < 12 -> R.string.home_greeting_morning
-            hour < 18 -> R.string.home_greeting_afternoon
-            else -> R.string.home_greeting_evening
-        },
-    )
-    val name = com.music.spotui.data.api.ProfileCache.name?.trim()?.substringBefore(' ')
-    Text(
-        text = if (name.isNullOrBlank()) greeting else "$greeting, $name",
-        style = MaterialTheme.typography.headlineSmall,
-        color = AppText,
-        maxLines = 1,
-        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
-    )
-}
-
-/** Spotify-style top row: profile avatar on the left (opens Settings, like the
- *  official app's profile drawer), then the filter pills — one single row. */
-@OptIn(ExperimentalGlideComposeApi::class)
+/**
+ * The top of Home: the design's bar (profile, Search, Settings), then Spotify's music/podcast
+ * filters when podcasts are on (the design has none, and with podcasts off there is nothing to filter).
+ */
 @Composable
 private fun HomeHeaderRow(navController: NavController, facet: String, onFacet: (String) -> Unit) {
     var showProfile by remember { androidx.compose.runtime.mutableStateOf(false) }
@@ -290,133 +255,36 @@ private fun HomeHeaderRow(navController: NavController, facet: String, onFacet: 
     androidx.compose.runtime.LaunchedEffect(Unit) {
         com.music.spotui.data.api.ProfileCache.ensure(context)
     }
-    Row(
+    HomeTopBar(navController) { showProfile = true }
+    if (com.music.spotui.data.api.Features.PODCASTS) Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        // The row's 10 dp above and below sit in each child instead, so the avatar's tap area
-        // takes them in (and the margin up to the separator) without moving anything.
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(androidx.compose.foundation.rememberScrollState())
+            .padding(start = 16.dp, end = 16.dp, bottom = 10.dp),
     ) {
-        val avatarUrl = com.music.spotui.data.api.ProfileCache.imageUrl
-        val initial = com.music.spotui.data.api.ProfileCache.name
-            ?.trim()?.firstOrNull()?.uppercase() ?: "•"
-        Box(
-            modifier = Modifier
-                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { showProfile = true }
-                .padding(start = 16.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
-        ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(34.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE8622C)),
-        ) {
-            if (avatarUrl != null) {
-                GlideImage(
-                    transition = CrossFade,
-                    model = avatarUrl,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = stringResource(R.string.recently_played_user_profile),
-                    modifier = Modifier.size(34.dp),
-                )
-            } else {
-                Text(
-                    text = initial,
-                    color = Color.Black,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        }
-        }
-        // B31: a separator between the profile and the options, reported missing from this
-        // header (the sheets already carry one).
-        Box(
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .size(width = 1.dp, height = 22.dp)
-                .background(tone(0xFF3E3E3E)),
-        )
-        // Scrolls sideways if the pills don't fit, like Spotify's.
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .weight(1f)
-                .horizontalScroll(androidx.compose.foundation.rememberScrollState())
-                .padding(start = 12.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
-        ) {
-            // Spotify's home chips; tapping the selected one goes back to "Tout".
-            HomePill(stringResource(R.string.filter_chip_all_label), selected = facet.isEmpty()) { onFacet("") }
-            HomePill(stringResource(R.string.recents_content_filter_music), selected = facet == "music-chip") { onFacet("music-chip") }
-            if (com.music.spotui.data.api.Features.PODCASTS) {
-                HomePill(stringResource(R.string.ad_category_title_podcasts), selected = facet == "podcasts-chip") { onFacet("podcasts-chip") }
-                HomePill(stringResource(R.string.audiobooks_title), selected = facet == "audiobooks-chip") { onFacet("audiobooks-chip") }
-            }
-        }
+        // Spotify's home chips; tapping the selected one goes back to "All".
+        HomePill(stringResource(R.string.filter_chip_all_label), selected = facet.isEmpty()) { onFacet("") }
+        HomePill(stringResource(R.string.recents_content_filter_music), selected = facet == "music-chip") { onFacet("music-chip") }
+        HomePill(stringResource(R.string.ad_category_title_podcasts), selected = facet == "podcasts-chip") { onFacet("podcasts-chip") }
+        HomePill(stringResource(R.string.audiobooks_title), selected = facet == "audiobooks-chip") { onFacet("audiobooks-chip") }
     }
 }
 
 @Composable
 private fun HomePill(label: String, selected: Boolean = false, onClick: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(if (selected) com.music.spotui.ui.theme.AppAccent else tone(0xFF2A2A2A))
+            .height(40.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (selected) s.primary else s.surfaceContainerHigh)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 18.dp),
     ) {
-        Text(text = label, color = if (selected) Color.Black else AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-private fun HomeShortcutGrid(navController: NavController, items: List<HomeItem>) {
-    // Large windows: more tiles per row (two on phones).
-    val cols = com.music.spotui.ui.components.windowSize().columns(2, 280.dp)
-    Column(modifier = Modifier.padding(8.dp, 4.dp)) {
-        items.chunked(cols).forEach { rowItems ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp, 4.dp),
-            ) {
-                rowItems.forEach { item ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.pressable(0.96f, onPressHint = { prefetchHomeItem(item) }) { onHomeItemClick(navController, item) }
-                            .weight(1f)
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
-                            ,
-                    ) {
-                        GlideImage(
-                            transition = CrossFade,
-                            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop,
-                            model = item.imageUrl,
-                            loading = placeholder(R.drawable.placeholder),
-                            failure = placeholder(R.drawable.placeholder),
-                            contentDescription = "",
-                        )
-                        Text(
-                            text = item.name,
-                            color = AppText,
-                            fontSize = 12.sp,
-                            lineHeight = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(8.dp, 4.dp),
-                        )
-                    }
-                }
-                repeat(cols - rowItems.size) { Spacer(modifier = Modifier.weight(1f)) }
-            }
-        }
+        Text(text = label, color = if (selected) s.onPrimary else s.onSurface, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
     }
 }
 
@@ -427,79 +295,6 @@ private fun uniqueKeys(raw: List<String>): List<String> {
         val n = (seen[k] ?: 0) + 1
         seen[k] = n
         if (n == 1) k else "$k#$n"
-    }
-}
-
-@Composable
-private fun HomeFeedSection(navController: NavController, section: HomeSection) {
-    Text(
-        text = section.title,
-        style = MaterialTheme.typography.titleLarge,
-        color = AppText,
-        maxLines = 2,
-        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-        modifier = Modifier.padding(16.dp, 20.dp, 16.dp, 4.dp),
-    )
-    val keys = remember(section) { uniqueKeys(section.items.map { it.name + "|" + it.imageUrl }) }
-    LazyRow(contentPadding = androidx.compose.foundation.layout.PaddingValues(10.dp, 0.dp)) {
-        items(section.items.size, key = { keys[it] }) { i ->
-            HomeFeedCard(section.items[i]) { onHomeItemClick(navController, section.items[i]) }
-        }
-    }
-}
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-private fun HomeFeedCard(item: HomeItem, onClick: () -> Unit) {
-    val isArtist = item is HomeItem.Artist
-    val subtitle = when (item) {
-        is HomeItem.Album -> item.subtitle
-        is HomeItem.Playlist -> item.subtitle
-        is HomeItem.Artist -> stringResource(R.string.artist_subtitle)
-        is HomeItem.Show -> item.subtitle
-    }
-    Column(
-        horizontalAlignment = if (isArtist) Alignment.CenterHorizontally else Alignment.Start,
-        modifier = Modifier.pressable(0.96f, onPressHint = { prefetchHomeItem(item) }) { onClick() }
-            .width(150.dp)
-            .padding(6.dp)
-            ,
-    ) {
-        Box {
-            GlideImage(
-                transition = CrossFade,
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(if (isArtist) CircleShape else RoundedCornerShape(18.dp)),
-                contentScale = ContentScale.Crop,
-                model = item.imageUrl,
-                loading = placeholder(R.drawable.placeholder),
-                failure = placeholder(R.drawable.placeholder),
-                contentDescription = "",
-            )
-            if (item is HomeItem.Show && !item.isEpisode) {
-                com.music.spotui.ui.components.NewEpisodeDot(item.id, AppAccent, Modifier.align(Alignment.TopEnd).padding(8.dp))
-            }
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = item.name,
-            color = AppText,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            textAlign = if (isArtist) TextAlign.Center else TextAlign.Start,
-        )
-        // Always two lines tall: a long artist mix no longer makes one card taller than its row.
-        Text(
-            text = subtitle,
-            color = AppMuted,
-            fontSize = 11.sp,
-            lineHeight = 14.sp,
-            minLines = 2,
-            maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            textAlign = if (isArtist) TextAlign.Center else TextAlign.Start,
-        )
     }
 }
 
