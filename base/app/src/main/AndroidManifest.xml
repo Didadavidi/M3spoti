@@ -129,6 +129,19 @@
                     android:scheme="https"
                     android:host="spoti.fi" />
             </intent-filter>
+            <!-- Spotify's own app links (spotify:track:…, spotify:playlist:…, spotify:user:…). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="spotify" />
+            </intent-filter>
+            <!-- "Share" to the app: a text with a Spotify link in it. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
 
         <!-- Supporter icons (SupportReminder.setIcon), off with the supporter perks: re-enabling

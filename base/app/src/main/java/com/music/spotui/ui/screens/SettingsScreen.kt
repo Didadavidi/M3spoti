@@ -7,6 +7,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.outlined.Album
+import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import com.music.spotui.ui.theme.coral
@@ -114,6 +115,7 @@ fun SettingsScreen(navController: NavController) {
             // A source picked in the player for this session leads too ([com.music.spotui.extensions.SessionSource]).
             val session by com.music.spotui.extensions.Extensions.sessionSource.collectAsStateWithLifecycle()
             if (tab == 0) {
+            LinksRow()
             Section(R.string.settings_section_playback)
             // An extension above Spotify: its settings, and Spotify's quality (kept, still used for what Spotify plays) leaves.
             val ext = remember(registry, session) { com.music.spotui.extensions.Extensions.sectionPlacement(app.myspoti.extensions.SettingSection.PLAYBACK) }
@@ -428,6 +430,27 @@ internal fun SettingsBadge(icon: androidx.compose.ui.graphics.vector.ImageVector
     val (bg, fg) = colors[index % colors.size]
     Box(Modifier.size(44.dp).clip(com.music.spotui.ui.dots.DotShapes.badges[index % 4]).background(bg), contentAlignment = Alignment.Center) {
         Icon(icon, null, tint = fg, modifier = Modifier.size(22.dp))
+    }
+}
+
+/** Settings, Links: whether Android opens Spotify links here; a tap goes to where that is allowed. */
+@Composable
+private fun LinksRow() {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val on = com.music.spotui.data.preferences.rememberLinksEnabled()
+    Section(R.string.settings_links)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().settingsCard()
+            .clickable { com.music.spotui.data.preferences.LinkHandling.openSettings(ctx) }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+    ) {
+        SettingsBadge(androidx.compose.material.icons.Icons.Outlined.Link, 3)
+        Column(Modifier.weight(1f).padding(start = 14.dp, end = 10.dp)) {
+            Text(stringResource(R.string.links_title), color = AppText, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(stringResource(if (on) R.string.links_on else R.string.links_off), color = AppMuted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+        DesignSwitch(on)
     }
 }
 

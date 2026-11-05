@@ -516,28 +516,9 @@ class MainActivity : AppCompatActivity() {
     private fun handle(intent: Intent?) {
         intent ?: return
         when (intent.action) {
-            Intent.ACTION_VIEW -> {
-                val link = intent.data?.toString() ?: return
-                // A collaborative-playlist invitation (…?pt=) or a spotify.link short link: kept / resolved there.
-                if (com.music.spotui.data.api.InviteLinks.handle(link)) return
-                val uri = spotifyUri(link) ?: return
-                // A shared list (or artist, podcast) opens on its page, as in the official app
-                // (reported: a shared playlist started playing and was never shown). A song or an
-                // episode still plays.
-                if (uri.split(':').getOrNull(1) in setOf("playlist", "album", "artist", "show")) {
-                    com.music.spotui.data.api.InviteLinks.page.value = uri
-                    return
-                }
-                // A song, with an audio-source extension on: asked there first, like any play.
-                if (uri.startsWith("spotify:track:") && com.music.spotui.extensions.Extensions.hasAudioSource()) {
-                    com.music.spotui.di.SongPlayer.playSong(uri)
-                    return
-                }
-                lifecycleScope.launch {
-                    MyspotiRuntime.api.ready.first { it }
-                    runCatching { MyspotiRuntime.api.player.play(uri) }
-                }
-            }
+            // A tapped link (https://open.spotify.com/…, spotify:…) or text shared with "Share".
+            Intent.ACTION_VIEW -> openLink(intent.data?.toString() ?: return, shared = false)
+            Intent.ACTION_SEND -> openLink(intent.getStringExtra(Intent.EXTRA_TEXT) ?: intent.getStringExtra(Intent.EXTRA_SUBJECT) ?: return, shared = true)
             android.provider.MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH -> {
                 val query = intent.getStringExtra(android.app.SearchManager.QUERY).orEmpty()
                 if (query.isNotBlank()) lifecycleScope.launch { AutoBrowser.playFromSearch(query) }
@@ -545,10 +526,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** `https://open.spotify.com/intl-fr/album/{id}?si=…` -> `spotify:album:{id}`. */
-    private fun spotifyUri(link: String): String? {
-        val m = Regex("(?:open|www|play)\\.spotify\\.com/(?:intl-[a-z-]+/)?(track|album|playlist|artist|show|episode)/([A-Za-z0-9]{22})").find(link) ?: return null
-        return "spotify:${m.groupValues[1]}:${m.groupValues[2]}"
+    /**
+     * A Spotify link, or a text with one in it: a collaborative-playlist invitation, a Blend or a
+     * short link is taken by InviteLinks; anything else opens as SpotifyLinks.open says (a list on
+     * its page, a song on its album's page, playing). Shared text with no Spotify link says so.
+     */
+    private fun openLink(text: String, shared: Boolean) {
+        if (com.music.spotui.data.api.InviteLinks.handle(text)) return
+        val uri = com.music.spotui.data.api.SpotifyLinks.uriIn(text)
+        if (uri == null) {
+            if (shared) android.widget.Toast.makeText(this, R.string.link_not_spotify, android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        com.music.spotui.data.api.SpotifyLinks.open(uri)
     }
 }
 

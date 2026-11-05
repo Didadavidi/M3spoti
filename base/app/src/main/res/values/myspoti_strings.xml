@@ -717,4 +717,15 @@
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+    <!-- Spotify links -->
+    <string name="link_not_spotify">No Spotify link in what was shared</string>
+    <string name="links_title">Open Spotify links</string>
+    <string name="links_on">On: Spotify links open in this app</string>
+    <string name="links_off">Off: Spotify links open in the browser. Tap to turn on.</string>
+    <string name="links_prompt_title">Open Spotify links here?</string>
+    <string name="links_prompt_text">Android only opens Spotify links in this app once you allow it. On the next screen, tap \"Add link\" and tick all the Spotify addresses.</string>
+    <string name="links_prompt_allow">Allow</string>
+    <string name="links_prompt_later">Later</string>
+    <string name="links_prompt_never">Don\'t ask again</string>
+    <string name="settings_links">Links</string>
 </resources>

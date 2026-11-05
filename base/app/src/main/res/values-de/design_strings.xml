@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- German texts of the new design and of Spotify link handling (English in values/myspoti_strings.xml). -->
+<resources>
+    <string name="nav_explore">Entdecken</string>
+
+    <string name="home_keep_listening">Weiterhören</string>
+    <string name="home_now_playing">Läuft gerade</string>
+    <string name="home_last_played">Zuletzt gehört</string>
+    <string name="home_jump_back_in">Wieder reinhören</string>
+    <plurals name="home_tracks_left">
+        <item quantity="one">Noch %d Titel</item>
+        <item quantity="other">Noch %d Titel</item>
+    </plurals>
+    <string name="home_mark_finished">%1$s als fertig markieren</string>
+    <string name="home_open">%1$s öffnen</string>
+    <string name="home_show_queue">Warteschlange anzeigen</string>
+    <string name="home_play_mix">%1$s abspielen</string>
+    <string name="home_pause_mix">%1$s pausieren</string>
+    <string name="home_profile">Profil</string>
+
+    <string name="library_shuffle_all">Alles zufällig</string>
+    <string name="library_all">Alles</string>
+    <plurals name="library_count">
+        <item quantity="one">%d Eintrag</item>
+        <item quantity="other">%d Einträge</item>
+    </plurals>
+
+    <string name="track_number">Titel %1$d</string>
+    <string name="time_left">noch %1$s</string>
+    <string name="context_save">Speichern</string>
+    <string name="context_saved">Gespeichert</string>
+
+    <string name="player_of_total">von %1$s</string>
+    <string name="player_close">Player schließen</string>
+    <string name="player_devices">Geräte</string>
+    <string name="player_video">Video</string>
+    <string name="player_sleep">Schlafen</string>
+    <string name="player_like">Zu Lieblingssongs hinzufügen</string>
+    <string name="player_unlike">Aus Lieblingssongs entfernen</string>
+
+    <string name="queue_clear">Leeren</string>
+    <string name="queue_from">Aus %1$s</string>
+
+    <string name="settings_colours">Farben</string>
+    <string name="settings_album_colours">Albumfarben im Player</string>
+    <string name="settings_album_colours_detail">Wiedergabe, Warteschlange und Songtexte folgen dem Cover</string>
+    <string name="settings_system_colours">Systemfarben überall sonst</string>
+    <string name="settings_system_colours_detail">Start, Bibliothek und Einstellungen nutzen deine Hintergrundbild-Farben</string>
+    <string name="settings_theme">Design</string>
+    <string name="settings_theme_system">Systemstandard</string>
+    <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_dark">Dunkel</string>
+
+    <string name="link_not_spotify">Im Geteilten ist kein Spotify-Link</string>
+    <string name="settings_links">Links</string>
+    <string name="links_title">Spotify-Links öffnen</string>
+    <string name="links_on">An: Spotify-Links öffnen sich in dieser App</string>
+    <string name="links_off">Aus: Spotify-Links öffnen sich im Browser. Zum Einschalten tippen.</string>
+    <string name="links_prompt_title">Spotify-Links hier öffnen?</string>
+    <string name="links_prompt_text">Android öffnet Spotify-Links erst in dieser App, wenn du es erlaubst. Tippe auf der nächsten Seite auf \"Link hinzufügen\" und hake alle Spotify-Adressen an.</string>
+    <string name="links_prompt_allow">Erlauben</string>
+    <string name="links_prompt_later">Später</string>
+    <string name="links_prompt_never">Nicht mehr fragen</string>
+</resources>

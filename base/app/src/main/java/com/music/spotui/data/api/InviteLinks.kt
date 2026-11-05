@@ -72,12 +72,8 @@ object InviteLinks {
             val invite = parse(target)
             if (invite != null) { pending.value = invite; return@launch }
             BLEND.find(target)?.let { blend.value = BlendLink(it.groupValues[1]); return@launch }
-            // Not an invitation: the item the short link leads to is played, as a direct link is.
-            val m = Regex("""spotify\.com/(?:intl-[a-z-]+/)?(track|album|playlist|artist|show|episode)/([A-Za-z0-9]{22})""").find(target) ?: return@launch
-            runCatching {
-                MyspotiRuntime.api.ready.first { it }
-                MyspotiRuntime.api.player.play("spotify:${m.groupValues[1]}:${m.groupValues[2]}")
-            }
+            // Not an invitation: the item the short link leads to opens as a direct link does.
+            SpotifyLinks.uriIn(target)?.let { uri -> kotlinx.coroutines.withContext(Dispatchers.Main) { SpotifyLinks.open(uri) } }
         }
         return true
     }
