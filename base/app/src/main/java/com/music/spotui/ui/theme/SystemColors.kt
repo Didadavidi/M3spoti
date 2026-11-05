@@ -106,3 +106,17 @@ val ColorScheme.coral: Color get() = tertiaryContainer
 val ColorScheme.onCoral: Color get() = onTertiaryContainer
 val ColorScheme.pink: Color get() = secondaryContainer
 val ColorScheme.onPink: Color get() = onSecondaryContainer
+
+/**
+ * The design's deep container (the mini player, the Home hero): the scheme's primary hue at
+ * almost-black on a light page; on a dark page the highest surface, so it still stands out.
+ */
+@SuppressLint("RestrictedApi")
+fun ColorScheme.deep(): Color =
+    if (surface.luminanceIsLight()) Color(Hct.from(Hct.fromInt(primary.toArgb()).hue, 40.0, 10.0).toInt())
+    else surfaceContainerHighest
+
+/** Text and icons on [deep]. */
+fun ColorScheme.onDeep(): Color = if (surface.luminanceIsLight()) inverseOnSurface else onSurface
+
+private fun Color.luminanceIsLight() = (0.2126f * red + 0.7152f * green + 0.0722f * blue) > 0.5f

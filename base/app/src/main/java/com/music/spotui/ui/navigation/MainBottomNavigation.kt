@@ -42,6 +42,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.music.spotui.ui.components.MiniPlayer
@@ -109,83 +111,46 @@ fun MainBottomNavigation(navController: NavHostController, bottomBarState: Mutab
         enter = androidx.compose.animation.EnterTransition.None,
         exit = androidx.compose.animation.ExitTransition.None,
         content = {
-            Box(
-                contentAlignment = Alignment.BottomCenter,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    // Settings, Display: the fade over the list (the default), or solid black (from #15).
-                    .then(
-                        if (com.music.spotui.data.preferences.SolidNavBar.on) Modifier.background(AppShade)
-                        // Like the official bar: clear above the mini player, near-opaque by the tab icons,
-                        // so covers scrolling underneath never compete with the labels.
-                        else Modifier.background(Brush.verticalGradient(
-                            0f to Color.Transparent,
-                            0.3f to AppShade.copy(alpha = 0.7f),
-                            0.6f to AppShade.copy(alpha = 0.92f),
-                            1f to AppShade,
-                        ))
-                    )
-            ) {
-
-                Column(modifier = Modifier.navigationBarsPadding()) {
-
-                    AnimatedVisibility(
-                        visible = hasTrack,
-                        enter = slideInVertically(initialOffsetY = { it }),
-                        exit = slideOutVertically(targetOffsetY = { it }),
-                        content = {
-                            // Large windows: a capped, centred capsule, not a bar across a desktop window.
-                            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                                Box(if (com.music.spotui.ui.components.windowSize().large) Modifier.widthIn(max = com.music.spotui.ui.components.WindowSize.MaxMiniPlayerWidth) else Modifier) {
-                                    MiniPlayer(navController)
-                                }
-                            }
-                        }
-                    )
-
-
-
-                    Spacer(modifier = Modifier.height(4.dp))
-                    val tabs = rememberTabNavigation(navController)
-                    // Large windows: the tabs are in the rail at the side (MainNavigationRail).
-                    if (!com.music.spotui.ui.components.windowSize().large) {
-                    // A floating pill, inset from both edges and clear of the gradient below it,
-                    // icon-only with a highlight behind the selected tab (M3 Expressive).
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 32.dp, vertical = 8.dp)
-                                .widthIn(max = 360.dp)
-                                .fillMaxWidth()
-                                .height(NavBarHeight)
-                                // PixelMusic's own nav bar (verified by running it): a moderate rounded
-                                // rect, not a full stadium capsule — reserve the 50% radius for small
-                                // pills (search field, chips) per its shape scale.
-                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(28.dp))
-                                // AppShade (surfaceContainerLowest) was nearly invisible against the dark
-                                // page behind it; a higher container tier reads clearly as a floating card.
-                                .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            TabItems.forEach { item ->
-                                NavBarTab(
-                                    iconRes = item.icon,
-                                    label = if (item.labelRes != 0) stringResource(item.labelRes) else item.label,
-                                    selected = tabs.selected == item.route,
-                                    onClick = { tabs.open(item) },
-                                )
+            val scheme = com.music.spotui.ui.theme.SystemColors.scheme
+            val large = com.music.spotui.ui.components.windowSize().large
+            Column(Modifier.fillMaxWidth().then(if (large) Modifier.navigationBarsPadding() else Modifier)) {
+                AnimatedVisibility(
+                    visible = hasTrack,
+                    enter = slideInVertically(initialOffsetY = { it }),
+                    exit = slideOutVertically(targetOffsetY = { it }),
+                    content = {
+                        // Large windows: a capped, centred card, not a bar across a desktop window.
+                        Box(Modifier.fillMaxWidth().padding(bottom = 8.dp), contentAlignment = Alignment.Center) {
+                            Box(if (large) Modifier.widthIn(max = com.music.spotui.ui.components.WindowSize.MaxMiniPlayerWidth) else Modifier) {
+                                MiniPlayer(navController)
                             }
                         }
                     }
+                )
+                val tabs = rememberTabNavigation(navController)
+                // Large windows: the tabs are in the rail at the side (MainNavigationRail).
+                if (!large) {
+                    // The design's bar: a solid band in the card colour down to the screen's edge,
+                    // three tabs, the selected one's icon on a filled pill above a bold label.
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(scheme.surfaceContainerHigh)
+                            .navigationBarsPadding()
+                            .height(NavBarHeight)
+                            .padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        TabItems.forEach { item ->
+                            NavBarTab(
+                                item = item,
+                                selected = tabs.selected == item.route,
+                                onClick = { tabs.open(item) },
+                            )
+                        }
                     }
-
-
-
                 }
-
-
-
             }
         }
     )
@@ -244,84 +209,78 @@ fun MainNavigationRail(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .width(88.dp)
-            .background(AppShade)
+            .width(96.dp)
+            .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         TabItems.forEach { item ->
-            Row(Modifier.fillMaxWidth().height(72.dp)) {
-                NavBarTab(
-                    iconRes = item.icon,
-                    label = if (item.labelRes != 0) stringResource(item.labelRes) else item.label,
-                    selected = tabs.selected == item.route,
-                    onClick = { tabs.open(item) },
-                )
-            }
+            NavBarTab(item = item, selected = tabs.selected == item.route, onClick = { tabs.open(item) })
         }
     }
 }
 
-private val NavBarHeight = 64.dp
-private val NavIconSize = 24.dp
-private val NavIndicatorSize = 48.dp
+private val NavBarHeight = 72.dp
+
+private fun Routes.designIcon() = when (this) {
+    Routes.Home -> com.music.spotui.ui.dots.DesignIcons.Home
+    Routes.Search -> com.music.spotui.ui.dots.DesignIcons.Explore
+    else -> com.music.spotui.ui.dots.DesignIcons.Library
+}
+
+@Composable
+private fun Routes.designLabel(): String = when (this) {
+    Routes.Search -> stringResource(R.string.nav_explore)
+    else -> if (labelRes != 0) stringResource(labelRes) else label
+}
 
 /**
- * One tab of the floating pill: an icon alone (the pill is too compact for a label), the
- * selected one lifted onto a rounded highlight that scales and fades in (M3 Expressive).
+ * One tab: the icon on a 66×34 pill (filled with the primary colour when selected, springing in),
+ * the label under it, black-bold when selected.
  */
 @Composable
-private fun RowScope.NavBarTab(
-    iconRes: Int,
-    label: String,
+private fun NavBarTab(
+    item: Routes,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val tint = if (selected) com.music.spotui.ui.theme.ExpressiveColor.scheme.onSecondaryContainer else AppMuted
-    Box(
+    val scheme = com.music.spotui.ui.theme.SystemColors.scheme
+    val label = item.designLabel()
+    val pill by androidx.compose.animation.animateColorAsState(if (selected) scheme.primary else Color.Transparent, label = "navPill")
+    val pillWidth by androidx.compose.animation.core.animateDpAsState(if (selected) 66.dp else 40.dp, com.music.spotui.ui.dots.bouncy(), label = "navPillWidth")
+    Column(
         modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight()
-            // No ripple: the highlight pill itself is the feedback.
+            .width(96.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClickLabel = label,
                 onClick = onClick,
             ),
-        contentAlignment = Alignment.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(
-            modifier = Modifier.size(NavIndicatorSize),
+            Modifier.size(pillWidth, 34.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(17.dp)).background(pill),
             contentAlignment = Alignment.Center,
         ) {
-            androidx.compose.animation.AnimatedVisibility(
-                visible = selected,
-                enter = androidx.compose.animation.scaleIn(
-                    animationSpec = androidx.compose.animation.core.spring(
-                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow,
-                    ),
-                ) + androidx.compose.animation.fadeIn(),
-                exit = androidx.compose.animation.scaleOut() + androidx.compose.animation.fadeOut(),
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                        .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.secondaryContainer),
-                )
-            }
             Icon(
-                painter = painterResource(id = iconRes),
-                // The pill has no visible label; TalkBack still gets one via onClickLabel above.
-                contentDescription = label,
-                tint = tint,
-                modifier = Modifier.size(NavIconSize),
+                imageVector = item.designIcon(),
+                contentDescription = null,
+                tint = if (selected) scheme.onPrimary else scheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp),
             )
         }
+        androidx.compose.material3.Text(
+            text = label,
+            color = if (selected) scheme.onSurface else scheme.onSurfaceVariant,
+            fontSize = 12.sp,
+            lineHeight = 14.sp,
+            fontWeight = if (selected) FontWeight.Black else FontWeight.SemiBold,
+            maxLines = 1,
+        )
     }
 }

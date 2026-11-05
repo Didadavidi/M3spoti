@@ -1,6 +1,10 @@
 package com.music.spotui.ui.components
 
 import com.music.spotui.ui.theme.tone
+import com.music.spotui.ui.theme.soft
+import com.music.spotui.ui.theme.onSoft
+import com.music.spotui.ui.theme.deep
+import com.music.spotui.ui.theme.onDeep
 import com.music.spotui.ui.theme.AppText
 
 import androidx.compose.ui.res.stringResource
@@ -264,21 +268,24 @@ fun MiniPlayer(navController: NavHostController) {
         }
     }
 
+    // The design's mini player: a deep card in the system colours, the cover printed in
+    // halftone in a circle, a springy play button and the wavy progress along the bottom.
+    val scheme = com.music.spotui.ui.theme.SystemColors.scheme
+    val deep = scheme.deep()
+    val onDeep = scheme.onDeep()
+    val remote = SongPlayer.activeDevice.value
     Column(
-        modifier = Modifier.pressable(0.96f) { com.music.spotui.ui.navigation.PlayerSheet.show() }
+        modifier = Modifier.pressable(0.97f) { com.music.spotui.ui.navigation.PlayerSheet.show() }
             // Where the full player rises from and sinks back to.
             .onGloballyPositioned { com.music.spotui.ui.navigation.PlayerSheet.miniTop = it.boundsInWindow().top }
-            .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(22.dp))
-            // Drawn: the colour follows a crossfade frame by frame without recomposing the card.
-            .drawBehind { drawRect(blend?.let { androidx.compose.ui.graphics.lerp(outgoingTint, animatedTint, it.progress()) } ?: animatedTint) }
+            .padding(horizontal = 10.dp)
+            .clip(RoundedCornerShape(28.dp))
+            .background(deep)
+            .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp)
-                .padding(start = 8.dp, end = 12.dp)
+            modifier = Modifier.fillMaxWidth().height(56.dp),
         ) {
             androidx.compose.foundation.pager.HorizontalPager(
                 state = pager,
@@ -288,11 +295,8 @@ fun MiniPlayer(navController: NavHostController) {
                 // T4: during an ad break the page publishes no track, so the song before it
                 // would sit in the mini player; an explicit ad state is shown instead.
                 val adPlaying = com.music.spotui.di.SongPlayer.adPlaying
-                // A song change that is no swipe (the end of a song, a skip from the player or
-                // the notification) crossfades instead of swapping in one frame. After a swipe the
-                // new song is already on screen (the page swiped to): no fade then, or the page
-                // jumped back to would show the old song fading out.
-                // Through a crossfade the blend below is the transition: no fade of its own.
+                // A song change that is no swipe crossfades instead of swapping in one frame
+                // (after a swipe the new song is already on screen: no fade then).
                 val shown = MiniSong(s?.title ?: outgoing?.title ?: songTitle, s?.singer ?: outgoing?.artist ?: songSinger, s?.coverUri ?: songCoverUri)
                 androidx.compose.animation.Crossfade(
                     targetState = shown,
@@ -300,141 +304,112 @@ fun MiniPlayer(navController: NavHostController) {
                     label = "miniSong",
                 ) { m ->
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp))) {
-                        GlideImage(
-                            transition = CrossFade,
-                            modifier = Modifier.size(40.dp),
-                            model = m.cover,
-                            contentScale = ContentScale.Crop,
-                            failure = placeholder(R.drawable.placeholder),
-                            loading = placeholder(R.drawable.placeholder),
-                            contentDescription = ""
-                        )
-                        // The outgoing cover dissolving into this one, laid over it.
-                        if (page == 1) SongBlendCover(blend, Modifier.size(40.dp))
-                    }
-                    val remote = SongPlayer.activeDevice.value
+                    com.music.spotui.ui.dots.HalftoneCover(
+                        url = m.cover,
+                        modifier = Modifier.size(56.dp),
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        cells = 16f,
+                        placeholder = onDeep.copy(alpha = 0.15f),
+                    )
                     Column(modifier = Modifier.padding(start = 12.dp, end = 8.dp)
                         .graphicsLayer { alpha = if (page == 1) blend?.wordsAlpha() ?: 1f else 1f }) {
-                        if (remote == null) {
-                            Text(text = if (adPlaying) stringResource(R.string.ad_playing) else (m.title), color = Color.White, fontSize = 13.sp, lineHeight = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                            if (!adPlaying) Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                // The artist yields the width: the output's name stays whole.
-                                Text(
-                                    text = m.singer, color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp, lineHeight = 15.sp,
-                                    maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                    modifier = Modifier.weight(1f, fill = false),
-                                )
-                                // The extension the sound comes from, discreet, as the output's name.
-                                playingExtensionName()?.let { name ->
-                                    Text(
-                                        text = " · $name", color = Color.White.copy(alpha = 0.55f), fontSize = 11.sp,
-                                        maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                        modifier = Modifier.widthIn(max = 110.dp),
-                                    )
-                                }
-                                if (routeLabel != null) {
-                                    Icon(
-                                        imageVector = if (route.kind == AudioRoute.Kind.BLUETOOTH) Icons.Filled.BluetoothAudio else Icons.Filled.Headphones,
-                                        contentDescription = stringResource(R.string.playing_on),
-                                        tint = Color.White.copy(alpha = 0.55f),
-                                        modifier = Modifier.padding(start = 6.dp).size(12.dp),
-                                    )
-                                    Text(
-                                        text = routeLabel, color = Color.White.copy(alpha = 0.55f), fontSize = 11.sp,
-                                        maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(start = 3.dp).widthIn(max = 110.dp),
-                                    )
-                                }
-                            }
-                        } else {
-                            // Playing on another device: "Title • Artist", then the device in green.
+                        Text(
+                            text = if (adPlaying) stringResource(R.string.ad_playing) else m.title,
+                            color = onDeep, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                        )
+                        if (!adPlaying) Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            // The artist yields the width: the output's name stays whole.
                             Text(
-                                text = androidx.compose.ui.text.buildAnnotatedString {
-                                    pushStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold, color = Color.White))
-                                    append(m.title)
-                                    pop()
-                                    pushStyle(androidx.compose.ui.text.SpanStyle(color = Color.White.copy(alpha = 0.7f)))
-                                    append(" • " + (m.singer))
-                                    pop()
-                                },
-                                fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, softWrap = false,
-                                // Scrolls once per track then rests: an endless marquee in the always-visible
-                                // mini player made the whole app redraw at 120 Hz without pause.
-                                modifier = Modifier.basicMarquee(iterations = 1, initialDelayMillis = 2_000),
+                                text = m.singer, color = onDeep.copy(alpha = 0.75f), fontSize = 14.sp, lineHeight = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false),
                             )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null, tint = com.music.spotui.ui.theme.AppAccent, modifier = Modifier.size(14.dp))
-                                Text(remote.name, color = com.music.spotui.ui.theme.AppAccent, fontSize = 12.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.padding(start = 4.dp))
+                            // The extension the sound comes from, discreet, as the output's name.
+                            playingExtensionName()?.let { name ->
+                                Text(
+                                    text = " · $name", color = onDeep.copy(alpha = 0.55f), fontSize = 11.sp,
+                                    maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                    modifier = Modifier.widthIn(max = 110.dp),
+                                )
+                            }
+                            // Where the sound goes: the Connect device, or the headphones.
+                            val where = remote?.name ?: routeLabel
+                            if (where != null) {
+                                Icon(
+                                    imageVector = when {
+                                        remote != null -> Icons.AutoMirrored.Filled.VolumeUp
+                                        route.kind == AudioRoute.Kind.BLUETOOTH -> Icons.Filled.BluetoothAudio
+                                        else -> Icons.Filled.Headphones
+                                    },
+                                    contentDescription = stringResource(R.string.playing_on),
+                                    tint = scheme.soft,
+                                    modifier = Modifier.padding(start = 6.dp).size(12.dp),
+                                )
+                                Text(
+                                    text = where, color = scheme.soft, fontSize = 11.sp,
+                                    maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(start = 3.dp).widthIn(max = 110.dp),
+                                )
                             }
                         }
                     }
                 }
                 }
             }
-            Icon(
-                painter = painterResource(id = if (SongPlayer.activeDevice.value != null) R.drawable.ic_devices else R.drawable.ic_devices),
-                tint = if (SongPlayer.activeDevice.value != null) com.music.spotui.ui.theme.AppAccent else Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.pressable(0.96f) { showDevices = true }
-                    .size(22.dp)
-                    ,
-                contentDescription = stringResource(R.string.mr_user_route_category_name),
-            )
-            Spacer(modifier = Modifier.width(20.dp))
-            if (SongPlayer.canLike) com.music.spotui.ui.screens.AddButton(song = { com.music.spotui.ui.screens.nowPlayingSong(vm) }, liked = liked, size = 24.dp) { vm.updateLikeState(true) }
-            Spacer(modifier = Modifier.width(20.dp))
-            // A tonal pill, like the full player's: primary behind, onPrimary icon, both from
-            // the Expressive theme (the playing cover's scheme), independent of the card's own
-            // per-track crossfade tint above.
-            val playPauseCorner by androidx.compose.animation.core.animateDpAsState(
-                targetValue = if (songPlayingState) 12.dp else 18.dp,
-                label = "miniPlayPauseCorner",
-            )
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(playPauseCorner))
-                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.primary)
-                    .pressable(0.96f) {
-                        if (songPlayingState) {
-                            SongPlayer.pause()
-                            vm.updateSongState(songCoverUri, songTitle, songSinger, false, songId, vm.currentSongIndex.value, vm.currentSongAlbum.value)
-                        } else {
-                            SongPlayer.play()
-                            vm.updateSongState(songCoverUri, songTitle, songSinger, true, songId, vm.currentSongIndex.value, vm.currentSongAlbum.value)
-                        }
-                    },
-                contentAlignment = Alignment.Center,
-            ) {
-                com.music.spotui.ui.components.PlayPauseIcon(
-                    playing = songPlayingState,
-                    contentDescription = if (songPlayingState) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
-                    tint = com.music.spotui.ui.theme.ExpressiveColor.scheme.onPrimary,
-                    modifier = Modifier.size(20.dp),
+            // Connect: shown while another device plays, so it can be changed from here.
+            if (remote != null) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_devices),
+                    tint = scheme.soft,
+                    modifier = Modifier.pressable(0.96f) { showDevices = true }.padding(8.dp).size(22.dp),
+                    contentDescription = stringResource(R.string.mr_user_route_category_name),
                 )
             }
+            com.music.spotui.ui.dots.MorphPlayButton(
+                playing = songPlayingState,
+                onClick = {
+                    if (songPlayingState) {
+                        SongPlayer.pause()
+                        vm.updateSongState(songCoverUri, songTitle, songSinger, false, songId, vm.currentSongIndex.value, vm.currentSongAlbum.value)
+                    } else {
+                        SongPlayer.play()
+                        vm.updateSongState(songCoverUri, songTitle, songSinger, true, songId, vm.currentSongIndex.value, vm.currentSongAlbum.value)
+                    }
+                },
+                container = scheme.soft,
+                content = scheme.onSoft,
+                width = 56.dp,
+                playingRadius = 18.dp,
+                pausedRadius = 28.dp,
+                iconSize = 26.dp,
+                label = if (songPlayingState) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
+            )
+            Icon(
+                imageVector = com.music.spotui.ui.dots.DesignIcons.Next,
+                contentDescription = stringResource(R.string.widget_next),
+                tint = onDeep,
+                modifier = Modifier.pressable(0.9f) { SongPlayer.next() }.padding(10.dp).size(24.dp),
+            )
         }
-        // Thin progress line at the bottom of the card.
-        // Drawn every frame from the engine clock: smooth at the display refresh rate.
-        androidx.compose.foundation.Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .height(2.dp)
-                .clip(RoundedCornerShape(1.dp))
-                // Its own layer: a tick re-records these two rectangles, not the whole card.
-                .graphicsLayer()
-        ) {
-            frame.value
-            val o = blend?.takeIf { it.outgoingWords }
-            val dur = (o?.song?.durationMs ?: SongPlayer.getDuration()).toFloat()
-            val p = if (dur > 0f) ((o?.positionMs() ?: SongPlayer.getCurrentPosition()) / dur).coerceIn(0f, 1f) else 0f
-            drawRect(Color.White.copy(alpha = 0.25f))
-            drawRect(Color.White, size = size.copy(width = size.width * p))
-        }
+        // The wavy progress: rolls while music plays, a straight track for what is left.
+        com.music.spotui.ui.dots.WavyProgress(
+            progress = {
+                frame.value
+                val o = blend?.takeIf { it.outgoingWords }
+                val dur = (o?.song?.durationMs ?: SongPlayer.getDuration()).toFloat()
+                if (dur > 0f) ((o?.positionMs() ?: SongPlayer.getCurrentPosition()) / dur) else 0f
+            },
+            color = scheme.soft,
+            track = androidx.compose.ui.graphics.lerp(deep, scheme.soft, 0.28f),
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp).height(10.dp),
+            amplitude = 2.5.dp,
+            wavelength = 8.dp,
+            stroke = 3.dp,
+        )
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

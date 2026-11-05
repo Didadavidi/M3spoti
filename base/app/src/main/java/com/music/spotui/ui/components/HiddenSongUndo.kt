@@ -41,7 +41,7 @@ fun HiddenSongUndo() {
         if (chosen == SnackbarResult.ActionPerformed) HiddenSongs.show(context, song.id)
         HiddenSongs.justHidden = null
     }
-    Box(Modifier.fillMaxSize().navigationBarsPadding().padding(bottom = 140.dp, start = 8.dp, end = 8.dp), contentAlignment = Alignment.BottomCenter) {
+    Box(Modifier.fillMaxSize().navigationBarsPadding().padding(bottom = 184.dp, start = 8.dp, end = 8.dp), contentAlignment = Alignment.BottomCenter) {
         SnackbarHost(host) { data ->
             Snackbar(snackbarData = data, containerColor = tone(0xFF282828), contentColor = AppText, actionContentColor = AppAccent)
         }
