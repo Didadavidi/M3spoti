@@ -102,6 +102,17 @@ android {
             if (!beta) proguardFiles("proguard-strip-logs.pro")
         }
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                (findProperty("designPreview") as String?)?.let { v -> it.systemProperty("designPreview", v) }
+                // Where Robolectric downloads its Android jars (a Maven Central mirror, when Central is unreachable).
+                (findProperty("robolectricRepo") as String?)?.let { v -> it.systemProperty("robolectric.dependency.repo.url", v) }
+                it.maxHeapSize = "2g"
+            }
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -119,6 +130,12 @@ dependencies {
     testImplementation("org.json:json:20240303")
     // A real XML pull parser in unit tests (the TTML lyrics parser; the tests skip themselves without it).
     testImplementation("net.sf.kxml:kxml2:2.3.0")
+    // Design previews: composables rendered to PNG on the JVM (./gradlew :app:testDebugUnitTest
+    // --tests '*DesignPreviewTest*' -PdesignPreview=<covers dir>:<out dir>); skipped otherwise.
+    testImplementation("org.robolectric:robolectric:4.17")
+    testImplementation(platform(libs.compose.bom))
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     implementation(libs.androidx.core.ktx)
