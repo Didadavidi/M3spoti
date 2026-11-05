@@ -153,7 +153,7 @@ object OrientationPref {
 }
 
 /** Library layout: false = rows (default), true = Spotify-style 3-column grid. */
-fun isLibraryGridView(c: Context): Boolean = prefs(c).getBoolean(KEY_LIBRARY_GRID, false)
+fun isLibraryGridView(c: Context): Boolean = prefs(c).getBoolean(KEY_LIBRARY_GRID, true)
 fun setLibraryGridView(c: Context, v: Boolean) = prefs(c).edit().putBoolean(KEY_LIBRARY_GRID, v).apply()
 
 /**

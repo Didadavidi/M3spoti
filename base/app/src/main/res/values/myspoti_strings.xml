@@ -684,4 +684,11 @@
     <string name="home_play_mix">Play %1$s</string>
     <string name="home_pause_mix">Pause %1$s</string>
     <string name="home_profile">Profile</string>
+    <!-- Library, new design -->
+    <string name="library_shuffle_all">Shuffle all</string>
+    <string name="library_all">Everything</string>
+    <plurals name="library_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
 </resources>
