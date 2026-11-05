@@ -462,12 +462,12 @@ private fun SearchFilterChips(selected: SearchFilter, onSelect: (SearchFilter) -
             val on = f == selected
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.height(32.dp).clip(RoundedCornerShape(16.dp))
-                    .background(if (on) com.music.spotui.ui.theme.AppAccent else tone(0xFF2A2A2A))
+                modifier = Modifier.height(42.dp).clip(RoundedCornerShape(16.dp))
+                    .background(if (on) com.music.spotui.ui.theme.SystemColors.scheme.primary else com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
                     .pressable(0.96f) { onSelect(if (on && f != SearchFilter.Top) SearchFilter.Top else f) }
-                    .padding(horizontal = 14.dp),
+                    .padding(horizontal = 18.dp),
             ) {
-                Text(stringResource(f.label), color = if (on) Color.Black else AppText, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(f.label), color = if (on) com.music.spotui.ui.theme.SystemColors.scheme.onPrimary else AppText, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
             }
         }
     }
@@ -521,28 +521,15 @@ fun RecentItemRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.pressable(0.96f) { onClick() }
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(10.dp, 8.dp),
+            .padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp),
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(if (item.type == "artist") 100.dp else 6.dp)),
-            model = item.image,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+        com.music.spotui.ui.dots.HalftoneCover(item.image, Modifier.size(56.dp), if (item.type == "artist") androidx.compose.foundation.shape.CircleShape else RoundedCornerShape(18.dp), cells = 14f)
         Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 10.dp, end = 8.dp),
         ) {
-            Text(text = item.name, color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = item.name, color = AppText, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             val subtitle = when (item.type) {
                 "song" -> stringResource(R.string.assisted_curation_search_song) + " • ${item.singer}"
                 "artist" -> stringResource(R.string.artist_subtitle)
@@ -551,7 +538,7 @@ fun RecentItemRow(
                 "playlist" -> stringResource(R.string.assisted_curation_search_playlist) + (if (item.singer.isNotBlank()) " • ${item.singer}" else "")
                 else -> ""
             }
-            Text(text = subtitle, color = AppMuted, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = subtitle, color = AppMuted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
         Icon(
             imageVector = Icons.Default.Close,
@@ -583,7 +570,7 @@ fun SearchSongRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp, 8.dp)
+            .padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp)
             // A mouse's right click opens the same menu as the long press (DeX, tablets).
             .secondaryClick(onLongClick)
             .combinedClickable(
@@ -613,20 +600,9 @@ fun SearchSongRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f).padding(end = 8.dp),
         ) {
-            GlideImage(
-                transition = CrossFade,
-                modifier = Modifier
-                    .padding(0.dp, 0.dp, 10.dp, 0.dp)
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(6.dp)),
-                model = song.coverUri,
-                contentScale = ContentScale.Crop,
-                failure = placeholder(R.drawable.placeholder),
-                loading = placeholder(R.drawable.placeholder),
-                contentDescription = "",
-            )
+            com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.padding(end = 12.dp).size(56.dp), RoundedCornerShape(18.dp), cells = 14f)
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = song.title, color = currentPlayingIndicatorColor, fontSize = 16.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                Text(text = song.title, color = currentPlayingIndicatorColor, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                 androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
                     if (song.explicit) { com.music.spotui.ui.screens.ExplicitBadge(); androidx.compose.foundation.layout.Spacer(Modifier.width(6.dp)) }
                     Text(text = stringResource(R.string.assisted_curation_search_song) + " • ${song.singer}", color = AppMuted, fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
@@ -646,9 +622,8 @@ fun SearchSectionHeader(title: String) {
     Text(
         text = title,
         color = AppText,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(16.dp, 18.dp, 16.dp, 4.dp),
+        style = MaterialTheme.typography.headlineSmall,
+        modifier = Modifier.padding(20.dp, 20.dp, 20.dp, 8.dp),
     )
 }
 
@@ -659,26 +634,14 @@ fun SearchShowRow(show: com.music.spotui.data.entity.PodcastModel, onClick: () -
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.pressable(0.96f) { onClick() }
             .fillMaxWidth()
-            .padding(16.dp, 8.dp)
-            ,
+            .padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp),
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
-                .padding(0.dp, 0.dp, 10.dp, 0.dp)
-                .size(48.dp)
-                .clip(RoundedCornerShape(6.dp)),
-            model = show.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+        com.music.spotui.ui.dots.HalftoneCover(show.coverUri, Modifier.padding(end = 12.dp).size(56.dp), RoundedCornerShape(18.dp), cells = 14f)
         Column {
-            Text(text = show.name, color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = show.name, color = AppText, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             Text(
                 text = stringResource(R.string.album_type_podcast) + (if (show.publisher.isNotBlank()) " • ${show.publisher}" else ""),
-                color = AppMuted, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                color = AppMuted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
         }
     }
@@ -691,24 +654,12 @@ fun SearchArtistRow(artist: com.music.spotui.data.entity.ArtistsModel, onClick: 
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.pressable(0.96f) { onClick() }
             .fillMaxWidth()
-            .padding(16.dp, 8.dp)
-            ,
+            .padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp),
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
-                .padding(0.dp, 0.dp, 10.dp, 0.dp)
-                .size(48.dp)
-                .clip(RoundedCornerShape(100.dp)),
-            model = artist.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+        com.music.spotui.ui.dots.HalftoneCover(artist.coverUri, Modifier.padding(end = 12.dp).size(56.dp), androidx.compose.foundation.shape.CircleShape, cells = 14f)
         Column {
-            Text(text = artist.name, color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-            Text(text = stringResource(R.string.artist_subtitle), color = AppMuted, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text(text = artist.name, color = AppText, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = stringResource(R.string.artist_subtitle), color = AppMuted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -720,24 +671,12 @@ fun SearchAlbumRow(album: com.music.spotui.data.entity.AlbumsModel, onClick: () 
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.pressable(0.96f) { onClick() }
             .fillMaxWidth()
-            .padding(16.dp, 8.dp)
-            ,
+            .padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp),
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier
-                .padding(0.dp, 0.dp, 10.dp, 0.dp)
-                .size(48.dp)
-                .clip(RoundedCornerShape(6.dp)),
-            model = album.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+        com.music.spotui.ui.dots.HalftoneCover(album.coverUri, Modifier.padding(end = 12.dp).size(56.dp), RoundedCornerShape(18.dp), cells = 14f)
         Column {
-            Text(text = album.name, color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-            Text(text = stringResource(R.string.album) + " • ${album.artists}", color = AppMuted, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = album.name, color = AppText, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = stringResource(R.string.album) + " • ${album.artists}", color = AppMuted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }
@@ -747,22 +686,14 @@ fun SearchAlbumRow(album: com.music.spotui.data.entity.AlbumsModel, onClick: () 
 fun SearchPlaylistRow(playlist: com.music.spotui.data.entity.LibraryEntry, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.pressable(0.96f) { onClick() }.fillMaxWidth().padding(16.dp, 8.dp),
+        modifier = Modifier.pressable(0.96f) { onClick() }.fillMaxWidth().padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp),
     ) {
-        GlideImage(
-            transition = CrossFade,
-            modifier = Modifier.padding(0.dp, 0.dp, 10.dp, 0.dp).size(48.dp).clip(RoundedCornerShape(6.dp)),
-            model = playlist.coverUri,
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.placeholder),
-            loading = placeholder(R.drawable.placeholder),
-            contentDescription = "",
-        )
+        com.music.spotui.ui.dots.HalftoneCover(playlist.coverUri, Modifier.padding(end = 12.dp).size(56.dp), RoundedCornerShape(18.dp), cells = 14f)
         Column {
-            Text(text = playlist.name, color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(text = playlist.name, color = AppText, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             Text(text = stringResource(R.string.assisted_curation_search_playlist) +
                 (if (playlist.subtitle.isNotBlank()) " • ${playlist.subtitle}" else ""),
-                color = AppMuted, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                color = AppMuted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }
@@ -788,9 +719,9 @@ fun BrowseAllSection(onCategoryClick: (genre: String, title: String) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.browse_all),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.headlineSmall,
             color = AppText,
-            modifier = Modifier.padding(16.dp, 12.dp, 16.dp, 8.dp),
+            modifier = Modifier.padding(20.dp, 16.dp, 20.dp, 10.dp),
         )
         // Large windows: more tiles per row (two on phones).
         val cols = com.music.spotui.ui.components.windowSize().columns(2, 220.dp)
@@ -820,14 +751,15 @@ private fun BrowseCategoryTile(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    // Tonal: the category's own colour, blended into a surface tone rather than shown
-    // at full saturation, so the grid reads as part of the Expressive scheme.
-    val base = tone(0xFF2A2A2A)
-    val tonal = remember(color, base) { androidx.compose.ui.graphics.lerp(color, base, 0.55f) }
+    // The category's own colour pulled toward the card colour (so the grid sits in the
+    // wallpaper's palette), its artwork printed in halftone in a cookie, tilted, at the corner.
+    val scheme = com.music.spotui.ui.theme.SystemColors.scheme
+    val base = scheme.surfaceContainerHigh
+    val tonal = remember(color, base) { androidx.compose.ui.graphics.lerp(color, base, if (com.music.spotui.ui.theme.SystemColors.dark) 0.55f else 0.62f) }
     Box(
         modifier = modifier
-            .height(96.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .height(112.dp)
+            .clip(RoundedCornerShape(28.dp))
             .background(tonal)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -835,26 +767,19 @@ private fun BrowseCategoryTile(
             ) { onClick() },
     ) {
         if (cover.isNotBlank()) {
-            GlideImage(
-                transition = CrossFade,
-                model = cover,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(64.dp)
-                    .offset(x = 16.dp, y = 10.dp)
-                    .rotate(25f)
-                    .clip(RoundedCornerShape(4.dp)),
+            com.music.spotui.ui.dots.HalftoneCover(
+                cover,
+                Modifier.align(Alignment.BottomEnd).offset(x = 14.dp, y = 14.dp).rotate(18f).size(76.dp),
+                com.music.spotui.ui.dots.DotShapes.cookie(),
+                cells = 14f,
             )
         }
         Text(
             text = name,
-            color = AppText,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            color = scheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
             maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(16.dp).padding(end = 40.dp),
         )
     }
 }
@@ -865,9 +790,9 @@ fun SearchTopBar() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(20.dp, 14.dp, 20.dp, 6.dp)
     ) {
-        Text(text = stringResource(R.string.navigationbar_musicappitems_search_title), style = MaterialTheme.typography.headlineSmall, color = AppText)
+        Text(text = stringResource(R.string.nav_explore), style = MaterialTheme.typography.displayMedium, color = AppText)
         //Icon(imageVector = Icons.Default.Person, contentDescription = "", tint = Color.White)
     }
 
@@ -888,15 +813,16 @@ fun SearchStickyBar(
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
-            .clip(RoundedCornerShape(50))
-            .height(55.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .padding(16.dp, 0.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(28.dp))
+            .height(56.dp)
+            .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
+            .padding(18.dp, 0.dp)
     ){
         Icon(
-            painterResource(id = R.drawable.ic_search_big),
+            com.music.spotui.ui.dots.DesignIcons.Search,
             tint = AppMuted,
+            modifier = Modifier.size(22.dp),
             contentDescription = "")
 
         TextField(
