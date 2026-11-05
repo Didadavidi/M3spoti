@@ -165,4 +165,24 @@ class DesignPreviewTest {
             st.value = if (name.startsWith("scheme")) scheme else dark
         }
     }
+
+    /** Now Playing in an orange cover's album colours (cover synthetic). */
+    @Test
+    fun player() {
+        assumeTrue(dirs != null)
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        com.music.spotui.di.Graph::class.java.getDeclaredField("app").apply { isAccessible = true }.set(com.music.spotui.di.Graph, app)
+        val st = com.music.spotui.di.Graph.currentSongState
+        st.updateSongState("", "Harbor Lights", "Marlow Vey", true, 1, 0, "Low Tide Radio")
+        val album = com.music.spotui.ui.theme.ExpressiveColor.albumScheme(0xFFFF6A2C.toInt())
+        val o = com.music.spotui.ui.theme.ExpressiveColor
+        val f = o.javaClass.getDeclaredField("scheme\$delegate"); f.isAccessible = true
+        @Suppress("UNCHECKED_CAST") (f.get(o) as androidx.compose.runtime.MutableState<Any>).value = album
+        shoot("player") {
+            androidx.compose.material3.MaterialTheme(typography = com.music.spotui.ui.theme.Typography) {
+                val nav = androidx.navigation.compose.rememberNavController()
+                Box(Modifier.size(420.dp, 900.dp)) { com.music.spotui.ui.screens.PlayerScreen(nav) }
+            }
+        }
+    }
 }

@@ -152,7 +152,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalGlideComposeApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun PlayerScreen(navController: NavController) {
+fun ClassicPlayerScreen(navController: NavController) {
     val playerViewModel : PlayerViewModel = viewModel()
     val songTitle = playerViewModel.currentSongTitle.value
     val songSinger = playerViewModel.currentSongSinger.value
@@ -851,7 +851,7 @@ private fun ImmersiveStrip(
 
 /** The clip filling the screen, landscape while it shows; back or the exit button leaves. */
 @Composable
-private fun VideoFullscreen() {
+internal fun VideoFullscreen() {
     val activity = LocalContext.current as? android.app.Activity
     androidx.compose.runtime.DisposableEffect(activity) {
         val before = activity?.requestedOrientation
@@ -881,11 +881,11 @@ private fun VideoFullscreen() {
 
 /** B26: the list the music plays from — the page's own label, else the name the app knows
  *  (the list the play started from), else the album's name. */
-private fun contextDisplayName(np: SongPlayer.NowPlaying, fallbackName: String): String =
+internal fun contextDisplayName(np: SongPlayer.NowPlaying, fallbackName: String): String =
     np.contextName.ifBlank { SongPlayer.knownContextName(np.contextUri) }.ifBlank { fallbackName }
 
 /** The list name both the header and the queue sheet show (B26). */
-private fun playerContextName(playerViewModel: PlayerViewModel): String =
+internal fun playerContextName(playerViewModel: PlayerViewModel): String =
     contextDisplayName(SongPlayer.nowPlaying.value, playerViewModel.currentSongAlbum.value)
 
 /** "Lecture à partir de <type>" + context name, or the queue (like the official app). */
@@ -906,17 +906,17 @@ private fun playingFromLabels(np: SongPlayer.NowPlaying, fallbackName: String): 
 }
 
 /** Spotify's uri of the user's Liked Songs: spotify:collection:tracks, or the older spotify:user:<name>:collection (by one artist: ...:artist:<id>). */
-private val LIKED_CONTEXT = Regex("spotify:(collection(:tracks)?|user:[^:]+:collection(:artist:[^:]+)?)")
+internal val LIKED_CONTEXT = Regex("spotify:(collection(:tracks)?|user:[^:]+:collection(:artist:[^:]+)?)")
 
 /** Only Liked Songs itself, not another collection (episodes) nor a radio that mentions one. */
-private fun isLikedContext(uri: String) = LIKED_CONTEXT.matches(uri)
+internal fun isLikedContext(uri: String) = LIKED_CONTEXT.matches(uri)
 
 /**
  * Route of the page the music is playing from (playlist, album, artist, liked); null when there
  * is none to open. A radio (spotify:station:...) has no page of its own: it never falls back to
  * Liked Songs.
  */
-private fun contextRoute(np: SongPlayer.NowPlaying): String? {
+internal fun contextRoute(np: SongPlayer.NowPlaying): String? {
     val parts = np.contextUri.split(":")
     val id = parts.getOrNull(2).orEmpty()
     // B26: opening that page again must carry the name the header shows.

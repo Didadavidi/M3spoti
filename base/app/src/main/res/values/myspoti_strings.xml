@@ -696,4 +696,12 @@
     <string name="time_left">%1$s left</string>
     <string name="context_save">Save</string>
     <string name="context_saved">Saved</string>
+    <!-- Now Playing, new design -->
+    <string name="player_of_total">of %1$s</string>
+    <string name="player_close">Close the player</string>
+    <string name="player_devices">Devices</string>
+    <string name="player_video">Video</string>
+    <string name="player_sleep">Sleep</string>
+    <string name="player_like">Add to Liked Songs</string>
+    <string name="player_unlike">Remove from Liked Songs</string>
 </resources>
