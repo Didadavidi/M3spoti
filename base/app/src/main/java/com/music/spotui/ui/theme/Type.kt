@@ -4,56 +4,64 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import app.myspoti.engine.R
 
 /**
- * UI typeface: Manrope (SIL Open Font License 1.1, licenses/Manrope-OFL.txt), a free
- * geometric sans close to the official app's look. One variable font file, each weight
- * picked through its "wght" axis (200 to 800: the heaviest cut asks for 900 and gets 800).
- * It has Latin, Cyrillic and Greek glyphs. The Figtree it replaced had no Cyrillic, so Android
- * drew those letters with the system font and a Russian or Ukrainian interface jumped between
- * two typefaces (issue #62).
+ * The one typeface: Roboto Flex (SIL Open Font License 1.1, licenses/RobotoFlex-OFL.txt), one
+ * variable file with Latin, Cyrillic and Greek (issue #62: every script in one face). The design
+ * leans on its width axis: headings are set wide and black, body text at normal width.
+ *
+ * Compose matches a FontFamily on weight and style only, so each width is its own family, every
+ * weight of it a fixed point on the "wght"/"wdth"/"opsz" axes of the same file.
  */
 @OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
-private fun sans(weight: Int) = Font(
-    R.font.app_sans,
+private fun flex(weight: Int, width: Float, opticalSize: Float) = Font(
+    R.font.roboto_flex,
     weight = FontWeight(weight),
-    variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
-        androidx.compose.ui.text.font.FontVariation.weight(weight),
+    variationSettings = FontVariation.Settings(
+        FontVariation.weight(weight),
+        FontVariation.width(width),
+        FontVariation.Setting("opsz", opticalSize),
     ),
 )
 
-val AppSans = FontFamily(sans(400), sans(500), sans(600), sans(700), sans(800), sans(900))
+private val weights = listOf(400, 500, 600, 700, 800, 900)
+private fun family(width: Float, opticalSize: Float) = FontFamily(weights.map { flex(it, width, opticalSize) })
 
-// Kept as an alias so existing references (Theme.kt etc.) don't break.
+/** Body text, labels, buttons: normal width. */
+val AppSans = family(width = 100f, opticalSize = 14f)
+/** Card and row titles ("Night Ferry", track names): a little wide. */
+val FlexTitle = family(width = 125f, opticalSize = 24f)
+/** Screen titles and section headers ("Albums", "Keep listening"): wide. */
+val FlexDisplay = family(width = 140f, opticalSize = 48f)
+/** The biggest words ("Your Mix", the player's title): the widest cut. */
+val FlexWide = family(width = 151f, opticalSize = 96f)
+/** Big numbers (the player's elapsed time): tall and narrow. */
+val FlexCondensed = family(width = 25f, opticalSize = 96f)
+
+// Kept as aliases so existing references don't break.
+val AppSansTitle = FlexDisplay
 val Montserrat = AppSans
 
-/**
- * Display/headline/title typeface: Google Sans Flex (OFL-1.1, licenses/GoogleSansFlex-OFL.txt).
- * Has no Cyrillic or Greek glyphs (issue #62), so it is used for titles only — body text stays
- * on Manrope ([AppSans]), which covers Myspoti's Russian and Greek strings.
- */
-@OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
-private fun flex(weight: Int) = Font(
-    R.font.flex,
-    weight = FontWeight(weight),
-    variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
-        androidx.compose.ui.text.font.FontVariation.weight(weight),
-    ),
-)
-
-val AppSansTitle = FontFamily(flex(400), flex(500), flex(600), flex(700), flex(800))
-
 private val base = TextStyle(fontFamily = AppSans)
-private val title = TextStyle(fontFamily = AppSansTitle, fontWeight = FontWeight.Bold)
 
 val Typography = Typography(
-    displayLarge = title, displayMedium = title, displaySmall = title,
-    headlineLarge = title, headlineMedium = title, headlineSmall = title,
-    titleLarge = title, titleMedium = title, titleSmall = title,
-    bodyLarge = base.copy(fontSize = 16.sp, lineHeight = 24.sp),
-    bodyMedium = base, bodySmall = base,
-    labelLarge = base, labelMedium = base, labelSmall = base,
+    displayLarge = TextStyle(fontFamily = FlexWide, fontWeight = FontWeight.Black, fontSize = 68.sp, lineHeight = 58.sp, letterSpacing = (-1.5).sp),
+    displayMedium = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 48.sp, lineHeight = 50.sp, letterSpacing = (-1).sp),
+    displaySmall = TextStyle(fontFamily = FlexWide, fontWeight = FontWeight.Black, fontSize = 36.sp, lineHeight = 38.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 32.sp, lineHeight = 36.sp),
+    headlineMedium = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 28.sp, lineHeight = 32.sp),
+    headlineSmall = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 22.sp, lineHeight = 28.sp),
+    titleLarge = TextStyle(fontFamily = FlexTitle, fontWeight = FontWeight.Black, fontSize = 20.sp, lineHeight = 24.sp),
+    titleMedium = TextStyle(fontFamily = FlexTitle, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, lineHeight = 22.sp),
+    titleSmall = TextStyle(fontFamily = AppSans, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, lineHeight = 20.sp),
+    bodyLarge = base.copy(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium),
+    bodyMedium = base.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium),
+    bodySmall = base.copy(fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold),
+    labelLarge = base.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+    labelMedium = base.copy(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold),
+    labelSmall = base.copy(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold),
 )

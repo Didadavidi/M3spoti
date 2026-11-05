@@ -20,7 +20,7 @@ import com.google.android.material.color.utilities.Hct
 import com.google.android.material.color.utilities.QuantizerCelebi
 import com.google.android.material.color.utilities.Score
 import com.google.android.material.color.utilities.SchemeNeutral
-import com.google.android.material.color.utilities.SchemeTonalSpot
+import com.google.android.material.color.utilities.SchemeContent
 import com.music.spotui.data.api.SupportReminder
 import com.music.spotui.di.COVER_DECODE_PX
 import com.music.spotui.di.Graph
@@ -32,10 +32,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 /**
- * The Expressive theme's colour scheme, derived from the playing song's cover (Material You's
- * own algorithm: [QuantizerCelebi] to a palette, [Score] to a seed, built into a tonal
- * [DynamicScheme]) and animated into on every song change. ui/theme/Color.kt's globals and
- * Theme.kt's ColorScheme both read [scheme], so every Classic screen re-skins together.
+ * The "album colours": a dark scheme built from the playing song's cover for Now Playing, Queue
+ * and Lyrics (Material You's own pipeline: [QuantizerCelebi] to a palette, [Score] to a seed),
+ * animated into on every song change. Unlike Material's own dark schemes, the surfaces keep the
+ * cover's hue at real chroma (a deep rust page under an orange cover, not a near-black grey), as
+ * the design's player screens do. With "Album colours in player" off, the dark system scheme.
  */
 @SuppressLint("RestrictedApi")
 object ExpressiveColor {
@@ -92,20 +93,48 @@ object ExpressiveColor {
         bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
         val ranked = Score.score(QuantizerCelebi.quantize(pixels, 128))
         val seedArgb = ranked.firstOrNull() ?: SupportReminder.accentColor.toArgb()
-        return dynamicSchemeFor(seedArgb).toComposeColorScheme()
+        return albumScheme(seedArgb)
     }
 
-    private fun dynamicSchemeFor(seedArgb: Int): DynamicScheme {
-        val hct = Hct.fromInt(seedArgb)
+    /** The album scheme for a cover's seed colour. */
+    fun albumScheme(seedArgb: Int): ColorScheme {
+        if (!ColorPrefs.albumColours) return SystemColors.build(SystemColors.DesignSeed.toArgb(), dark = true, oled = false)
+        val src = Hct.fromInt(seedArgb)
         val r = (seedArgb shr 16) and 0xFF
         val g = (seedArgb shr 8) and 0xFF
         val b = seedArgb and 0xFF
         val greyscale = maxOf(abs(r - g), abs(g - b), abs(r - b)) <= 10
-        return if (greyscale) SchemeNeutral(hct, true, 0.0) else SchemeTonalSpot(hct, true, 0.0)
+        val base = (if (greyscale) SchemeNeutral(src, true, 0.0) else SchemeContent(src, true, 0.0)).toComposeColorScheme()
+        val h = src.hue
+        // How colourful the page may be: the cover's own chroma, capped (a neon cover must not
+        // make an unreadable page), none at all for a black-and-white cover.
+        val c = if (greyscale) 0.0 else minOf(src.chroma, 48.0)
+        fun hct(chroma: Double, tone: Double) = Color(Hct.from(h, chroma, tone).toInt())
+        return base.copy(
+            primary = hct(maxOf(c, 40.0).takeIf { !greyscale } ?: 0.0, 70.0),
+            onPrimary = hct(c * 0.8, 14.0),
+            primaryContainer = hct(c * 0.8, 30.0),
+            onPrimaryContainer = hct(c * 0.3, 92.0),
+            tertiaryContainer = hct(c * 0.22, 93.0),
+            onTertiaryContainer = hct(c * 0.8, 14.0),
+            background = hct(c * 0.42, 7.0),
+            surface = hct(c * 0.42, 7.0),
+            surfaceDim = hct(c * 0.42, 7.0),
+            surfaceContainerLowest = hct(c * 0.4, 4.0),
+            surfaceContainerLow = hct(c * 0.5, 9.0),
+            surfaceContainer = hct(c * 0.6, 12.0),
+            surfaceContainerHigh = hct(c * 0.72, 18.0),
+            surfaceContainerHighest = hct(c * 0.72, 24.0),
+            surfaceBright = hct(c * 0.6, 26.0),
+            onSurface = hct(c * 0.1, 95.0),
+            onBackground = hct(c * 0.1, 95.0),
+            onSurfaceVariant = hct(c * 0.28, 82.0),
+            outline = hct(c * 0.3, 55.0),
+            outlineVariant = hct(c * 0.5, 30.0),
+        )
     }
 
-    private fun fallbackScheme(): ColorScheme =
-        dynamicSchemeFor(SupportReminder.accentColor.toArgb()).toComposeColorScheme()
+    private fun fallbackScheme(): ColorScheme = albumScheme(SupportReminder.accentColor.toArgb())
 
     private fun animateTo(target: ColorScheme, scope: CoroutineScope) {
         animation?.cancel()
@@ -121,7 +150,7 @@ object ExpressiveColor {
     }
 }
 
-private fun lerpColorScheme(a: ColorScheme, b: ColorScheme, t: Float): ColorScheme {
+internal fun lerpColorScheme(a: ColorScheme, b: ColorScheme, t: Float): ColorScheme {
     fun c(x: Color, y: Color) = lerp(x, y, t)
     return ColorScheme(
         primary = c(a.primary, b.primary),
@@ -175,7 +204,7 @@ private fun lerpColorScheme(a: ColorScheme, b: ColorScheme, t: Float): ColorSche
     )
 }
 
-private fun DynamicScheme.toComposeColorScheme(): ColorScheme = ColorScheme(
+internal fun DynamicScheme.toComposeColorScheme(): ColorScheme = ColorScheme(
     primary = Color(primary),
     onPrimary = Color(onPrimary),
     primaryContainer = Color(primaryContainer),

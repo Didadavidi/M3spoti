@@ -3,8 +3,8 @@ package com.music.spotui.ui.theme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 
-/** The Expressive colour scheme in effect: the playing cover's palette, or the fallback accent. */
-private val scheme get() = ExpressiveColor.scheme
+/** The system colour scheme in effect (wallpaper colours, light or dark): see [SystemColors]. */
+private val scheme get() = SystemColors.scheme
 
 val AppBackground: Color get() =
     if (app.myspoti.power.EnergySettings.oledBlack) Color.Black else scheme.surface
