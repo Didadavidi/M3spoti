@@ -691,4 +691,9 @@
         <item quantity="one">%d item</item>
         <item quantity="other">%d items</item>
     </plurals>
+    <!-- Album and playlist pages, new design -->
+    <string name="track_number">Track %1$d</string>
+    <string name="time_left">%1$s left</string>
+    <string name="context_save">Save</string>
+    <string name="context_saved">Saved</string>
 </resources>

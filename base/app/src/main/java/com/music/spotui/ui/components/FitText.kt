@@ -32,6 +32,7 @@ fun FitText(
     fontWeight: FontWeight? = null,
     maxLines: Int = 2,
     textAlign: TextAlign? = null,
+    fontFamily: androidx.compose.ui.text.font.FontFamily? = null,
 ) {
     var size by remember(text, fontSize) { mutableStateOf(fontSize) }
     var ready by remember(text, fontSize) { mutableStateOf(false) }
@@ -41,6 +42,7 @@ fun FitText(
         fontSize = size,
         lineHeight = size * 1.15f,
         fontWeight = fontWeight,
+        fontFamily = fontFamily,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
