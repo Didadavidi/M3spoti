@@ -121,19 +121,7 @@ fun PlayerScreen(navController: NavController) {
     )
     BackHandler(enabled = showLyrics) { showLyrics = false }
 
-    // The page is dark whatever the theme: light status and navigation bar icons while it shows.
-    val view = LocalView.current
-    DisposableEffect(view) {
-        val window = (view.context as? android.app.Activity)?.window
-        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
-        bars?.isAppearanceLightStatusBars = false
-        bars?.isAppearanceLightNavigationBars = false
-        onDispose {
-            val light = !com.music.spotui.ui.theme.SystemColors.dark
-            bars?.isAppearanceLightStatusBars = light
-            bars?.isAppearanceLightNavigationBars = light
-        }
-    }
+    DarkSystemBars()
 
     // The music video: looked up for the song shown, offered as a chip once ready, full screen.
     DisposableEffect(mv) {
@@ -463,5 +451,22 @@ private fun PlayerChip(
             painter != 0 -> Icon(androidx.compose.ui.res.painterResource(painter), null, tint = fg, modifier = Modifier.size(20.dp))
         }
         Text(label, color = fg, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 160.dp))
+    }
+}
+
+/** The album-colour pages are dark whatever the theme: light status and navigation bar icons while one shows. */
+@Composable
+internal fun DarkSystemBars() {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val window = (view.context as? android.app.Activity)?.window
+        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
+        bars?.isAppearanceLightStatusBars = false
+        bars?.isAppearanceLightNavigationBars = false
+        onDispose {
+            val light = !com.music.spotui.ui.theme.SystemColors.dark
+            bars?.isAppearanceLightStatusBars = light
+            bars?.isAppearanceLightNavigationBars = light
+        }
     }
 }

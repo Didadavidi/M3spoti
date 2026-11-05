@@ -704,4 +704,7 @@
     <string name="player_sleep">Sleep</string>
     <string name="player_like">Add to Liked Songs</string>
     <string name="player_unlike">Remove from Liked Songs</string>
+    <!-- Queue, new design -->
+    <string name="queue_clear">Clear</string>
+    <string name="queue_from">From %1$s</string>
 </resources>
