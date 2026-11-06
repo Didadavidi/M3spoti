@@ -251,8 +251,10 @@ fun PlayerScreen(navController: NavController) {
                     pausedRadius = 36.dp,
                     iconSize = 42.dp,
                     label = stringResource(if (playing) R.string.notif_action_pause else R.string.notif_action_play),
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 34.dp, bottom = 14.dp)
-                        .border(7.dp, album.surface, CircleShape),
+                    // The ring that cuts the button out of the cover, in the button's own shape.
+                    ring = 7.dp,
+                    ringColor = album.surface,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 34.dp, bottom = 14.dp),
                 )
             }
 

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -54,13 +55,20 @@ fun MorphPlayButton(
     pausedRadius: Dp = width * 0.32f,
     iconSize: Dp = width * 0.4f,
     label: String,
+    /** A ring in [ringColor] at the edge, in the button's own (morphing) shape. */
+    ring: Dp = 0.dp,
+    ringColor: Color = Color.Transparent,
 ) {
     val radius by animateDpAsState(if (playing) playingRadius else pausedRadius, bouncy(), label = "morph")
+    val shape = RoundedCornerShape(radius)
     Box(
         modifier
             .size(width, height)
-            .clip(RoundedCornerShape(radius))
+            .clip(shape)
             .background(container)
+            // Drawn here, not as a circle around the button: paused, the button is a rounded
+            // square and a round ring cut into its corners.
+            .then(if (ring > 0.dp) Modifier.border(ring, ringColor, shape) else Modifier)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(color = content),
