@@ -39,3 +39,5 @@ Desktop.ini
 *.log
 
 scripts/
+# The shared dev signing key is committed on purpose (see app/build.gradle.kts).
+!app/dev-debug.keystore

@@ -60,6 +60,16 @@ android {
     if (stableRelease && !hasReleaseKey && gradle.startParameter.taskNames.any { Regex("(assemble|bundle|package|install)Release").containsMatchIn(it) })
         throw GradleException("A stable release needs the release key: set MYSPOTI_KEYSTORE (CI) or add keystore/keystore.properties.")
     signingConfigs {
+        // One shared debug key for every machine (this PC, cloud sessions, CI), so a dev build
+        // from anywhere installs over the dev app already on the phone. Android refuses an update
+        // signed with another key (INSTALL_FAILED_UPDATE_INCOMPATIBLE, even for a copy hidden in
+        // the Private Space). The key is public on purpose: it only signs app.myspoti.dev.
+        getByName("debug") {
+            storeFile = file("dev-debug.keystore")
+            storePassword = "m3spoti-dev"
+            keyAlias = "m3spoti-dev"
+            keyPassword = "m3spoti-dev"
+        }
         create("release") {
             if (envStore != null) {
                 storeFile = file(envStore)
@@ -88,7 +98,9 @@ android {
             signingConfig = signingConfigs.getByName(if (hasReleaseKey) "release" else "debug")
             // -PoverDev: the optimised build under the dev app's id, to measure the speed of a
             // beta on the test phone without replacing the signed beta installed there.
+            // Signed with the dev key, or it could not install over the dev app.
             if (findProperty("overDev") != null) {
+                signingConfig = signingConfigs.getByName("debug")
                 applicationIdSuffix = ".dev"
                 manifestPlaceholders["appLabel"] = "M3spoti dev"
             }
