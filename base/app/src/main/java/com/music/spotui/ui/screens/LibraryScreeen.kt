@@ -179,12 +179,16 @@ fun LibraryScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(20.dp, 14.dp, 16.dp, 10.dp)
         ) {
-            Text(
+            // Shrinks to fit next to the three buttons ("Bibliothek" was cut to "Bibliot…").
+            val titleStyle = androidx.compose.material3.MaterialTheme.typography.displayMedium
+            com.music.spotui.ui.components.FitText(
                 text = stringResource(chipTitle(chip)),
-                style = androidx.compose.material3.MaterialTheme.typography.displayMedium,
+                fontSize = titleStyle.fontSize,
+                minSize = 26.sp,
+                fontWeight = titleStyle.fontWeight,
+                fontFamily = titleStyle.fontFamily,
                 color = scheme.onSurface,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 // The title itself scrolls the list to its top in the official app.
                 modifier = Modifier
                     .weight(1f)

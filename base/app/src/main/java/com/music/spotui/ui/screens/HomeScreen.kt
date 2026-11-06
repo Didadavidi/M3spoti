@@ -218,6 +218,7 @@ fun HomeFeedContent(navController: NavController, feed: HomeFeedModel, facet: St
     // The hero stands for Spotify's first mix; the rest of its shelf rings it as covers.
     val hero = remember(carousels) { pickHeroMix(carousels) }
     val page = com.music.spotui.ui.theme.SystemColors.scheme.surface
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = com.music.spotui.ui.components.bottomBarsSpace()),
@@ -240,6 +241,9 @@ fun HomeFeedContent(navController: NavController, feed: HomeFeedModel, facet: St
         }
         // Sections from extensions (home.sections), after Spotify's own, each under its extension's name.
         item { com.music.spotui.extensions.ExtensionBlocks(app.myspoti.extensions.Hook.HOME, app.myspoti.extensions.Surface.HOME, "{}") }
+    }
+    // The list scrolls on under the status bar: the page's colour behind its icons, not the shelves.
+    com.music.spotui.ui.theme.StatusBarScrim(page, solid = true)
     }
 }
 

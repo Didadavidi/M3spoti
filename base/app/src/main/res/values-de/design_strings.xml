@@ -61,4 +61,12 @@
     <string name="links_prompt_allow">Erlauben</string>
     <string name="links_prompt_later">Später</string>
     <string name="links_prompt_never">Nicht mehr fragen</string>
+
+    <!-- Album-Seite: die Tabs der Vorlage und was "Info" zeigt. -->
+    <string name="context_tab_tracks">Titel</string>
+    <string name="context_tab_about">Info</string>
+    <string name="context_about_artist">Künstler</string>
+    <string name="context_about_release">Veröffentlichung</string>
+    <string name="context_about_length">Länge</string>
+    <string name="context_find_tracks">Titel suchen</string>
 </resources>

@@ -728,4 +728,12 @@
     <string name="links_prompt_later">Later</string>
     <string name="links_prompt_never">Don\'t ask again</string>
     <string name="settings_links">Links</string>
+
+    <!-- Album page: the design's tabs, and what "About" shows. -->
+    <string name="context_tab_tracks">Tracks</string>
+    <string name="context_tab_about">About</string>
+    <string name="context_about_artist">Artist</string>
+    <string name="context_about_release">Release</string>
+    <string name="context_about_length">Length</string>
+    <string name="context_find_tracks">Search tracks</string>
 </resources>

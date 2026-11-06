@@ -766,18 +766,22 @@ private fun BrowseCategoryTile(
                 indication = null,
             ) { onClick() },
     ) {
-        if (cover.isNotBlank()) {
-            com.music.spotui.ui.dots.HalftoneCover(
-                cover,
-                Modifier.align(Alignment.BottomEnd).offset(x = 14.dp, y = 14.dp).rotate(18f).size(76.dp),
-                com.music.spotui.ui.dots.DotShapes.cookie(),
-                cells = 14f,
-            )
-        }
+        // A tile with no artwork of its own (New releases) gets the design's banded art from its name.
+        com.music.spotui.ui.dots.HalftoneCover(
+            cover,
+            Modifier.align(Alignment.BottomEnd).offset(x = 14.dp, y = 14.dp).rotate(18f).size(76.dp),
+            com.music.spotui.ui.dots.DotShapes.cookie(),
+            cells = 14f,
+            fallbackSeed = name,
+        )
         Text(
             text = name,
             color = scheme.onSurface,
-            style = MaterialTheme.typography.titleMedium,
+            // A word too long for the tile is hyphenated ("Neuerschei-nungen"), not cut anywhere.
+            style = MaterialTheme.typography.titleMedium.copy(
+                hyphens = androidx.compose.ui.text.style.Hyphens.Auto,
+                lineBreak = androidx.compose.ui.text.style.LineBreak.Heading,
+            ),
             maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             modifier = Modifier.padding(16.dp).padding(end = 40.dp),
         )

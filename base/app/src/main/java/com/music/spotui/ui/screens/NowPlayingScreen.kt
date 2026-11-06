@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -117,7 +118,7 @@ fun PlayerScreen(navController: NavController) {
         context = context,
         isLiked = isLiked,
         onDismiss = { showMenu = false },
-        onOpenQueue = { navController.navigate(Routes.Queue.route) },
+        onOpenQueue = { com.music.spotui.ui.navigation.PlayerSheet.openQueue(navController) },
     )
     BackHandler(enabled = showLyrics) { showLyrics = false }
 
@@ -171,6 +172,8 @@ fun PlayerScreen(navController: NavController) {
         Box(Modifier.fillMaxWidth().height(520.dp)) {
             DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
         }
+        // The white status bar icons over pale dots were hard to read.
+        com.music.spotui.ui.theme.StatusBarScrim(album.surface)
         Column(
             Modifier
                 .fillMaxSize()
@@ -369,19 +372,38 @@ fun PlayerScreen(navController: NavController) {
             Spacer(Modifier.weight(1f))
 
             // The chips: sleep, lyrics, queue, then the devices and the clip when there is one.
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 14.dp),
-            ) {
-                PlayerChip(DesignIcons.Sleep, stringResource(R.string.player_sleep), album) { showSleep = true }
-                if (!adPlaying) PlayerChip(DesignIcons.Lyrics, stringResource(R.string.lyrics_card_title), album) { showLyrics = true }
-                PlayerChip(DesignIcons.Queue, stringResource(R.string.immersive_queue_title), album) { navController.navigate(Routes.Queue.route) }
-                PlayerChip(
-                    null, remote?.name ?: stringResource(R.string.player_devices), album,
-                    painter = R.drawable.ic_devices, highlighted = remote != null,
-                ) { showDevices = true }
-                if (videoReady) PlayerChip(Icons.Default.OndemandVideo, stringResource(R.string.player_video), album) {
-                    mv.setOn(true); mv.fullscreen.value = true
+            // In one centred row: when the labels do not all fit, the devices, the clip and then
+            // the sleep timer show as round icons (a remote device keeps its name: it says where music plays).
+            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
+                val sleepLabel = stringResource(R.string.player_sleep)
+                val lyricsLabel = stringResource(R.string.lyrics_card_title)
+                val queueLabel = stringResource(R.string.immersive_queue_title)
+                val devicesLabel = remote?.name ?: stringResource(R.string.player_devices)
+                val videoLabel = stringResource(R.string.player_video)
+                // Indices: 0 sleep, 1 lyrics, 2 queue, 3 devices, 4 clip (absent ones get an empty label and no width).
+                val labels = listOf(sleepLabel, if (!adPlaying) lyricsLabel else "", queueLabel, devicesLabel, if (videoReady) videoLabel else "")
+                val present = labels.map { it.isNotEmpty() }
+                val drop = buildList { if (remote == null) add(3); add(4); add(0); add(1) }
+                val shown = chipLabels(maxWidth, labels.filterIndexed { i, _ -> present[i] }, drop.mapNotNull { d ->
+                    if (!present[d]) null else (0 until d).count { present[it] }
+                })
+                // Back from the compact list to the five slots.
+                var k = 0
+                val showLabel = present.map { if (it) shown[k++] else false }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ChipGap, Alignment.CenterHorizontally),
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                ) {
+                    PlayerChip(DesignIcons.Sleep, sleepLabel, album, showLabel = showLabel[0]) { showSleep = true }
+                    if (!adPlaying) PlayerChip(DesignIcons.Lyrics, lyricsLabel, album, showLabel = showLabel[1]) { showLyrics = true }
+                    PlayerChip(DesignIcons.Queue, queueLabel, album, showLabel = showLabel[2]) { com.music.spotui.ui.navigation.PlayerSheet.openQueue(navController) }
+                    PlayerChip(
+                        null, devicesLabel, album,
+                        painter = R.drawable.ic_devices, highlighted = remote != null, showLabel = showLabel[3],
+                    ) { showDevices = true }
+                    if (videoReady) PlayerChip(Icons.Default.OndemandVideo, videoLabel, album, showLabel = showLabel[4]) {
+                        mv.setOn(true); mv.fullscreen.value = true
+                    }
                 }
             }
         }
@@ -437,36 +459,54 @@ private fun PlayerChip(
     scheme: androidx.compose.material3.ColorScheme,
     painter: Int = 0,
     highlighted: Boolean = false,
+    /** Off: a round button with the icon alone (the label is still read out). */
+    showLabel: Boolean = true,
     onClick: () -> Unit,
 ) {
     val bg = if (highlighted) scheme.primary else scheme.surfaceContainerHigh
     val fg = if (highlighted) scheme.onPrimary else scheme.onSurface
+    val iconLabel = if (showLabel) null else label
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.height(46.dp).clip(RoundedCornerShape(23.dp)).background(bg).clickable(onClick = onClick).padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        modifier = Modifier.height(46.dp).then(if (showLabel) Modifier else Modifier.width(46.dp))
+            .clip(RoundedCornerShape(23.dp)).background(bg).clickable(onClick = onClick)
+            .padding(horizontal = if (showLabel) ChipPadding else 0.dp),
     ) {
         when {
-            icon != null -> Icon(icon, null, tint = fg, modifier = Modifier.size(20.dp))
-            painter != 0 -> Icon(androidx.compose.ui.res.painterResource(painter), null, tint = fg, modifier = Modifier.size(20.dp))
+            icon != null -> Icon(icon, iconLabel, tint = fg, modifier = Modifier.size(20.dp))
+            painter != 0 -> Icon(androidx.compose.ui.res.painterResource(painter), iconLabel, tint = fg, modifier = Modifier.size(20.dp))
         }
-        Text(label, color = fg, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 160.dp))
+        if (showLabel) Text(label, color = fg, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = ChipLabelMax))
+    }
+}
+
+private val ChipPadding = 14.dp
+private val ChipLabelMax = 160.dp
+private val ChipGap = 6.dp
+
+/**
+ * Which of the player's chips keep their label in [width]: all when they fit, else the ones in
+ * [dropOrder] become round icon buttons one by one until the row fits (the German labels were
+ * too long for one row: "Warteschlange" ran off the screen).
+ */
+@Composable
+private fun chipLabels(width: androidx.compose.ui.unit.Dp, labels: List<String>, dropOrder: List<Int>): List<Boolean> {
+    val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val style = androidx.compose.material3.LocalTextStyle.current.copy(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+    return remember(width, labels, style) {
+        val full = labels.map { l ->
+            val text = with(density) { measurer.measure(l, style, maxLines = 1).size.width.toDp() }
+            ChipPadding * 2 + 20.dp + 8.dp + minOf(text, ChipLabelMax)
+        }
+        val shown = MutableList(labels.size) { true }
+        fun total() = labels.indices.fold(0.dp) { sum, i -> sum + if (shown[i]) full[i] else 46.dp } + ChipGap * (labels.size - 1)
+        for (i in dropOrder) { if (total() <= width) break; if (i in labels.indices) shown[i] = false }
+        shown
     }
 }
 
 /** The album-colour pages are dark whatever the theme: light status and navigation bar icons while one shows. */
 @Composable
-internal fun DarkSystemBars() {
-    val view = LocalView.current
-    DisposableEffect(view) {
-        val window = (view.context as? android.app.Activity)?.window
-        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
-        bars?.isAppearanceLightStatusBars = false
-        bars?.isAppearanceLightNavigationBars = false
-        onDispose {
-            val light = !com.music.spotui.ui.theme.SystemColors.dark
-            bars?.isAppearanceLightStatusBars = light
-            bars?.isAppearanceLightNavigationBars = light
-        }
-    }
-}
+internal fun DarkSystemBars() = com.music.spotui.ui.theme.DarkSystemBars()

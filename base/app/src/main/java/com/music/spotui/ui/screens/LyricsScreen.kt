@@ -346,7 +346,7 @@ private fun LyricLineText(
     }
     Column(lineModifier) {
         val words = line.words
-        if (state == 0 && words != null) {
+        if (state == 0 && words != null && words.any { it.text.isNotBlank() }) {
             // Karaoke: each word goes straight from the upcoming colour to white as it is sung (drawn
             // on each frame, the line is not recomposed). Words in another colour were hard to tell apart.
             val shown = remember(line) { words.joinToString("") { it.text }.trimEnd() }
@@ -393,7 +393,8 @@ private fun LyricLineText(
             }
         } else {
             Text(
-                text = line.text,
+                // A pause between lines: a note on the pill, not an empty pill.
+                text = line.text.ifBlank { "♪" },
                 color = color,
                 fontSize = lineSize,
                 lineHeight = lineSize * 1.12f,
@@ -590,10 +591,23 @@ fun LyricsScreen(
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     com.music.spotui.ui.components.SkeletonLyrics(palette.highlight)
                 }
-            is LyricsViewModel.State.NotFound ->
+            is LyricsViewModel.State.NotFound -> {
                 Box(Modifier.weight(1f).fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                     Text(stringResource(R.string.lyrics_fullscreen_no_lyrics_error_version_two), color = palette.highlight, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
+                // No lyrics, still the song: its progress and play button (there were none).
+                LyricsControls(
+                    palette = palette,
+                    position = position,
+                    showTranslate = false,
+                    translationActive = false,
+                    translating = false,
+                    onTranslate = {},
+                    onShare = {},
+                    chips = false,
+                    modifier = Modifier.revealIn(reveal, 0.5f, 16f, span = 0.5f),
+                )
+            }
             is LyricsViewModel.State.Loaded -> {
                 val l = state.lyrics
                 // Lines Genius explains: lightly underlined, held to read the explanation.
@@ -820,11 +834,13 @@ private fun LyricsControls(
     onTranslate: () -> Unit,
     onShare: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Share and Translate above the bar: only with lyrics to share. */
+    chips: Boolean = true,
 ) {
     val durationMs = SongPlayer.getDuration().coerceAtLeast(0L)
     val playing = com.music.spotui.di.Graph.currentSongState.playingState.value
     Column(modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 8.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 10.dp)) {
+        if (chips) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 10.dp)) {
             LyricsChip(stringResource(R.string.lyrics_fullscreen_chip_label_share), R.drawable.ic_share, false, false, palette, onShare)
             if (showTranslate) LyricsChip(stringResource(R.string.lyrics_fullscreen_chip_label_translate), R.drawable.ic_translate_lyrics, translationActive, translating, palette, onTranslate)
         }

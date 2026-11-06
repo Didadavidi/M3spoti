@@ -43,6 +43,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -681,7 +682,10 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
     // Liked Songs: a track unliked anywhere leaves the list right away. Derived state:
     // recomputed when the page, the search, the sort or a like changes, while a recomposition
     // of the screen with nothing new in them re-sorts nothing (a 900-track list is real work).
-    val findable = p.type == "liked" || p.type == "playlist"
+    val findable = p.type == "liked" || p.type == "playlist" || p.type == "album"
+    // An album has the design's two tabs: its songs, and what it is (artist, release, length).
+    val albumTabs = p.type == "album"
+    var tab by androidx.compose.runtime.saveable.rememberSaveable(p.uri) { mutableStateOf(0) }
     val all by remember(p) {
         derivedStateOf {
             if (p.type == "liked" || p.type == "liked-artist") p.tracks.filter { SongPlayer.library["spotify:track:${it.spotifyTrackId}"] != false } else p.tracks
@@ -706,7 +710,8 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
     // down at the top unfolds them in place (that pull does not refresh; the next one does), and
     // they fold again once the songs are scrolled past them, unless a search is typed.
     val hasExtras = (findable && all.isNotEmpty()) || p.isBlend
-    var extrasShown by remember(p.uri) { mutableStateOf(false) }
+    // An album opens with its search showing, under the tabs, as in the design.
+    var extrasShown by remember(p.uri) { mutableStateOf(albumTabs) }
     val revealPull = remember(p.uri) { ExtrasReveal() }
     revealPull.enabled = hasExtras && !extrasShown
     revealPull.onReveal = { extrasShown = true; com.music.spotui.di.Haptics.toggle(true) }
@@ -744,7 +749,8 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                 if (value == null && p.coverUri.isNotBlank()) value = com.music.spotui.ui.dots.loadHalftone(context, p.coverUri)
             }
             Box(Modifier.fillMaxWidth()) {
-                Box(Modifier.fillMaxWidth().height(320.dp)) {
+                // Tall enough to run on behind the name, which sits on the dots as in the design.
+                Box(Modifier.fillMaxWidth().height(380.dp)) {
                     com.music.spotui.ui.dots.DotFieldBackground(
                         field = com.music.spotui.ui.dots.DotField.PAGE_HEADER,
                         inkA = art?.let { Color(it.inkA) } ?: scheme.primary,
@@ -753,6 +759,8 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                         animate = isThisContext,
                     )
                 }
+                // The status bar icons follow the theme: the page's colour under them, not pale or dark dots.
+                com.music.spotui.ui.theme.StatusBarScrim(scheme.surface)
                 Column(Modifier.fillMaxWidth().statusBarsPadding()) {
                     Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                         val deep = scheme.deep()
@@ -963,6 +971,9 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                 }
             }
         }
+        if (albumTabs) item(key = "tabs") { ContextTabs(tab) { tab = it } }
+        if (albumTabs && tab == 1) item(key = "about") { AlbumAbout(p) }
+        else {
         // Liked Songs: a track unliked anywhere leaves the list right away.
         // A Blend: its taste-match card and its members, as on the official Blend page.
         if (vm.collabLocked.value && !vm.editableContext.value) item(key = "collab-locked") {
@@ -987,7 +998,11 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                 .clip(RoundedCornerShape(32.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(6.dp)) {
                 com.music.spotui.ui.components.FindInListField(
                     find, { find = it },
-                    stringResource(if (p.type == "liked") R.string.find_in_context_edit_text_liked_songs_hint else R.string.find_in_context_edit_text_playlist_hint),
+                    stringResource(when (p.type) {
+                        "liked" -> R.string.find_in_context_edit_text_liked_songs_hint
+                        "album" -> R.string.context_find_tracks
+                        else -> R.string.find_in_context_edit_text_playlist_hint
+                    }),
                     Modifier.weight(1f),
                 )
             }
@@ -1031,6 +1046,7 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
         }
         // An album: Spotify's "More like this", albums close to its first song.
         if (p.type == "album") item(key = "similar") { SimilarAlbums(navController, p.tracks.firstOrNull()?.spotifyTrackId.orEmpty(), p.uri) }
+        }
         item { Spacer(Modifier.height(com.music.spotui.ui.components.bottomBarsSpace())) }
     }
     }
@@ -1568,6 +1584,83 @@ private fun TrackSortButton(sort: TrackOrder, onSort: (TrackOrder) -> Unit) {
 }
 
 
+/** The design's "Tracks | About" tabs on an album page: the chosen one bold, over a short bar. */
+@Composable
+private fun ContextTabs(selected: Int, onSelect: (Int) -> Unit) {
+    val scheme = com.music.spotui.ui.theme.SystemColors.scheme
+    val labels = listOf(stringResource(R.string.context_tab_tracks), stringResource(R.string.context_tab_about))
+    Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        Row(Modifier.fillMaxWidth()) {
+            labels.forEachIndexed { i, label ->
+                val on = i == selected
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .weight(1f)
+                        .selectable(
+                            selected = on,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            role = androidx.compose.ui.semantics.Role.Tab,
+                        ) { onSelect(i) }
+                        .padding(top = 12.dp),
+                ) {
+                    Text(
+                        label, fontSize = 16.sp,
+                        color = if (on) scheme.onSurface else scheme.onSurfaceVariant,
+                        fontWeight = if (on) FontWeight.ExtraBold else FontWeight.SemiBold,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Box(
+                        Modifier.width(48.dp).height(4.dp)
+                            .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(if (on) scheme.primary else Color.Transparent),
+                    )
+                }
+            }
+        }
+        Box(Modifier.fillMaxWidth().height(1.dp).background(scheme.outlineVariant))
+    }
+}
+
+/** An album's "About" tab: its note if it has one, then artist, release, number of songs and length as cards. */
+@Composable
+private fun AlbumAbout(p: ContextPageModel) {
+    val scheme = com.music.spotui.ui.theme.SystemColors.scheme
+    val totalMs = remember(p.tracks) { p.tracks.sumOf { it.durationMs.toLong() } }
+    val rows = buildList {
+        if (p.ownerName.isNotBlank()) add(stringResource(R.string.context_about_artist) to p.ownerName)
+        if (p.metaLine.isNotBlank()) add(stringResource(R.string.context_about_release) to p.metaLine)
+        if (p.tracks.isNotEmpty()) add(stringResource(R.string.context_tab_tracks) to p.tracks.size.toString())
+        if (totalMs > 0) add(stringResource(R.string.context_about_length) to albumLength(totalMs))
+    }
+    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (p.description.isNotBlank()) Text(
+            p.description, color = scheme.onSurface, fontSize = 15.sp,
+            modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
+        )
+        rows.forEachIndexed { i, (label, value) ->
+            val top = if (i == 0) 24.dp else 8.dp
+            val bottom = if (i == rows.lastIndex) 24.dp else 8.dp
+            Column(
+                Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom))
+                    .background(scheme.surfaceContainer)
+                    .padding(horizontal = 18.dp, vertical = 14.dp),
+            ) {
+                Text(label, color = scheme.onSurfaceVariant, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text(value, color = scheme.onSurface, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
+}
+
+/** "42 min", "1 h 5 min". */
+private fun albumLength(totalMs: Long): String {
+    val min = (totalMs + 30_000) / 60_000
+    return if (min >= 60) "${min / 60} h ${min % 60} min" else "$min min"
+}
+
 /** "More like this" under an album: Spotify's similar albums, from its first song. */
 @OptIn(com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi::class)
 @Composable
@@ -1591,8 +1684,11 @@ private fun SimilarAlbums(navController: NavController, firstTrackId: String, al
                 Column(Modifier.width(140.dp).pressable(0.96f) {
                     navController.navigate(com.music.spotui.ui.navigation.albumRoute(a.name, artists, a.uri.substringAfterLast(':')))
                 }) {
-                    GlideImage(transition = CrossFade, model = a.images.maxByOrNull { it.width ?: 0 }?.url, contentDescription = null, contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(140.dp).clip(RoundedCornerShape(4.dp)))
+                    // Printed in halftone like every other cover of the design (these were plain photos).
+                    com.music.spotui.ui.dots.HalftoneCover(
+                        a.images.maxByOrNull { it.width ?: 0 }?.url, Modifier.size(140.dp), RoundedCornerShape(24.dp),
+                        cells = 22f, fallbackSeed = a.name,
+                    )
                     Text(a.name, color = AppText, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
                     Text(artists, color = AppMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }

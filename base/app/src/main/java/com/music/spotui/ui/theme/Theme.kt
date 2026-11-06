@@ -42,20 +42,21 @@ fun SpotuiTheme(
     SystemColors.update(context, dark)
     val visualScheme: ColorScheme = SystemColors.scheme
     val view = LocalView.current
+    // Dark icons on the light palette, white ones on the dark and on the always-dark pages.
+    val lightIcons = !dark && SystemBars.darkPages == 0
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.attributes = window.attributes.apply { preferredRefreshRate = policy.displayRefreshCap }
             window.statusBarColor = Color.Transparent.toArgb()
-            // Dark icons on the light palette, white ones on the dark.
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !dark
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = lightIcons
             // B19: the navigation bar was left to the system — a white band under the always-dark
             // UI (reported in the modal sheets, where the bar was opaque) with dark icons on it.
             window.navigationBarColor = Color.Transparent.toArgb()
             // Without this Android lays its own translucent scrim on a transparent bar (API 29+),
             // which showed as a differently coloured strip under the full-screen Canvas.
             window.isNavigationBarContrastEnforced = false
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !dark
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = lightIcons
             // Behind the first frame and under overscroll: the palette's page colour.
             window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(AppBackground.toArgb()))
         }

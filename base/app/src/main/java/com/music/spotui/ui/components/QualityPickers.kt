@@ -6,6 +6,20 @@ import com.music.spotui.ui.theme.AppMuted
 import com.music.spotui.ui.theme.AppAccent
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Album
+import androidx.compose.material.icons.outlined.Autorenew
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Compress
+import androidx.compose.material.icons.outlined.DataUsage
+import androidx.compose.material.icons.outlined.GraphicEq
+import androidx.compose.material.icons.outlined.HighQuality
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.music.spotui.ui.screens.settingsCard
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.draw.clip
@@ -53,10 +67,10 @@ fun StreamingQualityPicker(modifier: Modifier = Modifier, cellular: Boolean = fa
         title = stringResource(title),
         detail = stringResource(R.string.quality_streaming_detail),
         options = listOf(
-            Option(StreamingQuality.AUTO, R.string.quality_streaming_auto, R.string.quality_streaming_auto_detail),
-            Option(StreamingQuality.LOW, R.string.quality_streaming_low, R.string.quality_streaming_low_detail),
-            Option(StreamingQuality.NORMAL, R.string.quality_streaming_normal, R.string.quality_streaming_normal_detail),
-            Option(StreamingQuality.HIGH, R.string.quality_streaming_high, R.string.quality_streaming_high_detail),
+            Option(StreamingQuality.AUTO, R.string.quality_streaming_auto, R.string.quality_streaming_auto_detail, Icons.Outlined.Autorenew),
+            Option(StreamingQuality.LOW, R.string.quality_streaming_low, R.string.quality_streaming_low_detail, Icons.Outlined.DataUsage),
+            Option(StreamingQuality.NORMAL, R.string.quality_streaming_normal, R.string.quality_streaming_normal_detail, Icons.Outlined.GraphicEq),
+            Option(StreamingQuality.HIGH, R.string.quality_streaming_high, R.string.quality_streaming_high_detail, Icons.Outlined.HighQuality),
         ),
         selected = current,
         onSelect = { current = it; setStreamingQuality(ctx, it, cellular) },
@@ -73,11 +87,11 @@ fun DownloadQualityPicker(modifier: Modifier = Modifier) {
         title = stringResource(R.string.quality_download_title),
         detail = stringResource(R.string.quality_download_detail),
         options = listOf(
-            Option(DownloadQuality.OFF, R.string.quality_download_off, R.string.quality_download_off_detail),
-            Option(DownloadQuality.SMALL, R.string.quality_download_small, R.string.quality_download_small_detail),
-            Option(DownloadQuality.CD, R.string.quality_download_cd, R.string.quality_download_cd_detail),
-            Option(DownloadQuality.HI_RES, R.string.quality_download_hires, R.string.quality_download_hires_detail),
-            Option(DownloadQuality.ASK, R.string.quality_download_ask, R.string.quality_download_ask_detail),
+            Option(DownloadQuality.OFF, R.string.quality_download_off, R.string.quality_download_off_detail, Icons.Outlined.Block),
+            Option(DownloadQuality.SMALL, R.string.quality_download_small, R.string.quality_download_small_detail, Icons.Outlined.Compress),
+            Option(DownloadQuality.CD, R.string.quality_download_cd, R.string.quality_download_cd_detail, Icons.Outlined.Album),
+            Option(DownloadQuality.HI_RES, R.string.quality_download_hires, R.string.quality_download_hires_detail, Icons.Outlined.HighQuality),
+            Option(DownloadQuality.ASK, R.string.quality_download_ask, R.string.quality_download_ask_detail, Icons.AutoMirrored.Outlined.HelpOutline),
         ),
         selected = current,
         onSelect = { current = it; setDownloadQuality(ctx, it) },
@@ -85,7 +99,7 @@ fun DownloadQualityPicker(modifier: Modifier = Modifier) {
     )
 }
 
-private class Option<T>(val value: T, val label: Int, val detail: Int)
+private class Option<T>(val value: T, val label: Int, val detail: Int, val icon: ImageVector? = null)
 
 @Composable
 private fun <T> QualityGroup(
@@ -106,27 +120,44 @@ private fun <T> QualityGroup(
         }
         return
     }
+    // The design's settings cards: a shaped icon badge, the choice and what it means, a round
+    // check at the end (was a plain radio list among the cards).
     Column(modifier.fillMaxWidth().selectableGroup()) {
-        Text(title, color = AppText, fontSize = 17.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp))
-        Text(detail, color = AppMuted, fontSize = 13.sp,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 4.dp))
-        for (o in options) {
+        Text(title, color = AppText, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(start = 26.dp, end = 20.dp, top = 4.dp))
+        Text(detail, color = AppMuted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 26.dp, end = 20.dp, bottom = 6.dp))
+        options.forEachIndexed { i, o ->
             val on = o.value == selected
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
+                modifier = Modifier.fillMaxWidth().settingsCard()
+                    .heightIn(min = 64.dp)
                     .selectable(selected = on, role = Role.RadioButton, onClick = { onSelect(o.value) })
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
             ) {
-                RadioButton(selected = on, onClick = null, modifier = Modifier.padding(horizontal = 8.dp),
-                    colors = RadioButtonDefaults.colors(selectedColor = AppAccent, unselectedColor = AppMuted))
-                Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                    Text(stringResource(o.label), color = if (on) AppAccent else AppText, fontSize = 16.sp)
-                    Text(stringResource(o.detail), color = AppMuted, fontSize = 12.sp)
+                o.icon?.let { com.music.spotui.ui.screens.SettingsBadge(it, i) }
+                Column(Modifier.weight(1f).padding(start = if (o.icon != null) 14.dp else 4.dp, end = 10.dp)) {
+                    Text(stringResource(o.label), color = AppText, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                    Text(stringResource(o.detail), color = AppMuted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
+                DesignCheck(on)
             }
         }
+    }
+}
+
+/** The design's round choice mark: an outlined ring, or a filled disc with a check. */
+@Composable
+private fun DesignCheck(on: Boolean) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    Box(
+        Modifier.size(30.dp).clip(CircleShape)
+            .background(if (on) s.primary else Color.Transparent)
+            .border(3.dp, if (on) s.primary else s.outline, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (on) androidx.compose.material3.Icon(com.music.spotui.ui.dots.DesignIcons.Check, null, tint = s.onPrimary, modifier = Modifier.size(18.dp))
     }
 }
 

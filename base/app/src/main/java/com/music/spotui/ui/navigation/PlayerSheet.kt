@@ -36,6 +36,19 @@ object PlayerSheet {
 
     /** The mini player's top edge in the window (px), where the player rises from and goes back to. */
     var miniTop by mutableFloatStateOf(0f)
+
+    /**
+     * The queue page was opened from the player: leaving it (its close arrow, back) brings the
+     * player back instead of the page under it. Opening the queue is a navigation, which closes
+     * the player like any other.
+     */
+    var reopenAfterQueue = false
+
+    /** Opens the queue page from the player. */
+    fun openQueue(navController: NavController) {
+        reopenAfterQueue = true
+        navController.navigate(Routes.Queue.route)
+    }
 }
 
 /**
@@ -66,8 +79,14 @@ private val CloseEasing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
 @Composable
 fun PlayerOverlay(navController: NavController) {
     // Any navigation from the player (album, artist, playlist…) lands on that page.
+    // Back from the queue opened in the player: the player again.
     LaunchedEffect(navController) {
-        navController.currentBackStackEntryFlow.drop(1).collect { PlayerSheet.close() }
+        navController.currentBackStackEntryFlow.drop(1).collect { entry ->
+            val route = entry.destination.route
+            if (route == Routes.Queue.route) PlayerSheet.close()
+            else if (PlayerSheet.reopenAfterQueue) { PlayerSheet.reopenAfterQueue = false; PlayerSheet.show() }
+            else PlayerSheet.close()
+        }
     }
     val open = PlayerSheet.open.value
     val progress = remember { Animatable(0f) }

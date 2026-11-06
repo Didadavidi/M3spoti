@@ -774,7 +774,8 @@ class Api constructor(
         if (iso.isNullOrBlank()) return ""
         return runCatching {
             val d = java.time.LocalDate.parse(iso.take(10))
-            d.format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", java.util.Locale.getDefault()))
+            // The language's own long date: "22. Juni 2026", "June 22, 2026" (a fixed "d MMM yyyy" lost the German dot).
+            d.format(java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG).withLocale(java.util.Locale.getDefault()))
         }.getOrDefault(iso.take(4))
     }
 
