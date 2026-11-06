@@ -113,6 +113,9 @@ fun HalftoneCover(
     val context = LocalContext.current
     val key = url.orEmpty()
     val art by produceState(cachedHalftone(key) ?: if (key.isBlank()) Halftone.synthetic(fallbackSeed) else null, key) {
+        // The initial value only counts for the first cover: on a new one (a skipped song in the
+        // player) the state still held the old art, so nothing loaded and the old cover stayed.
+        value = cachedHalftone(key) ?: if (key.isBlank()) Halftone.synthetic(fallbackSeed) else null
         if (key.isNotBlank() && value == null) value = loadHalftone(context, key) ?: Halftone.synthetic(fallbackSeed.ifBlank { key })
     }
     val box = modifier.clip(shape)

@@ -746,6 +746,8 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
             val scheme = com.music.spotui.ui.theme.SystemColors.scheme
             val liked = p.type == "liked" || p.type == "liked-artist"
             val art by androidx.compose.runtime.produceState(com.music.spotui.ui.dots.cachedHalftone(p.coverUri), p.coverUri) {
+                // A new cover starts from its own art, not the previous page's (the initial value only counts once).
+                value = com.music.spotui.ui.dots.cachedHalftone(p.coverUri)
                 if (value == null && p.coverUri.isNotBlank()) value = com.music.spotui.ui.dots.loadHalftone(context, p.coverUri)
             }
             Box(Modifier.fillMaxWidth()) {
