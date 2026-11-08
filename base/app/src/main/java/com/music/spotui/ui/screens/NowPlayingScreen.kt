@@ -116,7 +116,6 @@ fun PlayerScreen(navController: NavController) {
         navController = navController,
         playerViewModel = vm,
         context = context,
-        isLiked = isLiked,
         onDismiss = { showMenu = false },
         onOpenQueue = { com.music.spotui.ui.navigation.PlayerSheet.openQueue(navController) },
     )

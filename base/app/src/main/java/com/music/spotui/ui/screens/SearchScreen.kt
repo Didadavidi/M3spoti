@@ -2,17 +2,16 @@ package com.music.spotui.ui.screens
 
 import com.music.spotui.ui.components.secondaryClick
 import com.music.spotui.ui.theme.tone
+import com.music.spotui.ui.theme.AppAccent
 import com.music.spotui.ui.theme.AppText
 import com.music.spotui.ui.theme.AppMuted
 
 import kotlinx.coroutines.launch
 import com.music.spotui.ui.components.SearchClearButton
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.launchVoiceSearch
 import androidx.compose.ui.res.stringResource
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,10 +31,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -77,11 +78,7 @@ import app.myspoti.engine.R
 import com.music.spotui.data.api.Response
 import com.music.spotui.data.entity.SearchResults
 import com.music.spotui.data.entity.SongsModel
-import com.music.spotui.data.preferences.addLikedSongId
-import com.music.spotui.data.preferences.isSongLiked
-import com.music.spotui.data.preferences.removeLikedSongId
 import com.music.spotui.di.SongPlayer
-import com.music.spotui.ui.components.Loader
 import com.music.spotui.ui.navigation.Routes
 import com.music.spotui.ui.navigation.albumRoute
 import com.music.spotui.ui.navigation.artistRoute
@@ -166,8 +163,6 @@ fun SumUpSearchScreen(
         com.music.spotui.data.preferences.addRecentItem(context, item)
         recents = com.music.spotui.data.preferences.getRecentItems(context).filter { com.music.spotui.data.api.Features.PODCASTS || it.type != "show" }
     }
-    // Live Spotify search results for the current query.
-    val searchedList = results.songs
     // One relevance-mixed list (songs, artists, albums interleaved) instead of
     // separate type sections — matches how most music apps present search.
     val mixed = remember(results, filter) { filterSearchResults(results, filter) }
@@ -332,7 +327,7 @@ fun SumUpSearchScreen(
             items(mixed.size) { i ->
                 when (val row = mixed[i]) {
                     is SearchRow.Song -> com.music.spotui.ui.components.SwipeToQueue(row.song) {
-                        SearchSongRow(row.song, searchedList, searchViewModel, onPlayed = {
+                        SearchSongRow(row.song, searchViewModel, onPlayed = {
                             recordRecent(row.song.toRecentItem())
                         }, onLongClick = { menuSong = row.song })
                     }
@@ -389,7 +384,7 @@ fun SumUpSearchScreen(
                 item { SearchSectionHeader(stringResource(R.string.assisted_curation_search_filter_episodes)) }
                 items(results.episodes.size) { i ->
                     val ep = results.episodes[i]
-                    SearchSongRow(ep, results.episodes, searchViewModel, onPlayed = {
+                    SearchSongRow(ep, searchViewModel, onPlayed = {
                         recordRecent(ep.toRecentItem())
                     }, onLongClick = { menuSong = ep })
                 }
@@ -555,7 +550,6 @@ fun RecentItemRow(
 @Composable
 fun SearchSongRow(
     song: SongsModel,
-    songList: List<SongsModel>,
     searchViewModel: SearchViewModel,
     onPlayed: () -> Unit = {},
     onLongClick: (() -> Unit)? = null,
@@ -814,53 +808,79 @@ fun SearchStickyBar(
     // The field is always attached to a requester, so the clear button can put the cursor back in it.
     val ownFocus = remember { androidx.compose.ui.focus.FocusRequester() }
     val fieldFocus = focusRequester ?: ownFocus
-    Row(verticalAlignment = Alignment.CenterVertically,
+    val context = LocalContext.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .height(56.dp)
-            .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
-            .padding(18.dp, 0.dp)
-    ){
-        Icon(
-            com.music.spotui.ui.dots.DesignIcons.Search,
-            tint = AppMuted,
-            modifier = Modifier.size(22.dp),
-            contentDescription = "")
-
-        TextField(
-            enabled = true,
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        // The design's pill field, then voice search (the Google app's "Search with your voice") beside it.
+        Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .focusRequester(fieldFocus)
-                .onFocusChanged { onFocusChange(it.isFocused) },
-            value = text,
-            textStyle = TextStyle.Default.copy(fontSize = 16.sp, color = AppText, fontWeight = FontWeight(500)),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = com.music.spotui.ui.theme.AppAccent,
+                .weight(1f)
+                .clip(RoundedCornerShape(28.dp))
+                .height(56.dp)
+                .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
+                .padding(18.dp, 0.dp)
+        ){
+            Icon(
+                com.music.spotui.ui.dots.DesignIcons.Search,
+                tint = AppMuted,
+                modifier = Modifier.size(22.dp),
+                contentDescription = "")
 
-            ),
-            singleLine = true,
-            onValueChange = onTextChange,
-            placeholder = {
-                Text(
-                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    color = AppMuted,
-                    text = stringResource(R.string.search_header_field_hint)
-
-                )
-            },
-            trailingIcon = if (text.isEmpty()) null else {
-                { SearchClearButton(fieldFocus, AppMuted) { onTextChange("") } }
-            },
-        )
+            TextField(
+                enabled = true,
+                // The rest of the bar, so the clear button sits at its end.
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(fieldFocus)
+                    .onFocusChanged { onFocusChange(it.isFocused) },
+                value = text,
+                textStyle = TextStyle.Default.copy(fontSize = 16.sp, color = AppText, fontWeight = FontWeight(500)),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = AppText,
+                    unfocusedTextColor = AppText,
+                    cursorColor = com.music.spotui.ui.theme.AppAccent,
+                ),
+                singleLine = true,
+                onValueChange = onTextChange,
+                placeholder = {
+                    Text(
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = AppMuted,
+                        text = stringResource(R.string.search_header_field_hint)
+                    )
+                },
+                trailingIcon = if (text.isEmpty()) null else {
+                    { SearchClearButton(fieldFocus, AppMuted) { onTextChange("") } }
+                },
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
+                .pressable(0.9f) { launchVoiceSearch(context) },
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Mic,
+                contentDescription = stringResource(R.string.voice_search),
+                tint = AppText,
+                modifier = Modifier.size(24.dp),
+            )
+        }
     }
 }
 

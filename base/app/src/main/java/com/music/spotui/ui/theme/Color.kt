@@ -6,12 +6,15 @@ import androidx.compose.ui.graphics.lerp
 /** The system colour scheme in effect (wallpaper colours, light or dark): see [SystemColors]. */
 private val scheme get() = SystemColors.scheme
 
+/** The page: black with the AMOLED setting (an extension's look never undoes it), else an extension look's background or the scheme's. */
 val AppBackground: Color get() =
-    if (app.myspoti.power.EnergySettings.oledBlack) Color.Black else scheme.surface
-val GridBackground: Color get() = tone(0xFF2A2A2A)
-/** The accent: the playing cover's primary tone, or the fallback accent while nothing plays. */
+    if (app.myspoti.power.EnergySettings.oledBlack) Color.Black
+    else com.music.spotui.extensions.ExtensionLook.color(app.myspoti.extensions.UiStyle.BACKGROUND) ?: scheme.surface
+val GridBackground: Color get() = com.music.spotui.extensions.ExtensionLook.color(app.myspoti.extensions.UiStyle.SURFACE) ?: tone(0xFF2A2A2A)
+/** The accent: an extension look's, else the system scheme's primary. */
 val AppPalette: Color get() = AppAccent
-val AppAccent: Color get() = scheme.primary
+val AppAccent: Color get() =
+    com.music.spotui.extensions.ExtensionLook.color(app.myspoti.extensions.UiStyle.ACCENT) ?: scheme.primary
 
 /** Primary text and icons. */
 val AppText: Color get() = scheme.onSurface

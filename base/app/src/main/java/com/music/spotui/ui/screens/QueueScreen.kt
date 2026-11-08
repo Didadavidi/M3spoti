@@ -1,10 +1,16 @@
 package com.music.spotui.ui.screens
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import com.music.spotui.ui.components.animatedRow
+import com.music.spotui.ui.theme.AppText
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +35,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
@@ -42,12 +49,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import app.myspoti.engine.R
 import com.music.spotui.di.SongPlayer
@@ -60,6 +68,7 @@ import com.music.spotui.ui.dots.WavyProgress
 import com.music.spotui.ui.theme.ExpressiveColor
 import com.music.spotui.ui.theme.FlexDisplay
 import com.music.spotui.ui.theme.FlexWide
+import com.music.spotui.ui.theme.AppPalette
 
 /**
  * "Up next", in the album colours: a big title with Clear, the song playing as a bright card
@@ -69,11 +78,7 @@ import com.music.spotui.ui.theme.FlexWide
  */
 @Composable
 fun QueueScreen(navController: NavController) {
-    // Spotify's real queue, read from the engine's PlayerAPI while this screen is open.
-    androidx.compose.runtime.DisposableEffect(Unit) {
-        SongPlayer.watchQueue(true)
-        onDispose { SongPlayer.watchQueue(false) }
-    }
+    // Spotify's real queue, pushed by the engine.
     val q by SongPlayer.engineQueue
     val vm: com.music.spotui.ui.viewmodel.PlayerViewModel = viewModel()
     val s = ExpressiveColor.scheme
@@ -156,8 +161,13 @@ fun QueueScreen(navController: NavController) {
                     }
                 }
             }
-            itemsIndexed(rows, key = { i, it -> "r" + i + it.uid + it.uri }) { i, item ->
-                SwipeRemove(item) { QueueRow(item.song, i, queued = i < q.queued.size) { SongPlayer.skipTo(item) } }
+            // Keyed by song and occurrence: a row removed or played lets the ones under it slide up
+            // instead of every row after it being drawn anew.
+            val keys = queueKeys(rows)
+            itemsIndexed(rows, key = { i, _ -> keys[i] }) { i, item ->
+                Box(animatedRow()) {
+                    SwipeRemove(item) { QueueRow(item.song, i, queued = i < q.queued.size) { SongPlayer.skipTo(item) } }
+                }
             }
         }
 
@@ -202,6 +212,26 @@ private fun PlayingBars(color: Color, playing: Boolean) {
             Box(Modifier.width(6.dp).height(30.dp * h).clip(RoundedCornerShape(3.dp)).background(color))
         }
     }
+}
+
+/** One key per row: the song's uri, with its occurrence after the first ("uri~2"), never twice the same. */
+private fun queueKeys(rows: List<SongPlayer.QueueItem>): List<String> {
+    val seen = HashMap<String, Int>()
+    return rows.map { item ->
+        val count = seen.merge(item.uri, 1, Int::plus)!!
+        if (count == 1) item.uri else "${item.uri}~$count"
+    }
+}
+
+@Composable
+private fun QueueHeader(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text,
+        color = AppText,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier.padding(16.dp, 18.dp, 16.dp, 6.dp)
+    )
 }
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)

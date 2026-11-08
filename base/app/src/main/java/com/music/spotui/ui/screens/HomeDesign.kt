@@ -1,5 +1,6 @@
 package com.music.spotui.ui.screens
 
+import androidx.compose.material.icons.outlined.Notifications
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -166,6 +167,15 @@ internal fun HomeTopBar(navController: NavController, onProfile: () -> Unit) {
             }
         }
         Spacer(Modifier.weight(1f))
+        // From Myspoti 2.4.0: What's New (releases of followed artists) and friend activity.
+        Box(
+            Modifier.size(48.dp).clip(CircleShape).background(s.card).pressable(0.92f) { navController.navigate(Routes.WhatsNew.route) },
+            contentAlignment = Alignment.Center,
+        ) { Icon(androidx.compose.material.icons.Icons.Outlined.Notifications, stringResource(R.string.whats_new_title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
+        Box(
+            Modifier.size(48.dp).clip(CircleShape).background(s.card).pressable(0.92f) { navController.navigate(Routes.Friends.route) },
+            contentAlignment = Alignment.Center,
+        ) { Icon(androidx.compose.ui.res.painterResource(R.drawable.ic_friends_big), stringResource(R.string.friends_title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
         Box(
             Modifier.size(48.dp).clip(CircleShape).background(s.card).pressable(0.92f) {
                 navController.navigate(Routes.Search.route) { launchSingleTop = true }

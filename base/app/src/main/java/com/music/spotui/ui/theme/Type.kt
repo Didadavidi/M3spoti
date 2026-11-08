@@ -31,8 +31,10 @@ private fun flex(weight: Int, width: Float, opticalSize: Float) = Font(
 private val weights = listOf(400, 500, 600, 700, 800, 900)
 private fun family(width: Float, opticalSize: Float) = FontFamily(weights.map { flex(it, width, opticalSize) })
 
-/** Body text, labels, buttons: normal width. */
-val AppSans = family(width = 100f, opticalSize = 14f)
+private val ownSans = family(width = 100f, opticalSize = 14f)
+
+/** Body text, labels, buttons: normal width; the phone's own font when chosen in the settings (AppFontPref). */
+val AppSans: FontFamily get() = if (com.music.spotui.data.preferences.AppFontPref.system) FontFamily.Default else ownSans
 /** Card and row titles ("Night Ferry", track names): a little wide. */
 val FlexTitle = family(width = 125f, opticalSize = 24f)
 /** Screen titles and section headers ("Albums", "Keep listening"): wide. */
@@ -44,24 +46,31 @@ val FlexCondensed = family(width = 25f, opticalSize = 96f)
 
 // Kept as aliases so existing references don't break.
 val AppSansTitle = FlexDisplay
-val Montserrat = AppSans
+val Montserrat: FontFamily get() = AppSans
 
-private val base = TextStyle(fontFamily = AppSans)
+/** The design's type scale in [sans] for body text and in the wide cuts for titles (all [sans] with the system font). */
+private fun designTypography(sans: FontFamily, title: FontFamily, display: FontFamily, wide: FontFamily): Typography {
+    val base = TextStyle(fontFamily = sans)
+    return Typography(
+        displayLarge = TextStyle(fontFamily = wide, fontWeight = FontWeight.Black, fontSize = 68.sp, lineHeight = 58.sp, letterSpacing = (-1.5).sp),
+        displayMedium = TextStyle(fontFamily = display, fontWeight = FontWeight.Black, fontSize = 48.sp, lineHeight = 50.sp, letterSpacing = (-1).sp),
+        displaySmall = TextStyle(fontFamily = wide, fontWeight = FontWeight.Black, fontSize = 36.sp, lineHeight = 38.sp, letterSpacing = (-0.5).sp),
+        headlineLarge = TextStyle(fontFamily = display, fontWeight = FontWeight.Black, fontSize = 32.sp, lineHeight = 36.sp),
+        headlineMedium = TextStyle(fontFamily = display, fontWeight = FontWeight.Black, fontSize = 28.sp, lineHeight = 32.sp),
+        headlineSmall = TextStyle(fontFamily = display, fontWeight = FontWeight.Black, fontSize = 22.sp, lineHeight = 28.sp),
+        titleLarge = TextStyle(fontFamily = title, fontWeight = FontWeight.Black, fontSize = 20.sp, lineHeight = 24.sp),
+        titleMedium = TextStyle(fontFamily = title, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, lineHeight = 22.sp),
+        titleSmall = TextStyle(fontFamily = sans, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, lineHeight = 20.sp),
+        bodyLarge = base.copy(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium),
+        bodyMedium = base.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium),
+        bodySmall = base.copy(fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold),
+        labelLarge = base.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+        labelMedium = base.copy(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold),
+        labelSmall = base.copy(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold),
+    )
+}
 
-val Typography = Typography(
-    displayLarge = TextStyle(fontFamily = FlexWide, fontWeight = FontWeight.Black, fontSize = 68.sp, lineHeight = 58.sp, letterSpacing = (-1.5).sp),
-    displayMedium = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 48.sp, lineHeight = 50.sp, letterSpacing = (-1).sp),
-    displaySmall = TextStyle(fontFamily = FlexWide, fontWeight = FontWeight.Black, fontSize = 36.sp, lineHeight = 38.sp, letterSpacing = (-0.5).sp),
-    headlineLarge = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 32.sp, lineHeight = 36.sp),
-    headlineMedium = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 28.sp, lineHeight = 32.sp),
-    headlineSmall = TextStyle(fontFamily = FlexDisplay, fontWeight = FontWeight.Black, fontSize = 22.sp, lineHeight = 28.sp),
-    titleLarge = TextStyle(fontFamily = FlexTitle, fontWeight = FontWeight.Black, fontSize = 20.sp, lineHeight = 24.sp),
-    titleMedium = TextStyle(fontFamily = FlexTitle, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, lineHeight = 22.sp),
-    titleSmall = TextStyle(fontFamily = AppSans, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, lineHeight = 20.sp),
-    bodyLarge = base.copy(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium),
-    bodyMedium = base.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium),
-    bodySmall = base.copy(fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold),
-    labelLarge = base.copy(fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-    labelMedium = base.copy(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold),
-    labelSmall = base.copy(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold),
-)
+private val ownTypography by lazy { designTypography(ownSans, FlexTitle, FlexDisplay, FlexWide) }
+private val systemTypography by lazy { FontFamily.Default.let { designTypography(it, it, it, it) } }
+
+val Typography: Typography get() = if (com.music.spotui.data.preferences.AppFontPref.system) systemTypography else ownTypography
