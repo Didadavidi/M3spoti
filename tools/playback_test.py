@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Playback scenarios on a phone (debug build app.myspoti.dev, signed in).
+"""Playback scenarios on a phone (debug build app.m3spoti.dev, signed in).
 
 usage: tools/playback_test.py [--serial S] [--only name,name] [--skip name,name] [--playlist URI]
 
@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cdp  # noqa: E402
 
 ADB = cdp.ADB
-PKG = "app.myspoti.dev"
+PKG = "app.m3spoti.dev"
 OTHERS = ["app.myspoti", "com.spotify.music"]
 PLAYLIST = "spotify:playlist:5G7gcsU1CbvqYJYFawDRZa"
 BAD = [

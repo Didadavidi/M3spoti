@@ -5,7 +5,7 @@ through the app's own code paths without screenshots or taps. Stable releases le
 off in their manifest, and it answers nothing outside debug and beta builds even if turned on.
 
 ```
-tools/myspoti-cli [-p app.myspoti.dev] [-s serial] [-t 40] [--raw] <command> [args…]
+tools/myspoti-cli [-p app.m3spoti.dev] [-s serial] [-t 40] [--raw] <command> [args…]
 ```
 
 Each command is one broadcast (`<package>.CLI`, held to the adb shell by the `DUMP` permission).

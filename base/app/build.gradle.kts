@@ -18,15 +18,16 @@ android {
     namespace = "app.myspoti.engine"
     compileSdk = 37
 
-    // Two channels that install side by side: betas ("2.0.0-beta.3") stay "app.myspoti",
-    // signed with the first key, as "Myspoti Beta"; releases are "app.myspoti.stable",
-    // signed with their own key, as "Myspoti".
+    // Two channels that install side by side: betas ("2.0.0-beta.3") are "app.m3spoti",
+    // "M3spoti Beta"; releases are "app.m3spoti.stable", "M3spoti"; debug builds "app.m3spoti.dev".
+    // M3spoti's own ids, not Myspoti's: with the same id as the official app, Android refused to
+    // install one over the other (another key) and the fork could not sit next to the original.
     // Local builds (no version given) are on the beta side, like the phone test builds.
     val version = (findProperty("appVersionName") as String?) ?: "2.3.0"
     // "-beta" as in UpdateChecker.isBeta, one predicate for the app id, the label and the log stripping.
     val beta = findProperty("appVersionName") == null || version.contains("-beta")
     defaultConfig {
-        applicationId = if (beta) "app.myspoti" else "app.myspoti.stable"
+        applicationId = if (beta) "app.m3spoti" else "app.m3spoti.stable"
         manifestPlaceholders["appLabel"] = if (beta) "M3spoti Beta" else "M3spoti"
         // The adb command line (com.music.spotui.cli): betas and debug builds only.
         manifestPlaceholders["cliEnabled"] = beta.toString()
@@ -63,7 +64,7 @@ android {
         // One shared debug key for every machine (this PC, cloud sessions, CI), so a dev build
         // from anywhere installs over the dev app already on the phone. Android refuses an update
         // signed with another key (INSTALL_FAILED_UPDATE_INCOMPATIBLE, even for a copy hidden in
-        // the Private Space). The key is public on purpose: it only signs app.myspoti.dev.
+        // the Private Space). The key is public on purpose: it only signs app.m3spoti.dev.
         getByName("debug") {
             storeFile = file("dev-debug.keystore")
             storePassword = "m3spoti-dev"

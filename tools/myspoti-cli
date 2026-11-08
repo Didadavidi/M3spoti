@@ -85,7 +85,7 @@ def installed(serial, pkg):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("-p", "--package", default=os.environ.get("MYSPOTI_PACKAGE", "app.myspoti.dev"))
+    p.add_argument("-p", "--package", default=os.environ.get("MYSPOTI_PACKAGE", "app.m3spoti.dev"))
     p.add_argument("-s", "--serial", default=os.environ.get("ANDROID_SERIAL"))
     p.add_argument("-t", "--timeout", type=float, default=DEFAULT_TIMEOUT, help="seconds to wait for the reply")
     p.add_argument("--raw", action="store_true", help="print the reply on one line, as the app wrote it")
