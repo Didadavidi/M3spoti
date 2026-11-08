@@ -101,7 +101,7 @@
     <string name="download_kept_by_list">Остаётся скачанным: его держит скачанный плейлист</string>
     <string name="download_kept_by_named">Остаётся скачанным: «%1$s» скачан и содержит его</string>
     <string name="support_title">Поддержать автора оригинала</string>
-    <string name="support_body">M3spoti — это всего лишь форк Myspoti с новым дизайном. Вся настоящая работа — заслуга разработчика Myspoti: от меня здесь только дизайн, не более того. Если приложение вам нравится, поддержите автора оригинала.</string>
+    <string name="support_body">M3spoti — это форк Myspoti. От меня здесь только дизайн нового интерфейса, который Claude перенёс на Myspoti: вся настоящая работа — заслуга разработчика Myspoti. Если приложение вам нравится, поддержите автора оригинала.</string>
     <string name="support_action">Поддержать на Ko-fi</string>
     <string name="support_decline">Нет, спасибо</string>
     <string name="support_row_detail">Пожертвование разработчику Myspoti на Ko-fi или GitHub Sponsors</string>

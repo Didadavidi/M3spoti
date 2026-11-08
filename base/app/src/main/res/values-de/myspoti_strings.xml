@@ -91,7 +91,7 @@
     <string name="download_kept_by_list">Bleibt heruntergeladen: Eine heruntergeladene Playlist enthält ihn</string>
     <string name="download_kept_by_named">Bleibt heruntergeladen: „%1$s“ ist heruntergeladen und enthält ihn</string>
     <string name="support_title">Den ursprünglichen Entwickler unterstützen</string>
-    <string name="support_body">M3spoti ist nur ein Fork von Myspoti mit neuem Design. Die eigentliche Arbeit stammt vom Entwickler von Myspoti: Ich habe nur das Design gemacht und sonst nicht viel Aufwand reingesteckt. Wenn dir die App gefällt, unterstütze bitte den ursprünglichen Entwickler.</string>
+    <string name="support_body">M3spoti ist ein Fork von Myspoti. Ich habe nur die neue Oberfläche gestaltet und Claude sie auf Myspoti übertragen lassen: Die eigentliche Arbeit stammt vom Entwickler von Myspoti. Wenn dir die App gefällt, unterstütze bitte den ursprünglichen Entwickler.</string>
     <string name="support_action">Auf Ko-fi unterstützen</string>
     <string name="support_decline">Nein danke</string>
     <string name="support_row_detail">Spende an den Entwickler von Myspoti über Ko-fi oder GitHub Sponsors</string>

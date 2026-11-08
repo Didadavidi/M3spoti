@@ -104,7 +104,7 @@
     <string name="download_kept_by_list">Reste téléchargé : une playlist téléchargée le contient</string>
     <string name="download_kept_by_named">Reste téléchargé : « %1$s » est téléchargé et le contient</string>
     <string name="support_title">Soutenir le développeur d\'origine</string>
-    <string name="support_body">M3spoti n\'est qu\'un fork de Myspoti avec un nouveau design. Tout le vrai travail vient du développeur de Myspoti : je n\'ai fait que le design et je n\'ai pas mis beaucoup d\'effort dans le reste. Si l\'app vous plaît, soutenez le développeur d\'origine.</string>
+    <string name="support_body">M3spoti est un fork de Myspoti. J\'ai seulement conçu la nouvelle interface et demandé à Claude de l\'appliquer à Myspoti : tout le vrai travail vient du développeur de Myspoti. Si l\'app vous plaît, soutenez le développeur d\'origine.</string>
     <string name="support_action">Soutenir sur Ko-fi</string>
     <string name="support_decline">Non merci</string>
     <string name="support_row_detail">Faire un don au développeur de Myspoti sur Ko-fi ou GitHub Sponsors</string>

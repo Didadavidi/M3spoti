@@ -91,7 +91,7 @@
     <string name="download_kept_by_list">Ancora scaricato: una playlist scaricata lo contiene</string>
     <string name="download_kept_by_named">Ancora scaricato: «%1$s» è scaricato e lo contiene</string>
     <string name="support_title">Sostieni lo sviluppatore originale</string>
-    <string name="support_body">M3spoti è solo un fork di Myspoti con un nuovo design. Tutto il vero lavoro è dello sviluppatore di Myspoti: io ho fatto solo il design e nel resto non ci ho messo molto impegno. Se l\'app ti piace, sostieni lo sviluppatore originale.</string>
+    <string name="support_body">M3spoti è un fork di Myspoti. Io ho solo disegnato la nuova interfaccia e ho chiesto a Claude di applicarla a Myspoti: tutto il vero lavoro è dello sviluppatore di Myspoti. Se l\'app ti piace, sostieni lo sviluppatore originale.</string>
     <string name="support_action">Sostieni su Ko-fi</string>
     <string name="support_decline">No grazie</string>
     <string name="support_row_detail">Fai una donazione allo sviluppatore di Myspoti su Ko-fi o GitHub Sponsors</string>

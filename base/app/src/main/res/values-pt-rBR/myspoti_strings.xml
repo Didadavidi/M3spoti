@@ -95,7 +95,7 @@
     <string name="playlist_change_refused">O Spotify recusou a alteração desta playlist</string>
     <string name="download_kept_by_list">Continua baixada: uma playlist baixada a mantém</string>
     <string name="support_title">Apoie o desenvolvedor original</string>
-    <string name="support_body">O M3spoti é só um fork do Myspoti com um design novo. Todo o trabalho de verdade é do desenvolvedor do Myspoti: eu só fiz o design e não me esforcei muito com o resto. Se você gosta do app, apoie o desenvolvedor original.</string>
+    <string name="support_body">O M3spoti é um fork do Myspoti. Eu só desenhei a nova interface e pedi ao Claude que a aplicasse ao Myspoti: todo o trabalho de verdade é do desenvolvedor do Myspoti. Se você gosta do app, apoie o desenvolvedor original.</string>
     <string name="support_action">Apoiar no Ko-fi</string>
     <string name="support_decline">Não, obrigado</string>
     <string name="support_row_detail">Faça uma doação ao desenvolvedor do Myspoti no Ko-fi ou no GitHub Sponsors</string>

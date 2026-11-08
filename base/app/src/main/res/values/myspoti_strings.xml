@@ -108,7 +108,7 @@
     <string name="download_kept_by_list">Still downloaded: a downloaded playlist holds it</string>
     <string name="download_kept_by_named">Still downloaded: “%1$s” is downloaded and holds it</string>
     <string name="support_title">Support the original developer</string>
-    <string name="support_body">M3spoti is just a fork of Myspoti with a new design. All the real work is by Myspoti\'s developer: I only made the design and didn\'t put much effort into anything else. If you enjoy the app, please support the original developer.</string>
+    <string name="support_body">M3spoti is a fork of Myspoti. I only designed the new UI and had Claude apply it to Myspoti: all the real work is by Myspoti\'s developer. If you enjoy the app, please support the original developer.</string>
     <string name="support_action">Support on Ko-fi</string>
     <string name="support_decline">No thanks</string>
     <string name="support_row_detail">Donate to Myspoti\'s developer on Ko-fi or GitHub Sponsors</string>

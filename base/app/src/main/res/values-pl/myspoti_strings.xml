@@ -101,7 +101,7 @@
     <string name="download_kept_by_list">Nadal pobrane: trzyma je pobrana playlista</string>
     <string name="download_kept_by_named">Nadal pobrane: «%1$s» jest pobrane i zawiera ten utwór</string>
     <string name="support_title">Wesprzyj oryginalnego twórcę</string>
-    <string name="support_body">M3spoti to tylko fork Myspoti z nowym wyglądem. Cała prawdziwa praca to zasługa twórcy Myspoti: ode mnie pochodzi tylko nowy wygląd, nic poza nim. Jeśli aplikacja Ci się podoba, wesprzyj oryginalnego twórcę.</string>
+    <string name="support_body">M3spoti to fork Myspoti. Ode mnie pochodzi tylko projekt nowego interfejsu, który Claude przeniósł na Myspoti: cała prawdziwa praca to zasługa twórcy Myspoti. Jeśli aplikacja Ci się podoba, wesprzyj oryginalnego twórcę.</string>
     <string name="support_action">Wesprzyj na Ko-fi</string>
     <string name="support_decline">Nie, dziękuję</string>
     <string name="support_row_detail">Przekaż darowiznę twórcy Myspoti na Ko-fi lub GitHub Sponsors</string>

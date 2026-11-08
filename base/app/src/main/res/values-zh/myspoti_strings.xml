@@ -98,7 +98,7 @@
     <string name="download_kept_by_list">仍保留下载：已下载的播放列表包含它</string>
     <string name="download_kept_by_named">仍保留下载：已下载的“%1$s”包含它</string>
     <string name="support_title">支持原作者</string>
-    <string name="support_body">M3spoti 只是 Myspoti 的一个分支，换了新的设计。真正的工作都来自 Myspoti 的开发者：我只做了设计，其他方面没花多少功夫。如果你喜欢这个应用，请支持原作者。</string>
+    <string name="support_body">M3spoti 是 Myspoti 的一个分支。我只设计了新的界面，并让 Claude 把它应用到 Myspoti 上：真正的工作都来自 Myspoti 的开发者。如果你喜欢这个应用，请支持原作者。</string>
     <string name="support_action">在 Ko-fi 上支持</string>
     <string name="support_decline">不用了</string>
     <string name="support_row_detail">在 Ko-fi 或 GitHub Sponsors 上向 Myspoti 的开发者捐助</string>
