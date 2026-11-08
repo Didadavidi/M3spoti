@@ -90,11 +90,11 @@
     <string name="playlist_change_refused">Spotify hat die Änderung an dieser Playlist abgelehnt</string>
     <string name="download_kept_by_list">Bleibt heruntergeladen: Eine heruntergeladene Playlist enthält ihn</string>
     <string name="download_kept_by_named">Bleibt heruntergeladen: „%1$s“ ist heruntergeladen und enthält ihn</string>
-    <string name="support_title">Myspoti unterstützen</string>
-    <string name="support_body">Myspoti ist kostenlos, werbefrei und wird in meiner Freizeit entwickelt. Wenn es dir gefällt, hilft eine kleine Spende, es am Laufen zu halten.</string>
+    <string name="support_title">Den ursprünglichen Entwickler unterstützen</string>
+    <string name="support_body">M3spoti ist nur ein Fork von Myspoti mit neuem Design. Die eigentliche Arbeit stammt vom Entwickler von Myspoti: Ich habe nur das Design gemacht und sonst nicht viel Aufwand reingesteckt. Wenn dir die App gefällt, unterstütze bitte den ursprünglichen Entwickler.</string>
     <string name="support_action">Auf Ko-fi unterstützen</string>
     <string name="support_decline">Nein danke</string>
-    <string name="support_row_detail">Eine kleine Spende über Ko-fi oder GitHub Sponsors hält die App am Laufen</string>
+    <string name="support_row_detail">Spende an den Entwickler von Myspoti über Ko-fi oder GitHub Sponsors</string>
     <string name="supporter_perks_title">Vorteile für Unterstützer*innen</string>
     <string name="supporter_perks_detail">Akzentfarbe, App-Icon und ein Abzeichen als Dankeschön</string>
     <string name="supporter_perks_locked">Freigeschaltet durch deine Unterstützung für Myspoti. Es basiert auf deinem Wort: Nichts wird geprüft.</string>
@@ -104,7 +104,7 @@
     <string name="supporter_monthly">Jeden Monat</string>
     <string name="supporter_badge">Unterstützer*in</string>
     <string name="supporter_thanks_title">Danke für deine Unterstützung!</string>
-    <string name="supporter_thanks_body">Wenn dir Myspoti weiterhin nützt, hilft eine neue kleine Spende, es am Laufen zu halten.</string>
+    <string name="supporter_thanks_body">Wenn dir die App weiterhin nützt, hilft eine neue kleine Spende an den Entwickler von Myspoti, sie am Laufen zu halten.</string>
     <string name="support_again">Erneut unterstützen</string>
     <string name="supporter_accent">Akzentfarbe</string>
     <string name="supporter_icon">App-Icon</string>

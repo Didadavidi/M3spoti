@@ -90,11 +90,11 @@
     <string name="playlist_change_refused">Το Spotify απέρριψε την αλλαγή σε αυτή την playlist</string>
     <string name="download_kept_by_list">Εξακολουθεί να έχει ληφθεί: τη διατηρεί μια playlist που έχει ληφθεί</string>
     <string name="download_kept_by_named">Εξακολουθεί να έχει ληφθεί: το «%1$s» έχει ληφθεί και το περιέχει</string>
-    <string name="support_title">Στήριξε το Myspoti</string>
-    <string name="support_body">Το Myspoti είναι δωρεάν, χωρίς διαφημίσεις, και φτιάχνεται στον ελεύθερο χρόνο μου. Αν σου αρέσει, μια μικρή δωρεά βοηθά να συνεχίσει.</string>
+    <string name="support_title">Στήριξε τον αρχικό προγραμματιστή</string>
+    <string name="support_body">Το M3spoti είναι απλώς ένα fork του Myspoti με νέο σχεδιασμό. Όλη η πραγματική δουλειά είναι του προγραμματιστή του Myspoti: εγώ έφτιαξα μόνο τον σχεδιασμό και δεν έβαλα πολύ κόπο σε τίποτα άλλο. Αν σου αρέσει η εφαρμογή, στήριξε τον αρχικό προγραμματιστή.</string>
     <string name="support_action">Στήριξε στο Ko-fi</string>
     <string name="support_decline">Όχι, ευχαριστώ</string>
-    <string name="support_row_detail">Μια μικρή δωρεά στο Ko-fi ή στο GitHub Sponsors βοηθά την εφαρμογή να συνεχίσει</string>
+    <string name="support_row_detail">Κάνε δωρεά στον προγραμματιστή του Myspoti στο Ko-fi ή στο GitHub Sponsors</string>
     <string name="supporter_perks_title">Ανταμοιβές υποστηρικτή</string>
     <string name="supporter_perks_detail">Χρώμα τόνου, εικονίδιο εφαρμογής και σήμα, ως ευχαριστία</string>
     <string name="supporter_perks_locked">Ξεκλειδώνεται με τη στήριξη του Myspoti. Βασίζεται στον λόγο σου: δεν ελέγχεται τίποτα.</string>
@@ -104,7 +104,7 @@
     <string name="supporter_monthly">Κάθε μήνα</string>
     <string name="supporter_badge">Υποστηρικτής</string>
     <string name="supporter_thanks_title">Ευχαριστούμε για τη στήριξή σου!</string>
-    <string name="supporter_thanks_body">Αν το Myspoti εξακολουθεί να σου είναι χρήσιμο, μια νέα μικρή δωρεά βοηθά να συνεχίσει.</string>
+    <string name="supporter_thanks_body">Αν η εφαρμογή εξακολουθεί να σου είναι χρήσιμη, μια νέα μικρή δωρεά στον προγραμματιστή του Myspoti βοηθά να συνεχίσει.</string>
     <string name="support_again">Στήριξε ξανά</string>
     <string name="supporter_accent">Χρώμα τόνου</string>
     <string name="supporter_icon">Εικονίδιο εφαρμογής</string>

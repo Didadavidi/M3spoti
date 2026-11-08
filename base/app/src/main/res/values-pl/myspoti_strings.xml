@@ -100,11 +100,11 @@
     <string name="playlist_change_refused">Spotify odrzuciło zmianę w tej playliście</string>
     <string name="download_kept_by_list">Nadal pobrane: trzyma je pobrana playlista</string>
     <string name="download_kept_by_named">Nadal pobrane: «%1$s» jest pobrane i zawiera ten utwór</string>
-    <string name="support_title">Wesprzyj Myspoti</string>
-    <string name="support_body">Myspoti jest darmowe, bez reklam i powstaje w moim wolnym czasie. Jeśli Ci się podoba, niewielka darowizna pomoże je rozwijać.</string>
+    <string name="support_title">Wesprzyj oryginalnego twórcę</string>
+    <string name="support_body">M3spoti to tylko fork Myspoti z nowym wyglądem. Cała prawdziwa praca to zasługa twórcy Myspoti: ode mnie pochodzi tylko nowy wygląd, nic poza nim. Jeśli aplikacja Ci się podoba, wesprzyj oryginalnego twórcę.</string>
     <string name="support_action">Wesprzyj na Ko-fi</string>
     <string name="support_decline">Nie, dziękuję</string>
-    <string name="support_row_detail">Niewielka darowizna na Ko-fi lub GitHub Sponsors pomaga rozwijać aplikację</string>
+    <string name="support_row_detail">Przekaż darowiznę twórcy Myspoti na Ko-fi lub GitHub Sponsors</string>
     <string name="supporter_perks_title">Bonusy dla wspierających</string>
     <string name="supporter_perks_detail">Kolor akcentu, ikona aplikacji i odznaka, w ramach podziękowania</string>
     <string name="supporter_perks_locked">Odblokowywane przez wsparcie Myspoti. Na słowo honoru: nic nie jest sprawdzane.</string>
@@ -114,7 +114,7 @@
     <string name="supporter_monthly">Co miesiąc</string>
     <string name="supporter_badge">Wspierający</string>
     <string name="supporter_thanks_title">Dziękujemy za wsparcie!</string>
-    <string name="supporter_thanks_body">Jeśli Myspoti nadal Ci służy, kolejna niewielka darowizna pomoże je rozwijać.</string>
+    <string name="supporter_thanks_body">Jeśli aplikacja nadal Ci służy, kolejna niewielka darowizna dla twórcy Myspoti pomoże ją rozwijać.</string>
     <string name="support_again">Wesprzyj ponownie</string>
     <string name="supporter_accent">Kolor akcentu</string>
     <string name="supporter_icon">Ikona aplikacji</string>

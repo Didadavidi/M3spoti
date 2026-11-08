@@ -90,11 +90,11 @@
     <string name="playlist_change_refused">Spotify ha rechazado el cambio en esta playlist</string>
     <string name="download_kept_by_list">Sigue descargada: una playlist descargada la incluye</string>
     <string name="download_kept_by_named">Sigue descargada: «%1$s» está descargado y la incluye</string>
-    <string name="support_title">Apoya Myspoti</string>
-    <string name="support_body">Myspoti es gratis, sin anuncios, y lo desarrollo en mi tiempo libre. Si te gusta, una pequeña donación ayuda a que siga adelante.</string>
+    <string name="support_title">Apoya al desarrollador original</string>
+    <string name="support_body">M3spoti es solo un fork de Myspoti con un diseño nuevo. Todo el trabajo de verdad es del desarrollador de Myspoti: yo solo hice el diseño y no le dediqué mucho esfuerzo a nada más. Si te gusta la app, apoya al desarrollador original.</string>
     <string name="support_action">Apoyar en Ko-fi</string>
     <string name="support_decline">No, gracias</string>
-    <string name="support_row_detail">Una pequeña donación en Ko-fi o GitHub Sponsors ayuda a mantener la app</string>
+    <string name="support_row_detail">Dona al desarrollador de Myspoti en Ko-fi o GitHub Sponsors</string>
     <string name="supporter_perks_title">Ventajas de apoyo</string>
     <string name="supporter_perks_detail">Color de acento, icono de la app y una insignia, como agradecimiento</string>
     <string name="supporter_perks_locked">Se desbloquean al apoyar Myspoti. Es de palabra: no se comprueba nada.</string>
@@ -104,7 +104,7 @@
     <string name="supporter_monthly">Cada mes</string>
     <string name="supporter_badge">Colaborador</string>
     <string name="supporter_thanks_title">¡Gracias por tu apoyo!</string>
-    <string name="supporter_thanks_body">Si Myspoti te sigue siendo útil, una nueva pequeña donación ayuda a que siga adelante.</string>
+    <string name="supporter_thanks_body">Si la app te sigue siendo útil, una nueva pequeña donación al desarrollador de Myspoti ayuda a que siga adelante.</string>
     <string name="support_again">Apoyar de nuevo</string>
     <string name="supporter_accent">Color de acento</string>
     <string name="supporter_icon">Icono de la app</string>

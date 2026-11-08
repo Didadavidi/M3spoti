@@ -94,11 +94,11 @@
     <string name="local_playlist_empty">Adicione músicas de Arquivos locais com o botão +.</string>
     <string name="playlist_change_refused">O Spotify recusou a alteração desta playlist</string>
     <string name="download_kept_by_list">Continua baixada: uma playlist baixada a mantém</string>
-    <string name="support_title">Apoie o Myspoti</string>
-    <string name="support_body">O Myspoti é gratuito, sem anúncios, e feito no meu tempo livre. Se você gosta dele, uma pequena doação ajuda a mantê-lo vivo.</string>
+    <string name="support_title">Apoie o desenvolvedor original</string>
+    <string name="support_body">O M3spoti é só um fork do Myspoti com um design novo. Todo o trabalho de verdade é do desenvolvedor do Myspoti: eu só fiz o design e não me esforcei muito com o resto. Se você gosta do app, apoie o desenvolvedor original.</string>
     <string name="support_action">Apoiar no Ko-fi</string>
     <string name="support_decline">Não, obrigado</string>
-    <string name="support_row_detail">Uma pequena doação no Ko-fi ou no GitHub Sponsors ajuda a manter o app</string>
+    <string name="support_row_detail">Faça uma doação ao desenvolvedor do Myspoti no Ko-fi ou no GitHub Sponsors</string>
     <string name="supporter_perks_title">Vantagens de apoiador</string>
     <string name="supporter_perks_detail">Cor de destaque, ícone do app e um selo, como agradecimento</string>
     <string name="supporter_perks_locked">Liberado ao apoiar o Myspoti. Vale a sua palavra: nada é verificado.</string>
@@ -108,7 +108,7 @@
     <string name="supporter_monthly">Todo mês</string>
     <string name="supporter_badge">Apoiador</string>
     <string name="supporter_thanks_title">Obrigado pelo seu apoio!</string>
-    <string name="supporter_thanks_body">Se o Myspoti ainda é útil para você, uma nova pequena doação ajuda a mantê-lo vivo.</string>
+    <string name="supporter_thanks_body">Se o app ainda é útil para você, uma nova pequena doação ao desenvolvedor do Myspoti ajuda a mantê-lo vivo.</string>
     <string name="support_again">Apoiar novamente</string>
     <string name="supporter_accent">Cor de destaque</string>
     <string name="supporter_icon">Ícone do app</string>
