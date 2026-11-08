@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The new design's texts and Spotify link handling (English in values/myspoti_strings.xml). -->
+<resources>
+    <string name="home_greeting_night">夜深了</string>
+    <string name="home_greeting_morning">早上好</string>
+    <string name="home_greeting_afternoon">下午好</string>
+    <string name="home_greeting_evening">晚上好</string>
+    <string name="nav_explore">探索</string>
+    <string name="home_keep_listening">继续收听</string>
+    <string name="home_now_playing">正在播放</string>
+    <string name="home_last_played">最近播放</string>
+    <string name="home_jump_back_in">再听一次</string>
+    <string name="home_mark_finished">将 %1$s 标记为已听完</string>
+    <string name="home_open">打开 %1$s</string>
+    <string name="home_show_queue">显示播放队列</string>
+    <string name="home_play_mix">播放 %1$s</string>
+    <string name="home_pause_mix">暂停 %1$s</string>
+    <string name="home_profile">个人资料</string>
+    <string name="library_shuffle_all">全部随机播放</string>
+    <string name="library_all">全部</string>
+    <string name="track_number">第 %1$d 首</string>
+    <string name="time_left">剩余 %1$s</string>
+    <string name="context_save">保存</string>
+    <string name="context_saved">已保存</string>
+    <string name="player_of_total">共 %1$s</string>
+    <string name="player_close">关闭播放器</string>
+    <string name="player_devices">设备</string>
+    <string name="player_video">视频</string>
+    <string name="player_sleep">定时关闭</string>
+    <string name="player_like">添加到已点赞的歌曲</string>
+    <string name="player_unlike">从已点赞的歌曲中移除</string>
+    <string name="queue_clear">清空</string>
+    <string name="queue_from">来自 %1$s</string>
+    <string name="settings_colours">颜色</string>
+    <string name="settings_album_colours">播放器使用专辑颜色</string>
+    <string name="settings_album_colours_detail">正在播放、播放队列和歌词跟随封面配色</string>
+    <string name="settings_system_colours">其他页面使用系统颜色</string>
+    <string name="settings_system_colours_detail">首页、音乐库和设置使用你的壁纸颜色</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_theme_system">跟随系统</string>
+    <string name="settings_theme_light">浅色</string>
+    <string name="settings_theme_dark">深色</string>
+    <string name="link_not_spotify">分享的内容中没有 Spotify 链接</string>
+    <string name="links_title">打开 Spotify 链接</string>
+    <string name="links_on">开：Spotify 链接在此应用中打开</string>
+    <string name="links_off">关：Spotify 链接在浏览器中打开。点按即可开启。</string>
+    <string name="links_prompt_title">在这里打开 Spotify 链接？</string>
+    <string name="links_prompt_text">只有在你允许后，Android 才会在此应用中打开 Spotify 链接。在下一个页面中，点按\"添加链接\"并勾选所有 Spotify 地址。</string>
+    <string name="links_prompt_allow">允许</string>
+    <string name="links_prompt_later">稍后</string>
+    <string name="links_prompt_never">不再询问</string>
+    <string name="settings_links">链接</string>
+    <string name="context_tab_tracks">曲目</string>
+    <string name="context_tab_about">简介</string>
+    <string name="context_about_artist">艺人</string>
+    <string name="context_about_release">发行</string>
+    <string name="context_about_length">时长</string>
+    <string name="context_find_tracks">搜索曲目</string>
+    <plurals name="home_tracks_left">
+        <item quantity="other">还剩 %d 首</item>
+    </plurals>
+    <plurals name="library_count">
+        <item quantity="other">%d 项</item>
+    </plurals>
+</resources>

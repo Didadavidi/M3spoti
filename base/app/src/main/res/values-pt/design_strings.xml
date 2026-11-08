@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The new design's texts and Spotify link handling (English in values/myspoti_strings.xml). -->
+<resources>
+    <string name="home_greeting_night">Acordado até tarde</string>
+    <string name="home_greeting_morning">Bom dia</string>
+    <string name="home_greeting_afternoon">Boa tarde</string>
+    <string name="home_greeting_evening">Boa noite</string>
+    <string name="nav_explore">Explorar</string>
+    <string name="home_keep_listening">Continuar ouvindo</string>
+    <string name="home_now_playing">Tocando agora</string>
+    <string name="home_last_played">Ouvido por último</string>
+    <string name="home_jump_back_in">Ouvir de novo</string>
+    <string name="home_mark_finished">Marcar %1$s como concluído</string>
+    <string name="home_open">Abrir %1$s</string>
+    <string name="home_show_queue">Mostrar a fila</string>
+    <string name="home_play_mix">Tocar %1$s</string>
+    <string name="home_pause_mix">Pausar %1$s</string>
+    <string name="home_profile">Perfil</string>
+    <string name="library_shuffle_all">Tudo aleatório</string>
+    <string name="library_all">Tudo</string>
+    <string name="track_number">Faixa %1$d</string>
+    <string name="time_left">Faltam %1$s</string>
+    <string name="context_save">Salvar</string>
+    <string name="context_saved">Salvo</string>
+    <string name="player_of_total">de %1$s</string>
+    <string name="player_close">Fechar o player</string>
+    <string name="player_devices">Dispositivos</string>
+    <string name="player_video">Vídeo</string>
+    <string name="player_sleep">Timer</string>
+    <string name="player_like">Adicionar às Músicas Curtidas</string>
+    <string name="player_unlike">Remover das Músicas Curtidas</string>
+    <string name="queue_clear">Limpar</string>
+    <string name="queue_from">De %1$s</string>
+    <string name="settings_colours">Cores</string>
+    <string name="settings_album_colours">Cores do álbum no player</string>
+    <string name="settings_album_colours_detail">Tocando agora, Fila e Letras seguem a capa</string>
+    <string name="settings_system_colours">Cores do sistema no resto</string>
+    <string name="settings_system_colours_detail">Início, Biblioteca e Configurações usam as cores do seu papel de parede</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_system">Padrão do sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Escuro</string>
+    <string name="link_not_spotify">Nenhum link do Spotify no que foi compartilhado</string>
+    <string name="links_title">Abrir links do Spotify</string>
+    <string name="links_on">Ativado: os links do Spotify abrem neste app</string>
+    <string name="links_off">Desativado: os links do Spotify abrem no navegador. Toque para ativar.</string>
+    <string name="links_prompt_title">Abrir links do Spotify aqui?</string>
+    <string name="links_prompt_text">O Android só abre links do Spotify neste app depois que você permitir. Na próxima tela, toque em \"Adicionar link\" e marque todos os endereços do Spotify.</string>
+    <string name="links_prompt_allow">Permitir</string>
+    <string name="links_prompt_later">Mais tarde</string>
+    <string name="links_prompt_never">Não perguntar de novo</string>
+    <string name="settings_links">Links</string>
+    <string name="context_tab_tracks">Faixas</string>
+    <string name="context_tab_about">Sobre</string>
+    <string name="context_about_artist">Artista</string>
+    <string name="context_about_release">Lançamento</string>
+    <string name="context_about_length">Duração</string>
+    <string name="context_find_tracks">Buscar faixas</string>
+    <plurals name="home_tracks_left">
+        <item quantity="one">Falta %d faixa</item>
+        <item quantity="many">Faltam %d faixas</item>
+        <item quantity="other">Faltam %d faixas</item>
+    </plurals>
+    <plurals name="library_count">
+        <item quantity="one">%d item</item>
+        <item quantity="many">%d itens</item>
+        <item quantity="other">%d itens</item>
+    </plurals>
+</resources>
