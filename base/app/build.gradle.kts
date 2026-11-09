@@ -89,10 +89,13 @@ android {
                 keyAlias = System.getenv("MYSPOTI_KEY_ALIAS")
                 keyPassword = System.getenv("MYSPOTI_KEY_PASSWORD")
             } else if (keystorePropertiesFile.exists()) {
-                storeFile = rootProject.file("keystore/${keystoreProperties.getProperty("storeFile")}")
+                // storeFile: a name in keystore/, or a full path (the key kept in one safe place outside the checkout).
+                val store = keystoreProperties.getProperty("storeFile")
+                storeFile = if (File(store).isAbsolute) File(store) else rootProject.file("keystore/$store")
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
-                keyPassword = keystoreProperties.getProperty("keyPassword")
+                // A PKCS12 key (keytool's default) has one password: the store's.
+                keyPassword = keystoreProperties.getProperty("keyPassword") ?: storePassword
             }
         }
     }
