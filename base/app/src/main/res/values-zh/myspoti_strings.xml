@@ -7,7 +7,7 @@
     <string name="welcome_rotate_clips">官方视频。</string>
     <string name="welcome_rotate_offline">通过扩展离线收听。</string>
     <string name="welcome_login">使用 Spotify 登录</string>
-    <string name="welcome_privacy">你将在 Spotify 自己的页面登录。Myspoti 永远看不到你的密码。</string>
+    <string name="welcome_privacy">你将在 Spotify 自己的页面登录。M3spoti 永远看不到你的密码。</string>
     <string name="remove_from_liked">从“已点赞的歌曲”中移除</string>
     <string name="repeat_on">循环播放：开</string>
     <string name="repeat_one">单曲循环</string>

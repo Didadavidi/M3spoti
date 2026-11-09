@@ -165,7 +165,7 @@
     <string name="extension_rate_down">Αρνητική βαθμολογία</string>
     <string name="extension_rated">Ευχαριστούμε: η ψήφος σου είναι στο GitHub</string>
     <string name="extension_signin_title">Σύνδεση στο GitHub</string>
-    <string name="extension_signin_body">Άνοιξε το %1$s και πληκτρολόγησε αυτόν τον κωδικό. Το Myspoti δεν βλέπει ποτέ τον κωδικό πρόσβασής σου.</string>
+    <string name="extension_signin_body">Άνοιξε το %1$s και πληκτρολόγησε αυτόν τον κωδικό. Το M3spoti δεν βλέπει ποτέ τον κωδικό πρόσβασής σου.</string>
     <string name="extension_signin_open">Άνοιγμα του GitHub</string>
     <string name="extension_report">Αναφορά</string>
     <string name="extension_detail_github">GitHub</string>
