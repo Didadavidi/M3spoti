@@ -28,7 +28,6 @@ import com.music.spotui.di.SongPlayer
 import com.music.spotui.ui.immersive.player.ImmersivePlayerActions
 import com.music.spotui.ui.immersive.player.ImmersivePlayerState
 import com.music.spotui.ui.immersive.player.ImmersiveRepeat
-import com.music.spotui.ui.look.MeshPalette
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,7 +66,7 @@ class TvScreenshotTest {
     private fun playlists(n: Int, prefix: String) = List(n) { HomeItem.Playlist("$prefix ${it + 1}", "", "Mix of the week", id = "pl$prefix$it") }
 
     @Test fun home() = shoot("home") {
-        TvFrame(TvTab.Home, {}) {
+        TvFrame(TvTab.Home, bar = true, onSelect = {}) {
             TvHomeShelves("Good evening", listOf(
                 HomeSection("", playlists(6, "Daily Mix")),
                 HomeSection("Made for you", playlists(9, "Discover")),
@@ -78,23 +77,43 @@ class TvScreenshotTest {
 
     @Test fun list() = shoot("list") {
         val entry = LibraryEntry("pl1", "Night Drive", "Myspoti", "", isPlaylist = true, uri = "spotify:playlist:pl1")
-        TvFrame(TvTab.Library, {}) {
-            TvSongsPage(entry, ContextPageModel("spotify:playlist:pl1", "playlist", "Night Drive", "", ownerName = "Myspoti", tracks = songs), {}, {}, {})
+        TvFrame(TvTab.Library, bar = false, onSelect = {}) {
+            TvSongsPage(entry, ContextPageModel("spotify:playlist:pl1", "playlist", "Night Drive", "", ownerName = "Myspoti", tracks = songs), {}, {}, {}, {})
         }
     }
 
     @Test fun search() = shoot("search") {
-        TvFrame(TvTab.Search, {}) {
+        TvFrame(TvTab.Search, bar = true, onSelect = {}) {
             TvSearchResults(SearchResults(
                 songs = songs.take(8),
                 artists = listOf("M83", "Tame Impala", "Kavinsky", "MGMT", "Justice", "Daft Punk", "Air").mapIndexed { i, n -> ArtistsModel(n, "", id = "a$i") },
                 albums = List(8) { AlbumsModel(it, "M83", "", "Album ${it + 1}", "2011", spotifyId = "al$it") },
-            ), {}, {})
+            ), "Mid", {}, {})
         }
     }
 
+    @Test fun noResults() = shoot("no-results") {
+        TvFrame(TvTab.Search, bar = true, onSelect = {}) { TvNoResults("zxqv lights", {}, {}, {}) }
+    }
+
+    @Test fun offline() = shoot("offline") {
+        TvFrame(TvTab.Home, bar = true, onSelect = {}) { TvRetry {} }
+    }
+
+    @Test fun emptyLibrary() = shoot("empty-library") {
+        TvFrame(TvTab.Library, bar = true, onSelect = {}) {
+            TvMessage("Your library is empty", "Save albums, playlists and artists and they'll show up here.", { TvEmptyArt() },
+                "Go to Search" to com.music.spotui.ui.dots.DesignIcons.Search, {}, "Browse Home" to com.music.spotui.ui.dots.DesignIcons.Home, {},
+                focus = androidx.compose.runtime.remember { androidx.compose.ui.focus.FocusRequester() })
+        }
+    }
+
+    @Test fun welcome() = shoot("welcome") { TvWelcome {} }
+
+    @Test fun loginHelp() = shoot("login-help") { TvLoginHelp {} }
+
     @Test fun artist() = shoot("artist") {
-        TvFrame(TvTab.Search, {}) {
+        TvFrame(TvTab.Search, bar = false, onSelect = {}) {
             TvArtistPage(ArtistOverviewModel(
                 id = "a1", name = "Tame Impala", monthlyListeners = 31_245_871,
                 topTracks = songs.map { ArtistTrackUi(it) },
@@ -105,14 +124,14 @@ class TvScreenshotTest {
     }
 
     @Test fun player() = shoot("player") {
-        TvFrame(TvTab.NowPlaying, {}) {
+        TvFrame(TvTab.NowPlaying, bar = false, onSelect = {}) {
             TvPlayerScreen(
                 ImmersivePlayerState(title = "Breathe Deeper", artist = "Tame Impala", playing = true, positionMs = { 74_000L }, durationMs = 372_000L,
-                    shuffle = true, repeatMode = ImmersiveRepeat.ALL, liked = true),
+                    shuffle = true, repeatMode = ImmersiveRepeat.ALL, liked = true, contextName = "Night Drive"),
                 ImmersivePlayerActions(),
-                MeshPalette(listOf(Color(0xFF5B2A86), Color(0xFFC04A7A), Color(0xFF1F3B73), Color(0xFFE08A4F))),
+                com.music.spotui.ui.theme.albumSchemeOf(0xFFE0663A.toInt()),
                 onArtist = {}, onDevices = {},
-            ) { _, modifier -> FakeLyrics(modifier) }
+            )
         }
     }
 
@@ -122,17 +141,5 @@ class TvScreenshotTest {
             SongPlayer.ConnectDevice("2", "Pixel 9", "SMARTPHONE", isSelf = false, isActive = true),
             SongPlayer.ConnectDevice("3", "Kitchen speaker", "CAST_AUDIO", isSelf = false, isActive = false),
         )) {}
-    }
-
-    /** Stands in for the lyrics panel, which needs the engine. */
-    @Composable
-    private fun FakeLyrics(modifier: Modifier) {
-        Column(modifier.padding(top = 40.dp)) {
-            listOf("I don't know where I'm going", "But I know I'm on my way", "Breathe deeper, feel the night", "Every colour in the light", "We could stay here")
-                .forEachIndexed { i, line ->
-                    Text(line, color = Color.White.copy(alpha = if (i == 2) 1f else 0.35f), fontSize = 34.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 12.dp))
-                }
-        }
     }
 }

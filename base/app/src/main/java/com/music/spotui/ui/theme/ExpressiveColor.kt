@@ -104,39 +104,7 @@ object ExpressiveColor {
     /** The album scheme for a cover's seed colour. */
     fun albumScheme(seedArgb: Int): ColorScheme {
         if (!ColorPrefs.albumColours) return SystemColors.build(SystemColors.DesignSeed.toArgb(), dark = true, oled = false)
-        val src = Hct.fromInt(seedArgb)
-        val r = (seedArgb shr 16) and 0xFF
-        val g = (seedArgb shr 8) and 0xFF
-        val b = seedArgb and 0xFF
-        val greyscale = maxOf(abs(r - g), abs(g - b), abs(r - b)) <= 10
-        val base = (if (greyscale) SchemeNeutral(src, true, 0.0) else SchemeContent(src, true, 0.0)).toComposeColorScheme()
-        val h = src.hue
-        // How colourful the page may be: the cover's own chroma, capped (a neon cover must not
-        // make an unreadable page), none at all for a black-and-white cover.
-        val c = if (greyscale) 0.0 else minOf(src.chroma, 48.0)
-        fun hct(chroma: Double, tone: Double) = Color(Hct.from(h, chroma, tone).toInt())
-        return base.copy(
-            primary = hct(maxOf(c, 40.0).takeIf { !greyscale } ?: 0.0, 70.0),
-            onPrimary = hct(c * 0.8, 14.0),
-            primaryContainer = hct(c * 0.8, 30.0),
-            onPrimaryContainer = hct(c * 0.3, 92.0),
-            tertiaryContainer = hct(c * 0.22, 93.0),
-            onTertiaryContainer = hct(c * 0.8, 14.0),
-            background = hct(c * 0.42, 7.0),
-            surface = hct(c * 0.42, 7.0),
-            surfaceDim = hct(c * 0.42, 7.0),
-            surfaceContainerLowest = hct(c * 0.4, 4.0),
-            surfaceContainerLow = hct(c * 0.5, 9.0),
-            surfaceContainer = hct(c * 0.6, 12.0),
-            surfaceContainerHigh = hct(c * 0.72, 18.0),
-            surfaceContainerHighest = hct(c * 0.72, 24.0),
-            surfaceBright = hct(c * 0.6, 26.0),
-            onSurface = hct(c * 0.1, 95.0),
-            onBackground = hct(c * 0.1, 95.0),
-            onSurfaceVariant = hct(c * 0.28, 82.0),
-            outline = hct(c * 0.3, 55.0),
-            outlineVariant = hct(c * 0.5, 30.0),
-        )
+        return albumSchemeOf(seedArgb)
     }
 
     private fun fallbackScheme(): ColorScheme = albumScheme(SupportReminder.accentColor.toArgb())
@@ -259,3 +227,44 @@ internal fun DynamicScheme.toComposeColorScheme(): ColorScheme = ColorScheme(
     onTertiaryFixed = Color(onTertiaryFixed),
     onTertiaryFixedVariant = Color(onTertiaryFixedVariant),
 )
+
+/**
+ * The album scheme for a cover's seed colour, whatever the "Album colours" switch says: a dark page
+ * in the cover's hue, as colourful as the cover allows. [ExpressiveColor.albumScheme] checks the switch.
+ */
+@SuppressLint("RestrictedApi")
+fun albumSchemeOf(seedArgb: Int): ColorScheme {
+    val src = Hct.fromInt(seedArgb)
+    val r = (seedArgb shr 16) and 0xFF
+    val g = (seedArgb shr 8) and 0xFF
+    val b = seedArgb and 0xFF
+    val greyscale = maxOf(abs(r - g), abs(g - b), abs(r - b)) <= 10
+    val base = (if (greyscale) SchemeNeutral(src, true, 0.0) else SchemeContent(src, true, 0.0)).toComposeColorScheme()
+    val h = src.hue
+    // How colourful the page may be: the cover's own chroma, capped (a neon cover must not
+    // make an unreadable page), none at all for a black-and-white cover.
+    val c = if (greyscale) 0.0 else minOf(src.chroma, 48.0)
+    fun hct(chroma: Double, tone: Double) = Color(Hct.from(h, chroma, tone).toInt())
+    return base.copy(
+        primary = hct(maxOf(c, 40.0).takeIf { !greyscale } ?: 0.0, 70.0),
+        onPrimary = hct(c * 0.8, 14.0),
+        primaryContainer = hct(c * 0.8, 30.0),
+        onPrimaryContainer = hct(c * 0.3, 92.0),
+        tertiaryContainer = hct(c * 0.22, 93.0),
+        onTertiaryContainer = hct(c * 0.8, 14.0),
+        background = hct(c * 0.42, 7.0),
+        surface = hct(c * 0.42, 7.0),
+        surfaceDim = hct(c * 0.42, 7.0),
+        surfaceContainerLowest = hct(c * 0.4, 4.0),
+        surfaceContainerLow = hct(c * 0.5, 9.0),
+        surfaceContainer = hct(c * 0.6, 12.0),
+        surfaceContainerHigh = hct(c * 0.72, 18.0),
+        surfaceContainerHighest = hct(c * 0.72, 24.0),
+        surfaceBright = hct(c * 0.6, 26.0),
+        onSurface = hct(c * 0.1, 95.0),
+        onBackground = hct(c * 0.1, 95.0),
+        onSurfaceVariant = hct(c * 0.28, 82.0),
+        outline = hct(c * 0.3, 55.0),
+        outlineVariant = hct(c * 0.5, 30.0),
+    )
+}

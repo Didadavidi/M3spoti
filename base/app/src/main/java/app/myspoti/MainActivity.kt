@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                             )
                             signedIn -> if (tv) com.music.spotui.ui.tv.TvApp() else App()
                             connecting -> ConnectingScreen()
-                            else -> WelcomeScreen(onLogin = { showLogin() })
+                            else -> if (tv) com.music.spotui.ui.tv.TvWelcome(onLogin = { showLogin() }) else WelcomeScreen(onLogin = { showLogin() })
                         }
                         // The sign-in page opening (the app's own screen, never a white page) or not coming (an
                         // error with Try again, never a page that stays blank): over whatever is under it.

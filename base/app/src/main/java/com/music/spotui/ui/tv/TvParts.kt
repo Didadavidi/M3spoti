@@ -11,6 +11,8 @@
  */
 package com.music.spotui.ui.tv
 
+import com.music.spotui.ui.theme.coral
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -65,13 +67,11 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
-internal val TvBg = Color(0xFF000000)
-internal val TvAccent = Color(0xFFFF2D78)
-internal val TvTitle = Color(0xFFF2F2F5)
-internal val TvSubtle = Color(0xFF8A8A8E)
-
-/** The tabs of the floating bar, in their order. */
-internal enum class TvTab { Home, Library, Search, NowPlaying }
+// The design's roles, for the pages that name them directly (artist, podcast, devices).
+internal val TvBg: Color @Composable get() = tvScheme.surface
+internal val TvAccent: Color @Composable get() = tvScheme.coral
+internal val TvTitle: Color @Composable get() = tvScheme.onSurface
+internal val TvSubtle: Color @Composable get() = tvScheme.onSurfaceVariant
 
 /**
  * The focus look of a card: a soft scale, a white halo around it and a hairline white border,
@@ -130,82 +130,35 @@ internal fun Modifier.tvPill(
         .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
 }
 
-/** The floating pill of tabs at the top; the white pill marks the open tab. */
+/** A cover with its title and subtitle under it, for shelves and grids: the design's halftone card. */
 @Composable
-internal fun TvTopBar(selected: TvTab, labels: Map<TvTab, String>, onSelect: (TvTab) -> Unit, modifier: Modifier = Modifier) {
-    var barFocused by remember { mutableStateOf(false) }
-    // On Now Playing the bar fades away until the remote reaches it.
-    val alpha by animateFloatAsState(if (selected == TvTab.NowPlaying && !barFocused) 0f else 1f, tween(500), label = "barAlpha")
-    Box(
-        modifier.fillMaxWidth().onFocusChanged { barFocused = it.hasFocus }.graphicsLayer { this.alpha = alpha }.padding(vertical = 14.dp),
-        contentAlignment = Alignment.Center,
+internal fun TvAlbumCard(title: String, subtitle: String, coverUrl: String, size: Dp, round: Boolean = false, modifier: Modifier = Modifier, onClick: () -> Unit) =
+    TvCoverCard(title, subtitle, coverUrl, size, modifier, if (round) androidx.compose.foundation.shape.CircleShape else com.music.spotui.ui.dots.DotShapes.Squircle, onClick)
+
+/** A song of an artist or a podcast: its number (or halftone cover), title and artist, and its length, on a soft row. */
+@Composable
+internal fun TvSongRow(s: com.music.spotui.data.entity.SongsModel, number: Int?, onClick: () -> Unit) {
+    val ui = tvScheme
+    val shape = RoundedCornerShape(20.dp)
+    Row(
+        Modifier.fillMaxWidth().height(64.dp).tvFocus(shape, ui.surface, ui.coral, scale = 1.03f, onClick = onClick).clip(shape)
+            .background(ui.surfaceContainerLow).padding(horizontal = if (number != null) 20.dp else 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            Modifier.clip(RoundedCornerShape(50)).background(Color(0xE61C1C1E))
-                .background(Brush.verticalGradient(0f to Color(0x14FFFFFF), 0.5f to Color.Transparent))
-                .padding(horizontal = 6.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            TvTab.entries.forEach { tab ->
-                val isSelected = tab == selected
-                var focused by remember { mutableStateOf(false) }
-                val bg by animateColorAsState(
-                    when { isSelected -> Color.White; focused -> Color(0xFF2C2C2E); else -> Color.Transparent }, tween(180), label = "tabBg")
-                val fg by animateColorAsState(if (isSelected) Color.Black else if (focused) Color.White else Color(0xFF9A9A9A), tween(180), label = "tabFg")
-                Box(
-                    Modifier.clip(RoundedCornerShape(50)).background(bg)
-                        .onFocusChanged { focused = it.isFocused }
-                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onSelect(tab) }
-                        .padding(horizontal = 18.dp, vertical = 8.dp),
-                ) {
-                    Text(labels[tab].orEmpty(), fontSize = 15.sp, color = fg,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium)
-                }
-            }
+        if (number != null) TvText("$number", ui.onSurfaceVariant, 18.sp, FontWeight.Bold, Modifier.width(32.dp))
+        else TvArt(s.coverUri, s.title, Modifier.size(48.dp), RoundedCornerShape(12.dp), cells = 14f)
+        Column(Modifier.weight(1f).padding(start = if (number == null) 14.dp else 0.dp)) {
+            TvText(s.title, ui.onSurface, 18.sp, FontWeight.ExtraBold)
+            TvText(s.singer, ui.onSurfaceVariant, 16.sp, FontWeight.Medium)
         }
-    }
-}
-
-/** A square cover with its title and subtitle under it, for shelves and grids. */
-@Composable
-internal fun TvAlbumCard(title: String, subtitle: String, coverUrl: String, size: Dp, round: Boolean = false, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val corner = if (round) size / 2 else 12.dp
-    val shape = RoundedCornerShape(corner)
-    Column(modifier.width(size)) {
-        TvCover(coverUrl, Modifier.fillMaxWidth().aspectRatio(1f).tvCard(shape, corner, onClick = onClick), shape)
-        Column(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TvTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (subtitle.isNotBlank()) {
-                Text(subtitle, fontSize = 12.sp, color = TvSubtle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
-            }
-        }
-    }
-}
-
-/** A big square card whose title sits on a tinted scrim over the cover (the lead shelf of Home). */
-@Composable
-internal fun TvGradientCard(title: String, subtitle: String, coverUrl: String, width: Dp, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(16.dp)
-    // A dark scrim, not the cover's own colour: a palette read for every card is too much for a weak TV.
-    val tint = Color(0xFF101012)
-    Box(modifier.width(width).aspectRatio(1f).tvCard(shape, 16.dp, focusedScale = 1.06f, borderAlpha = 0.7f, onClick = onClick)) {
-        TvCover(coverUrl, Modifier.fillMaxSize(), shape)
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.4f to Color.Transparent, 1f to tint.copy(alpha = 0.92f))))
-        Column(Modifier.align(Alignment.BottomStart).padding(14.dp)) {
-            Text(title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            if (subtitle.isNotBlank()) {
-                Text(subtitle, color = Color.White.copy(alpha = 0.78f), fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 2.dp))
-            }
-        }
+        if (s.durationMs > 0) TvText(formatMs(s.durationMs.toLong()), ui.onSurfaceVariant, 16.sp, FontWeight.SemiBold, Modifier.padding(start = 12.dp, end = 8.dp))
     }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun TvCover(url: String, modifier: Modifier, shape: RoundedCornerShape = RoundedCornerShape(8.dp)) {
-    Box(modifier.clip(shape).background(Color(0xFF1C1C1E)), contentAlignment = Alignment.Center) {
+    Box(modifier.clip(shape).background(tvScheme.surfaceContainerLow), contentAlignment = Alignment.Center) {
         if (url.isNotBlank()) GlideImage(model = url, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
         else Icon(Icons.Default.MusicNote, null, tint = Color.White.copy(alpha = 0.2f), modifier = Modifier.size(40.dp))
     }
@@ -225,10 +178,10 @@ internal fun TvIconButton(icon: ImageVector, label: String, size: Dp = 48.dp, ti
 internal fun TvShelfSkeleton(rows: Int = 3) {
     val t = rememberInfiniteTransition(label = "sk")
     val a by t.animateFloat(0.05f, 0.16f, infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Reverse), label = "a")
-    val bar = Color.White.copy(alpha = a)
+    val bar = tvScheme.onSurface.copy(alpha = a)
     Column(Modifier.fillMaxSize().padding(top = 20.dp), verticalArrangement = Arrangement.spacedBy(28.dp)) {
-        SkeletonRow(bar, 200.dp, 5)
-        repeat(rows) { SkeletonRow(bar, 140.dp, 7) }
+        SkeletonRow(bar, 170.dp, 5)
+        repeat(rows) { SkeletonRow(bar, 150.dp, 6) }
     }
 }
 
@@ -239,7 +192,7 @@ private fun SkeletonRow(bar: Color, cardSize: Dp, cards: Int) {
         Row(Modifier.padding(start = 48.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             repeat(cards) {
                 Column {
-                    Box(Modifier.size(cardSize).clip(RoundedCornerShape(12.dp)).background(bar))
+                    Box(Modifier.size(cardSize).clip(RoundedCornerShape(32)).background(bar))
                     Box(Modifier.padding(top = 8.dp).width(cardSize * 0.7f).height(11.dp).clip(RoundedCornerShape(4.dp)).background(bar))
                 }
             }
