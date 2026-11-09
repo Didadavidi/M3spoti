@@ -57,6 +57,10 @@ import com.music.spotui.ui.components.pressable
 import com.music.spotui.ui.theme.AppAccent
 import com.music.spotui.ui.theme.AppBackground
 import com.music.spotui.ui.theme.AppSans
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import com.music.spotui.ui.theme.deep
+import com.music.spotui.ui.theme.coral
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.foundation.border
@@ -68,84 +72,127 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * First screen of a signed-out app: what Myspoti is, then Spotify's own login page
- * (shown by the engine once [onLogin] is tapped). The logo, the name, what the app adds and
- * the button rise into place one after the other, over a soft green light that drifts.
+ * First screen of a signed-out app, in the design: a deep hero card ("Hi. Let's play.") with the
+ * dot field and halftone shapes, then what signing in is and the button that opens Spotify's own
+ * login page ([onLogin]). The email and the code are typed on that page, never in the app.
+ * The parts rise into place one after the other.
  */
 @Composable
 fun WelcomeScreen(onLogin: () -> Unit) {
-    // One entrance per part, a beat apart: logo, name, features, button.
-    val parts = remember { List(4) { Animatable(0f) } }
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    // One entrance per part, a beat apart: hero, text, button.
+    val parts = remember { List(3) { Animatable(0f) } }
     LaunchedEffect(Unit) {
-        parts.forEachIndexed { i, a -> launch { delay(150L + i * 180L); a.animateTo(1f, tween(650, easing = FastOutSlowInEasing)) } }
+        parts.forEachIndexed { i, a -> launch { delay(120L + i * 180L); a.animateTo(1f, tween(650, easing = FastOutSlowInEasing)) } }
     }
     fun Modifier.rise(i: Int) = graphicsLayer {
         val v = parts[i].value
         alpha = v
         translationY = (1f - v) * 24.dp.toPx()
     }
-    Box(Modifier.fillMaxSize().background(AppBackground)) {
-        Glow(Modifier.fillMaxSize())
-        Box(Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 28.dp, vertical = 24.dp)) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth().align(Alignment.Center).padding(bottom = 120.dp),
+    var help by remember { mutableStateOf(false) }
+    if (help) com.music.spotui.ui.components.LoginHelpDialog(onClose = { help = false })
+    Column(
+        Modifier.fillMaxSize().background(AppBackground).systemBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        WelcomeHero(Modifier.weight(1f).fillMaxWidth().rise(0))
+        Column(Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp, top = 24.dp).rise(1)) {
+            Text(
+                stringResource(R.string.welcome_signin_title), color = s.onSurface,
+                fontFamily = com.music.spotui.ui.theme.FlexDisplay, fontWeight = FontWeight.Black, fontSize = 26.sp,
+            )
+            Text(
+                stringResource(R.string.welcome_privacy), color = s.onSurfaceVariant, fontFamily = AppSans,
+                fontSize = 15.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 6.dp),
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth().padding(top = 22.dp).rise(2),
+        ) {
+            // A TV remote: the button takes the focus at once and shows it (a ring); a focus with
+            // no look left nothing on screen to say what OK would do.
+            val ctx = androidx.compose.ui.platform.LocalContext.current
+            val tv = remember { com.music.spotui.ui.tv.Tv.isTv(ctx) }
+            val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+            var focused by remember { mutableStateOf(false) }
+            if (tv) LaunchedEffect(Unit) { delay(300); runCatching { focus.requestFocus() } }
+            androidx.compose.foundation.layout.Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .then(if (tv) Modifier.focusRequester(focus).onFocusChanged { focused = it.isFocused } else Modifier)
+                    .pressable(0.96f, onClick = onLogin)
+                    .clip(RoundedCornerShape(30.dp))
+                    .then(if (focused) Modifier.border(3.dp, s.onSurface, RoundedCornerShape(30.dp)) else Modifier)
+                    .background(s.primary),
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .graphicsLayer {
-                            val v = parts[0].value
-                            alpha = v
-                            val s = 0.85f + 0.15f * v
-                            scaleX = s; scaleY = s
-                        }
-                        .clip(RoundedCornerShape(32.dp))
-                        .background(tone(0xFF181818)),
+                Text(stringResource(R.string.welcome_login), color = s.onPrimary, fontFamily = AppSans,
+                    fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward, null,
+                    tint = s.onPrimary, modifier = Modifier.size(22.dp),
                 )
-                Spacer(Modifier.height(28.dp))
-                Text("M3spoti", color = AppText, fontFamily = AppSans, fontWeight = FontWeight.ExtraBold, fontSize = 40.sp,
-                    modifier = Modifier.rise(1))
-                Spacer(Modifier.height(12.dp))
-                Box(Modifier.rise(2)) { Features() }
             }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).rise(3),
+            // What goes wrong at sign-in, and the way to a report: the app's login help.
+            androidx.compose.foundation.layout.Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 14.dp).clip(RoundedCornerShape(50))
+                    .pressable(0.96f) { help = true }.padding(horizontal = 14.dp, vertical = 10.dp),
             ) {
-                // A TV remote: the button takes the focus at once and shows it (a white ring); a
-                // focus with no look left nothing on screen to say what OK would do.
-                val ctx = androidx.compose.ui.platform.LocalContext.current
-                val tv = remember { com.music.spotui.ui.tv.Tv.isTv(ctx) }
-                val focus = remember { androidx.compose.ui.focus.FocusRequester() }
-                var focused by remember { mutableStateOf(false) }
-                if (tv) LaunchedEffect(Unit) { delay(300); runCatching { focus.requestFocus() } }
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(54.dp)
-                        .then(if (tv) Modifier.focusRequester(focus).onFocusChanged { focused = it.isFocused } else Modifier)
-                        .pressable(0.96f, onClick = onLogin)
-                        .clip(RoundedCornerShape(50))
-                        .then(if (focused) Modifier.border(3.dp, Color.White, RoundedCornerShape(50)) else Modifier)
-                        .background(AppAccent),
-                ) {
-                    Text(stringResource(R.string.welcome_login), color = com.music.spotui.ui.theme.AppOnAccent, fontFamily = AppSans,
-                        fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                }
-                Text(
-                    stringResource(R.string.welcome_privacy),
-                    color = AppText.copy(alpha = 0.5f), fontFamily = AppSans, fontSize = 13.sp, lineHeight = 18.sp,
-                    textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp),
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Outlined.HelpOutline, null,
+                    tint = s.primary, modifier = Modifier.size(18.dp),
                 )
+                Text(stringResource(R.string.welcome_trouble), color = s.primary, fontFamily = AppSans,
+                    fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.padding(start = 6.dp))
             }
         }
     }
 }
+
+/**
+ * The design's welcome card: the deep colour under the Home hero's dot field, a tilted capsule and
+ * two discs in halftone (the design's banded art: nothing is playing yet), and "Hi. Let's play."
+ * set huge and wide at its foot.
+ */
+@Composable
+private fun WelcomeHero(modifier: Modifier) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    val deep = s.deep()
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier.clip(RoundedCornerShape(40.dp)).background(deep)) {
+        com.music.spotui.ui.dots.DotFieldBackground(
+            field = com.music.spotui.ui.dots.DotField.HOME_HERO,
+            inkA = androidx.compose.ui.graphics.lerp(s.primary, s.primaryContainer, 0.45f),
+            inkB = s.coral,
+            step = 8f,
+        )
+        val w = maxWidth
+        val ring = Modifier.border(6.dp, deep, androidx.compose.foundation.shape.CircleShape)
+        // The capsule, upper right, tilted like the Home hero's.
+        Box(
+            Modifier.align(Alignment.TopEnd).padding(top = w * 0.08f, end = w * 0.04f)
+                .size(w * 0.42f, w * 0.66f).graphicsLayer { rotationZ = 38f }
+                .border(6.dp, deep, com.music.spotui.ui.dots.DotShapes.Pill).padding(3.dp),
+        ) {
+            com.music.spotui.ui.dots.HalftoneCover(null, Modifier.fillMaxSize(), com.music.spotui.ui.dots.DotShapes.Pill,
+                cells = 24f, animate = true, fallbackSeed = "M3spoti")
+        }
+        Box(Modifier.align(Alignment.TopStart).padding(start = w * 0.12f, top = w * 0.2f).size(w * 0.3f).then(ring).padding(3.dp)) {
+            com.music.spotui.ui.dots.HalftoneCover(null, Modifier.fillMaxSize(), androidx.compose.foundation.shape.CircleShape,
+                cells = 16f, animate = true, fallbackSeed = "Hi")
+        }
+        Text(
+            stringResource(R.string.welcome_hi),
+            color = Color.White, fontFamily = com.music.spotui.ui.theme.FlexWide, fontWeight = FontWeight.Black,
+            fontSize = 54.sp, lineHeight = 50.sp, letterSpacing = (-1.5).sp,
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = 22.dp, bottom = 22.dp, end = 16.dp),
+        )
+    }
+}
+
 
 /** A soft green light behind the logo, drifting slowly. */
 @Composable

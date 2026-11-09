@@ -1,5 +1,19 @@
 package com.music.spotui.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.material.icons.outlined.Person
+import com.music.spotui.ui.theme.coral
+import com.music.spotui.ui.theme.onCoral
+import com.music.spotui.ui.theme.pink
+import com.music.spotui.ui.theme.onPink
+import com.music.spotui.ui.theme.soft
+import com.music.spotui.ui.theme.onSoft
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,7 +65,9 @@ private class AccountsLook(val text: Color, val muted: Color, val accent: Color,
 @Composable
 private fun accountsLook(): AccountsLook =
     if (isImmersive()) AccountsLook(Immersive.Text, Immersive.TextSecondary, Immersive.Accent, Immersive.Destructive, Color.Transparent)
-    else AccountsLook(AppText, AppMuted, AppAccent, Color(0xFFFF6B6B), tone(0xFF282828))
+    else com.music.spotui.ui.theme.SystemColors.scheme.let { s ->
+        AccountsLook(s.onSurface, s.onSurfaceVariant, s.primary, s.error, s.surfaceContainerHigh)
+    }
 
 /**
  * The Spotify accounts kept on this phone, in both looks (Settings, and the sheet behind the
@@ -75,59 +91,66 @@ fun AccountsList(onLeave: () -> Unit = {}) {
         val active = list.current ?: SavedAccount(profile = list.active)
         listOf(active) + list.accounts.filter { it.profile != list.active }.sortedWith(compareBy<SavedAccount> { !it.known }.thenByDescending { it.usedAt })
     }
-    Column(Modifier.fillMaxWidth()) {
-        shown.forEach { account ->
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    // One colour per account, in the design's order (the active one in the primary container).
+    val badges = listOf(s.primaryContainer to s.onPrimaryContainer, s.coral to s.onCoral, s.pink to s.onPink, s.soft to s.onSoft)
+    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        shown.forEachIndexed { i, account ->
             val active = account.profile == list.active
             // The account in use: its name and picture as read now, before they are saved.
             val name = (if (active) com.music.spotui.data.api.ProfileCache.name else null) ?: account.name
             val image = (if (active) com.music.spotui.data.api.ProfileCache.imageUrl else null) ?: account.imageUrl
             val premium = if (active) livePlan ?: account.premium else account.premium
+            val shownName = name?.takeIf { it.isNotBlank() } ?: stringResource(if (account.known || active) R.string.spotify_account else R.string.accounts_not_signed_in)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(if (i == 0) 24.dp else 18.dp))
+                    .background(if (active) s.primaryContainer.copy(alpha = 0.55f) else s.surfaceContainer)
                     .clickable(enabled = !active, role = Role.Button) { switchTo = account }
-                    .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                    .padding(start = 12.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
             ) {
-                ProfileAvatar(url = image, name = name, size = 40.dp)
-                Column(Modifier.weight(1f).padding(start = 14.dp)) {
-                    Text(
-                        name?.takeIf { it.isNotBlank() } ?: stringResource(if (account.known || active) R.string.spotify_account else R.string.accounts_not_signed_in),
-                        color = look.text, fontSize = 16.sp, fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    )
-                    val plan = when (premium) {
-                        true -> stringResource(R.string.accounts_plan_premium)
-                        false -> stringResource(R.string.accounts_plan_free)
-                        null -> null
-                    }
-                    val detail = listOfNotNull(plan, if (active) stringResource(R.string.accounts_in_use) else null).joinToString(" · ")
-                    if (detail.isNotEmpty()) Text(detail, color = if (active) look.accent else look.muted, fontSize = 12.sp)
+                val (bg, fg) = badges[i % badges.size]
+                Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(bg), contentAlignment = Alignment.Center) {
+                    if (image != null) ProfileAvatar(url = image, name = shownName, size = 48.dp)
+                    else Text(shownName.take(1).uppercase(), color = fg, fontSize = 20.sp, fontWeight = FontWeight.Black)
                 }
-                if (active) Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.accounts_in_use), tint = look.accent,
-                    modifier = Modifier.padding(horizontal = 12.dp).size(22.dp))
+                Column(Modifier.weight(1f).padding(start = 14.dp)) {
+                    Text(shownName, color = s.onSurface, style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (active) Text(stringResource(R.string.accounts_in_use), color = s.onSurfaceVariant, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+                val plan = when (premium) {
+                    true -> stringResource(R.string.accounts_plan_premium)
+                    false -> stringResource(R.string.accounts_plan_free)
+                    null -> null
+                }
+                if (plan != null) Text(
+                    plan, color = s.onSurface, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(horizontal = 6.dp).clip(RoundedCornerShape(50))
+                        .background(if (premium == true) s.surface else s.surfaceContainerHigh).padding(horizontal = 10.dp, vertical = 5.dp),
+                )
+                if (active) Box(Modifier.padding(horizontal = 6.dp).size(32.dp).clip(CircleShape).background(s.primary), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.accounts_in_use), tint = s.onPrimary, modifier = Modifier.size(18.dp))
+                }
                 // The account in use is removed by "Log out"; the others from here.
                 else IconButton(onClick = { remove = account }) {
-                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.accounts_remove), tint = look.muted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.accounts_remove), tint = s.onSurfaceVariant, modifier = Modifier.size(20.dp))
                 }
             }
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-                .clickable(role = Role.Button) {
-                    if (host.multiProfile) { onLeave(); SessionActions.addAccount(Graph.app) } else addSingle = true
-                }
-                .padding(horizontal = 20.dp, vertical = 10.dp),
-        ) {
-            Icon(Icons.Filled.Add, contentDescription = null, tint = look.text, modifier = Modifier.size(40.dp).padding(8.dp))
-            Column(Modifier.padding(start = 14.dp)) {
-                Text(stringResource(R.string.accounts_add), color = look.text, fontSize = 16.sp)
-                Text(stringResource(if (host.multiProfile) R.string.accounts_add_detail else R.string.accounts_add_single_detail), color = look.muted, fontSize = 12.sp)
-            }
+        Box(Modifier.fillMaxWidth().padding(vertical = 8.dp).height(1.dp).background(s.outlineVariant))
+        AccountAction(Icons.Filled.Add, stringResource(R.string.accounts_add),
+            stringResource(if (host.multiProfile) R.string.accounts_add_detail else R.string.accounts_add_single_detail), s.primaryContainer, s.onPrimaryContainer) {
+            if (host.multiProfile) { onLeave(); SessionActions.addAccount(Graph.app) } else addSingle = true
+        }
+        AccountAction(Icons.Outlined.Person, stringResource(R.string.account_page_title), stringResource(R.string.account_page_detail), s.surfaceContainerHigh, s.onSurface) {
+            onLeave()
+            com.music.spotui.ui.screens.AccountBrowser.open(Graph.app, com.music.spotui.ui.screens.AccountBrowser.ACCOUNT_URL)
         }
         Text(
             stringResource(if (host.multiProfile) R.string.accounts_footer else R.string.accounts_single_footer),
-            color = look.muted, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
+            color = s.onSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
         )
     }
     switchTo?.let { account ->
@@ -182,15 +205,38 @@ fun switchAccountDetail(): String {
         .ifEmpty { stringResource(R.string.accounts_switch_row_detail) }
 }
 
-/** [AccountsList] in a sheet of the current look, from the sheet behind the avatar. */
+/** "Add another account", "Manage your account": a round tinted badge, the label and what it does. */
+@Composable
+private fun AccountAction(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, detail: String, bg: Color, fg: Color, onClick: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 4.dp, vertical = 8.dp),
+    ) {
+        Box(Modifier.size(44.dp).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = fg, modifier = Modifier.size(22.dp))
+        }
+        Column(Modifier.padding(start = 14.dp)) {
+            Text(label, color = s.onSurface, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(detail, color = s.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+/** [AccountsList] in the design's sheet: "Accounts" big, a round close button, the cards. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountsSheet(onDismiss: () -> Unit, onLeave: () -> Unit = onDismiss) {
-    val look = accountsLook()
-    LookSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = tone(0xFF282828)) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    LookSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = s.surface) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp)) {
-            Text(stringResource(R.string.accounts_title), color = look.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 16.dp, bottom = 12.dp)) {
+                Text(stringResource(R.string.accounts_title), color = s.onSurface, modifier = Modifier.weight(1f),
+                    fontFamily = com.music.spotui.ui.theme.FlexDisplay, fontWeight = FontWeight.Black, fontSize = 28.sp)
+                Box(Modifier.size(44.dp).clip(CircleShape).background(s.surfaceContainerHigh).clickable(onClick = onDismiss), contentAlignment = Alignment.Center) {
+                    Icon(com.music.spotui.ui.dots.DesignIcons.Close, stringResource(R.string.bottom_actions_close), tint = s.onSurface, modifier = Modifier.size(20.dp))
+                }
+            }
             // Switching or adding leaves the screens: the sheet goes, and whatever opened it.
             AccountsList(onLeave = onLeave)
         }

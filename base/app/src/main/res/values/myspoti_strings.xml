@@ -881,4 +881,25 @@
     <string name="settings_sources_none">No extension plays or downloads music yet: Spotify plays everything. Add one in Extensions.</string>
     <string name="ext_settings_header">Extension settings</string>
     <string name="queue_autoplay_heading">Autoplay</string>
+    <string name="welcome_hi">Hi.\nLet\'s play.</string>
+    <string name="welcome_signin_title">Sign in with Spotify</string>
+    <string name="welcome_trouble">Trouble signing in?</string>
+    <string name="login_help_code_title">Didn\'t get the code?</string>
+    <string name="login_tip_spam">Look in your spam or promotions folder</string>
+    <string name="login_tip_expire">A code only works for a few minutes</string>
+    <string name="login_tip_spelling">Check that your email is spelled right</string>
+    <string name="friends_listening_now">Listening now</string>
+    <string name="whats_new_badge">New</string>
+    <string name="live_radio_live">Live</string>
+    <string name="live_radio_live_radio">Live radio</string>
+    <string name="live_radio_on_air">On air</string>
+    <string name="live_radio_previous_station">Previous station</string>
+    <string name="live_radio_next_station">Next station</string>
+    <string name="automix_song_a">Song A</string>
+    <string name="automix_song_b">Song B</string>
+    <string name="automix_bullet_tempo">Matches the tempo and key of the next song</string>
+    <string name="automix_bullet_moment">Picks the best moment to start the blend</string>
+    <string name="automix_bullet_albums">Albums can stay exactly as the artist made them</string>
+    <string name="sponsorblock_what_to_skip">What to skip</string>
+    <string name="sponsorblock_source_note">Segments come from the community-run SponsorBlock database.</string>
 </resources>

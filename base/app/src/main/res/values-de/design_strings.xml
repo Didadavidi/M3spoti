@@ -69,4 +69,25 @@
     <string name="context_about_release">Veröffentlichung</string>
     <string name="context_about_length">Länge</string>
     <string name="context_find_tracks">Titel suchen</string>
+    <string name="welcome_hi">Hi.\nLos geht\'s.</string>
+    <string name="welcome_signin_title">Mit Spotify anmelden</string>
+    <string name="welcome_trouble">Probleme beim Anmelden?</string>
+    <string name="login_help_code_title">Keinen Code bekommen?</string>
+    <string name="login_tip_spam">Schau im Spam- oder Werbeordner nach</string>
+    <string name="login_tip_expire">Ein Code gilt nur ein paar Minuten</string>
+    <string name="login_tip_spelling">Prüfe, ob deine E-Mail-Adresse richtig geschrieben ist</string>
+    <string name="friends_listening_now">Hört gerade</string>
+    <string name="whats_new_badge">Neu</string>
+    <string name="live_radio_live">Live</string>
+    <string name="live_radio_live_radio">Live-Radio</string>
+    <string name="live_radio_on_air">Auf Sendung</string>
+    <string name="live_radio_previous_station">Vorheriger Sender</string>
+    <string name="live_radio_next_station">Nächster Sender</string>
+    <string name="automix_song_a">Song A</string>
+    <string name="automix_song_b">Song B</string>
+    <string name="automix_bullet_tempo">Passt Tempo und Tonart an den nächsten Song an</string>
+    <string name="automix_bullet_moment">Findet den besten Moment für den Übergang</string>
+    <string name="automix_bullet_albums">Alben können genau so bleiben, wie der Künstler sie gemacht hat</string>
+    <string name="sponsorblock_what_to_skip">Was übersprungen wird</string>
+    <string name="sponsorblock_source_note">Die Abschnitte stammen aus der von der Community gepflegten SponsorBlock-Datenbank.</string>
 </resources>

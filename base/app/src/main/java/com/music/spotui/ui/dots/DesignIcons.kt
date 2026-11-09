@@ -38,6 +38,8 @@ object DesignIcons {
     val Tune by lazy { stroke("tune", 2.6f, "M4 6h10M4 12h4M12 12h8M4 18h12", circle(17f, 6f, 2.2f), circle(10f, 12f, 2.2f), circle(19f, 18f, 2.2f)) }
     val Chevrons by lazy { stroke("chevrons", 3f, "M6 6l6 6-6 6M13 6l6 6-6 6") }
     val Check by lazy { stroke("check", 2.8f, "M5 12l5 5 9-10") }
+    val Minus by lazy { stroke("minus", 2.8f, "M5 12h14") }
+    val Wave by lazy { stroke("wave", 2.6f, "M2 12c2-5 4-5 6 0s4 5 6 0 4-5 6 0 2 3 2 3") }
     val AddToQueue by lazy { stroke("add_queue", 2.8f, "M4 6h11M4 12h11M4 18h7M18 13v8M14 17h8") }
     val Shuffle by lazy { stroke("shuffle", 2.6f, "M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5") }
     val Repeat by lazy { stroke("repeat", 2.6f, "M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4") }

@@ -62,4 +62,25 @@
     <plurals name="library_count">
         <item quantity="other">%d 项</item>
     </plurals>
+    <string name="welcome_hi">嗨。\n开播吧。</string>
+    <string name="welcome_signin_title">使用 Spotify 登录</string>
+    <string name="welcome_trouble">登录遇到问题？</string>
+    <string name="login_help_code_title">没收到验证码？</string>
+    <string name="login_tip_spam">看看垃圾邮件或推广邮件文件夹</string>
+    <string name="login_tip_expire">验证码只在几分钟内有效</string>
+    <string name="login_tip_spelling">检查邮箱地址是否拼写正确</string>
+    <string name="friends_listening_now">正在收听</string>
+    <string name="whats_new_badge">新</string>
+    <string name="live_radio_live">直播</string>
+    <string name="live_radio_live_radio">电台直播</string>
+    <string name="live_radio_on_air">正在播出</string>
+    <string name="live_radio_previous_station">上一个电台</string>
+    <string name="live_radio_next_station">下一个电台</string>
+    <string name="automix_song_a">歌曲 A</string>
+    <string name="automix_song_b">歌曲 B</string>
+    <string name="automix_bullet_tempo">让节奏和调性贴合下一首歌</string>
+    <string name="automix_bullet_moment">挑选开始混音的最佳时机</string>
+    <string name="automix_bullet_albums">专辑可以保持艺人制作时的原样</string>
+    <string name="sponsorblock_what_to_skip">要跳过的内容</string>
+    <string name="sponsorblock_source_note">片段来自社区维护的 SponsorBlock 数据库。</string>
 </resources>

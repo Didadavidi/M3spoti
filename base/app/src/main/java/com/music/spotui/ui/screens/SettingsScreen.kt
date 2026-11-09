@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import com.music.spotui.ui.theme.coral
+import com.music.spotui.ui.theme.deep
 import com.music.spotui.ui.theme.onCoral
 import com.music.spotui.ui.theme.pink
 import com.music.spotui.ui.theme.onPink
@@ -699,42 +700,29 @@ private fun TransitionsRow() {
     val automix = com.music.spotui.automix.AutoMix
     val mode = transition.mode
     var intro by remember { mutableStateOf(false) }
+    val scheme = com.music.spotui.ui.theme.SystemColors.scheme
     @Composable
     fun Chip(label: String, selected: Boolean, onClick: () -> Unit) = Text(
         label,
-        color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText, fontSize = 14.sp,
-        modifier = Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
-            .background(if (selected) com.music.spotui.ui.theme.AppAccent else tone(0xFF2A2A2A))
+        color = if (selected) scheme.onPrimary else scheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold,
+        modifier = Modifier.clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+            .background(if (selected) scheme.primary else scheme.surfaceContainerHigh)
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
     )
-    androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
-        Text(stringResource(R.string.settings_transitions_title), color = AppText, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
-        Text(
-            stringResource(R.string.settings_transitions_detail),
-            color = AppMuted, fontSize = 12.sp,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-        Row(
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(top = 10.dp),
-        ) {
-            Chip(stringResource(R.string.settings_crossfade_off), mode == TransitionMode.OFF) { transition.set(ctx, TransitionMode.OFF) }
-            Chip(stringResource(R.string.settings_crossfade_title), mode == TransitionMode.CROSSFADE) { transition.set(ctx, TransitionMode.CROSSFADE) }
-            Chip(stringResource(R.string.settings_automix_title), mode == TransitionMode.AUTOMIX) {
-                transition.set(ctx, TransitionMode.AUTOMIX)
-                if (!com.music.spotui.ui.components.AutoMixIntro.seen) intro = true
-            }
-        }
-        Text(
-            stringResource(when (mode) {
-                TransitionMode.OFF -> R.string.settings_transition_off_detail
-                TransitionMode.CROSSFADE -> R.string.settings_transition_crossfade_detail
-                TransitionMode.AUTOMIX -> R.string.settings_transition_automix_detail
-            }),
-            color = AppMuted, fontSize = 12.sp,
-            modifier = Modifier.padding(top = 8.dp),
-        )
+    // The page's lead under its title (Settings › Playback › Transitions), then one card per mode.
+    Text(stringResource(R.string.settings_transitions_detail), color = scheme.onSurfaceVariant, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 10.dp))
+    TransitionCard(com.music.spotui.ui.dots.DesignIcons.Minus, stringResource(R.string.settings_crossfade_off),
+        stringResource(R.string.settings_transition_off_detail), 0, mode == TransitionMode.OFF) { transition.set(ctx, TransitionMode.OFF) }
+    TransitionCard(com.music.spotui.ui.dots.DesignIcons.Shuffle, stringResource(R.string.settings_crossfade_title),
+        stringResource(R.string.settings_transition_crossfade_detail), 1, mode == TransitionMode.CROSSFADE) { transition.set(ctx, TransitionMode.CROSSFADE) }
+    TransitionCard(com.music.spotui.ui.dots.DesignIcons.Wave, stringResource(R.string.settings_automix_title),
+        stringResource(R.string.settings_transition_automix_detail), 2, mode == TransitionMode.AUTOMIX) {
+        transition.set(ctx, TransitionMode.AUTOMIX)
+        if (!com.music.spotui.ui.components.AutoMixIntro.seen) intro = true
+    }
+    androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp)) {
         // The long explanation of AutoMix, as the Immersive page gives it under the choice.
         if (mode == TransitionMode.AUTOMIX) Text(
             stringResource(R.string.settings_automix_detail),
@@ -795,17 +783,87 @@ private fun TransitionsRow() {
             automix.pulseLevel, automix::changePulseLevel)
         AutoMixCacheRow()
     }
-    if (intro) androidx.compose.material3.AlertDialog(
-        onDismissRequest = { intro = false; com.music.spotui.ui.components.AutoMixIntro.markSeen() },
-        containerColor = tone(0xFF282828),
-        title = { Text(stringResource(R.string.settings_automix_intro_title), color = AppText) },
-        text = { Text(stringResource(R.string.settings_automix_intro_text), color = AppMuted) },
-        confirmButton = {
-            androidx.compose.material3.TextButton(onClick = { intro = false; com.music.spotui.ui.components.AutoMixIntro.markSeen() }) {
-                Text(stringResource(R.string.settings_automix_intro_ok), color = com.music.spotui.ui.theme.AppAccent)
+    if (intro) AutoMixIntroSheet { intro = false; com.music.spotui.ui.components.AutoMixIntro.markSeen() }
+}
+
+/** One transition mode as the design's card: a round badge, the mode and what it does, a ring that fills when picked. */
+@Composable
+private fun TransitionCard(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, detail: String, index: Int, selected: Boolean, onClick: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().settingsCard()
+            .then(if (selected) Modifier.border(2.dp, s.primary, androidx.compose.foundation.shape.RoundedCornerShape(20.dp)) else Modifier)
+            .clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 12.dp),
+    ) {
+        SettingsBadge(icon, index)
+        Column(Modifier.weight(1f).padding(start = 14.dp, end = 10.dp)) {
+            Text(label, color = s.onSurface, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(detail, color = s.onSurfaceVariant, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+        Box(
+            Modifier.size(28.dp).clip(CircleShape).background(if (selected) s.primary else Color.Transparent)
+                .border(3.dp, if (selected) s.primary else s.outline, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) { if (selected) Icon(com.music.spotui.ui.dots.DesignIcons.Check, null, tint = s.onPrimary, modifier = Modifier.size(16.dp)) }
+    }
+}
+
+/**
+ * "What's AutoMix?", the first time it is picked: two waves crossing on a deep card (song A into
+ * song B), what it does in three ticks, and Got it.
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun AutoMixIntroSheet(onDone: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    val deep = s.deep()
+    androidx.compose.material3.ModalBottomSheet(onDismissRequest = onDone, containerColor = s.surface) {
+        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
+            Box(Modifier.fillMaxWidth().height(140.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(28.dp)).background(deep)) {
+                val a = s.primaryContainer
+                val b = s.coral
+                androidx.compose.foundation.Canvas(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 22.dp)) {
+                    fun wave(color: Color, from: Float, to: Float, phase: Float) {
+                        val path = androidx.compose.ui.graphics.Path()
+                        val steps = 80
+                        for (i in 0..steps) {
+                            val x = size.width * i / steps
+                            val p = i / steps.toFloat()
+                            val alpha = ((p - from) / (to - from)).coerceIn(0f, 1f)
+                            val amp = size.height * 0.42f * (if (from < to) alpha else 1f - alpha)
+                            val y = size.height / 2 + amp * kotlin.math.sin(p * 14f + phase)
+                            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                        }
+                        drawPath(path, color, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 5.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round))
+                    }
+                    wave(a, 1f, 0.15f, 0f)
+                    wave(b, 0.3f, 1f, 1.2f)
+                }
+                Text(stringResource(R.string.automix_song_a).uppercase(), color = a, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp,
+                    modifier = Modifier.align(Alignment.BottomStart).padding(14.dp))
+                Text(stringResource(R.string.automix_song_b).uppercase(), color = b, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(14.dp))
             }
-        },
-    )
+            Text(stringResource(R.string.settings_automix_intro_title), color = s.onSurface, fontFamily = com.music.spotui.ui.theme.FlexDisplay,
+                fontWeight = FontWeight.Black, fontSize = 26.sp, modifier = Modifier.padding(top = 18.dp))
+            Text(stringResource(R.string.settings_automix_intro_text), color = s.onSurfaceVariant, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp))
+            listOf(R.string.automix_bullet_tempo, R.string.automix_bullet_moment, R.string.automix_bullet_albums).forEach { b ->
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 10.dp)) {
+                    Box(Modifier.size(28.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).background(s.primaryContainer), contentAlignment = Alignment.Center) {
+                        Icon(com.music.spotui.ui.dots.DesignIcons.Check, null, tint = s.onPrimaryContainer, modifier = Modifier.size(16.dp))
+                    }
+                    Text(stringResource(b), color = s.onSurface, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 12.dp))
+                }
+            }
+            Text(
+                stringResource(R.string.settings_automix_intro_ok), color = s.onPrimary, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(top = 20.dp).fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                    .background(s.primary).clickable(onClick = onDone).padding(vertical = 16.dp),
+            )
+        }
+    }
 }
 
 /** The AutoMix analyses kept on the phone: their space, and a button that drops them (analysed again when played). */

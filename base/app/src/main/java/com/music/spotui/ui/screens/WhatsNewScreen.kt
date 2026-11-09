@@ -1,5 +1,12 @@
 package com.music.spotui.ui.screens
 
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.height
+import com.music.spotui.ui.theme.deep
+import com.music.spotui.ui.theme.onDeep
+import com.music.spotui.ui.theme.coral
+import com.music.spotui.ui.theme.onCoral
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -256,41 +263,38 @@ internal fun whatsNewDate(item: WhatsNewItem): String {
 }
 
 /**
- * "What's New", behind the bell on Home: the releases of the artists the account follows and the
- * episodes of its shows, newest first, under "New" and "Earlier" as on the Web Player's page.
+ * "What's New", behind the bell on Home, in the design: a round back button and the title set big,
+ * All / Music / Podcasts chips, the newest release as a deep hero card, then the others as cards
+ * (halftone cover, a dot while unseen, a square play button), under "New" and "Earlier".
+ * A long press opens the release's menu (save, share…).
  */
 @Composable
 fun WhatsNewScreen(navController: NavController) {
     var content by remember { mutableStateOf(WhatsNewContent.ALL) }
     var attempt by remember { mutableStateOf(0) }
     val feed = rememberWhatsNewFeed(content, attempt)
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
 
-    Column(Modifier.fillMaxSize().background(com.music.spotui.ui.theme.AppBackground).statusBarsPadding()) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 16.dp, top = 8.dp),
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.accessibility_navigate_back),
-                tint = AppText,
-                modifier = Modifier.wideClickable(horizontal = 8.dp, vertical = 10.dp) { navController.popBackStack() }
-                    .size(40.dp).padding(8.dp),
-            )
-            Text(
-                stringResource(R.string.whats_new_title),
-                fontWeight = FontWeight.Bold, color = AppText, fontSize = 24.sp, maxLines = 1,
-                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 4.dp),
-            )
-        }
+    Column(Modifier.fillMaxSize().background(s.surface).statusBarsPadding()) {
+        Box(
+            Modifier.padding(start = 16.dp, top = 12.dp).size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh)
+                .clickable { navController.popBackStack() },
+            contentAlignment = Alignment.Center,
+        ) { Icon(com.music.spotui.ui.dots.DesignIcons.Back, stringResource(R.string.accessibility_navigate_back), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
         Text(
-            stringResource(R.string.whats_new_subtitle),
-            color = AppMuted, fontSize = 13.sp, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 2.dp),
+            stringResource(R.string.whats_new_title), color = s.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            style = androidx.compose.material3.MaterialTheme.typography.displayMedium,
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp),
+        )
+        Text(
+            stringResource(R.string.whats_new_subtitle), color = s.onSurfaceVariant, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 2.dp),
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
+            FilterPill(stringResource(R.string.filter_chip_all_label), content == WhatsNewContent.ALL) { content = WhatsNewContent.ALL }
             FilterPill(stringResource(R.string.recents_filter_music), content == WhatsNewContent.MUSIC) {
                 content = content.toggled(WhatsNewContent.MUSIC)
             }
@@ -301,95 +305,132 @@ fun WhatsNewScreen(navController: NavController) {
         val sections = feed.sections
         when {
             sections == null && feed.failure != null -> Column(Modifier.padding(20.dp)) {
-                Text(stringResource(R.string.whats_new_failed, feed.failure.orEmpty()), color = AppMuted, fontSize = 14.sp)
+                Text(stringResource(R.string.whats_new_failed, feed.failure.orEmpty()), color = s.onSurfaceVariant, fontSize = 14.sp)
                 Text(
-                    stringResource(R.string.home_retry), color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                    stringResource(R.string.home_retry), color = s.primary, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.padding(top = 12.dp).clickable { attempt++ },
                 )
             }
             sections == null -> com.music.spotui.ui.components.SkeletonList(count = 9)
             sections.fresh.isEmpty() && sections.earlier.isEmpty() -> Text(
-                stringResource(R.string.whats_new_empty), color = AppMuted, fontSize = 14.sp, modifier = Modifier.padding(20.dp),
+                stringResource(R.string.whats_new_empty), color = s.onSurfaceVariant, fontSize = 15.sp, modifier = Modifier.padding(20.dp),
             )
-            else -> LazyColumn(contentPadding = PaddingValues(bottom = com.music.spotui.ui.components.bottomBarsSpace())) {
-                section(R.string.whats_new_section_new, sections.fresh, navController)
-                section(R.string.whats_new_section_earlier, sections.earlier, navController)
+            else -> LazyColumn(
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = com.music.spotui.ui.components.bottomBarsSpace()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val hero = sections.fresh.firstOrNull() ?: sections.earlier.firstOrNull()
+                hero?.let { h -> item(key = "hero") { WhatsNewHero(h) { navController.navigate(h.route()) } } }
+                section(R.string.whats_new_section_new, sections.fresh.filter { it != hero }, fresh = true, navController)
+                section(R.string.whats_new_section_earlier, sections.earlier.filter { it != hero }, fresh = false, navController)
             }
         }
     }
 }
 
-private fun LazyListScope.section(title: Int, list: List<WhatsNewItem>, navController: NavController) {
+private fun LazyListScope.section(title: Int, list: List<WhatsNewItem>, fresh: Boolean, navController: NavController) {
     if (list.isEmpty()) return
     item(key = "title:$title") {
         Text(
-            stringResource(title), color = AppText, fontSize = 18.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 6.dp),
+            stringResource(title), color = com.music.spotui.ui.theme.SystemColors.scheme.primary,
+            fontFamily = com.music.spotui.ui.theme.FlexDisplay, fontSize = 17.sp, fontWeight = FontWeight.Black,
+            modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 12.dp, bottom = 2.dp),
         )
     }
-    items(list, key = { "item:${it.id}" }) { item -> WhatsNewRow(item) { navController.navigate(item.route()) } }
+    items(list, key = { "item:${it.id}" }) { item -> WhatsNewRow(item, fresh) { navController.navigate(item.route()) } }
 }
 
-/**
- * Cover, title, "Single • Artist" (or the show) and the day it came out, then the Web Player's
- * actions: + / ✓ for the library, the ⋯ menu, and play at the end.
- */
-@OptIn(ExperimentalGlideComposeApi::class)
+/** The newest release: a deep card with its cover in a halftone cookie, a NEW badge, the title big and a Play pill. */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-private fun WhatsNewRow(item: WhatsNewItem, onClick: () -> Unit) {
+private fun WhatsNewHero(item: WhatsNewItem, onClick: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    val deep = s.deep()
+    val onDeep = s.onDeep()
     val saved = whatsNewSaved(item)
     val playback = whatsNewPlayback(item)
     var menu by remember { mutableStateOf(false) }
     if (menu) WhatsNewOptionsSheet(item, saved) { menu = false }
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(32.dp)).background(deep)
+            .combinedClickable(onClick = onClick, onLongClick = { menu = true }).padding(16.dp),
     ) {
-        GlideImage(
-            transition = CrossFade,
-            model = item.coverUrl.orEmpty(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(64.dp).clip(RoundedCornerShape(4.dp)).background(tone(0xFF282828)),
-        )
-        Column(Modifier.padding(start = 12.dp).weight(1f)) {
-            Text(item.title, color = if (playback.current) AppAccent else AppText, fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(whatsNewSubtitle(item), color = AppMuted, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            val date = whatsNewDate(item)
-            if (date.isNotEmpty()) Text(date, color = AppMuted, fontSize = 12.sp, maxLines = 1)
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 2.dp)) {
-                LikeButton(liked = saved, size = 24.dp) { SongPlayer.setSaved(item.uri, !saved) }
-                Icon(
-                    Icons.Filled.MoreHoriz,
-                    contentDescription = stringResource(R.string.content_description_context_menu),
-                    tint = AppMuted,
-                    modifier = Modifier.padding(start = 12.dp).clip(CircleShape).clickable { menu = true }.padding(8.dp).size(24.dp),
+        com.music.spotui.ui.dots.HalftoneCover(item.coverUrl, Modifier.size(116.dp), com.music.spotui.ui.dots.DotShapes.cookie(10, 0.1f), cells = 22f, fallbackSeed = item.title)
+        Column(Modifier.weight(1f).padding(start = 16.dp)) {
+            Text(
+                stringResource(R.string.whats_new_badge).uppercase(), color = s.onCoral, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp,
+                modifier = Modifier.clip(RoundedCornerShape(50)).background(s.coral).padding(horizontal = 9.dp, vertical = 3.dp),
+            )
+            Text(item.title, color = onDeep, fontFamily = com.music.spotui.ui.theme.FlexWide, fontWeight = FontWeight.Black, fontSize = 24.sp,
+                lineHeight = 26.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
+            Text(listOf(whatsNewSubtitle(item), whatsNewDate(item)).filter { it.isNotEmpty() }.joinToString(" · "),
+                color = onDeep.copy(alpha = 0.8f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 10.dp).clip(RoundedCornerShape(50)).background(s.primaryContainer)
+                    .clickable { item.togglePlay(playback) }.padding(start = 12.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            ) {
+                Icon(if (playback.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, tint = s.onPrimaryContainer, modifier = Modifier.size(20.dp))
+                Text(
+                    stringResource(if (playback.playing) R.string.content_description_pause_button else R.string.content_description_play_button),
+                    color = s.onPrimaryContainer, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(start = 4.dp),
                 )
-                Spacer(Modifier.weight(1f))
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(40.dp).clip(CircleShape).background(AppText).clickable { item.togglePlay(playback) },
-                ) {
-                    Icon(
-                        if (playback.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        contentDescription = stringResource(if (playback.playing) R.string.content_description_pause_button else R.string.content_description_play_button),
-                        tint = Color.Black,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
             }
+        }
+    }
+}
+
+/**
+ * A release as a card: its cover in halftone, the title (a dot while new), "Single · Artist" and the
+ * day, and a square play button. A long press opens its menu (save to the library, share…).
+ */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun WhatsNewRow(item: WhatsNewItem, fresh: Boolean, onClick: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    val saved = whatsNewSaved(item)
+    val playback = whatsNewPlayback(item)
+    var menu by remember { mutableStateOf(false) }
+    if (menu) WhatsNewOptionsSheet(item, saved) { menu = false }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(s.surfaceContainer)
+            .combinedClickable(onClick = onClick, onLongClick = { menu = true }).padding(10.dp),
+    ) {
+        com.music.spotui.ui.dots.HalftoneCover(item.coverUrl, Modifier.size(64.dp), RoundedCornerShape(18.dp), cells = 14f, fallbackSeed = item.title)
+        Column(Modifier.padding(start = 14.dp).weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(item.title, color = if (playback.current) s.primary else s.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false))
+                if (fresh) Box(Modifier.padding(start = 6.dp).size(8.dp).clip(CircleShape).background(s.coral))
+            }
+            Text(listOf(whatsNewSubtitle(item), whatsNewDate(item)).filter { it.isNotEmpty() }.joinToString(" · "),
+                color = s.onSurfaceVariant, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.padding(start = 8.dp).size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.primary).clickable { item.togglePlay(playback) },
+        ) {
+            Icon(
+                if (playback.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                contentDescription = stringResource(if (playback.playing) R.string.content_description_pause_button else R.string.content_description_play_button),
+                tint = s.onPrimary, modifier = Modifier.size(24.dp),
+            )
         }
     }
 }
 
 @Composable
 private fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
     Box(
-        Modifier.clip(RoundedCornerShape(50))
-            .background(if (selected) AppText else tone(0xFF282828))
+        Modifier.height(40.dp).clip(RoundedCornerShape(16.dp))
+            .then(if (selected) Modifier.background(s.primary) else Modifier.border(2.dp, s.outlineVariant, RoundedCornerShape(16.dp)))
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 7.dp),
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Text(label, color = if (selected) Color.Black else AppText, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        Text(label, color = if (selected) s.onPrimary else s.onSurface, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
     }
 }

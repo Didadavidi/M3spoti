@@ -68,4 +68,25 @@
         <item quantity="many">%d элементов</item>
         <item quantity="other">%d элемента</item>
     </plurals>
+    <string name="welcome_hi">Привет.\nПоехали.</string>
+    <string name="welcome_signin_title">Войти через Spotify</string>
+    <string name="welcome_trouble">Не получается войти?</string>
+    <string name="login_help_code_title">Не пришёл код?</string>
+    <string name="login_tip_spam">Загляните в папку «Спам» или «Промоакции»</string>
+    <string name="login_tip_expire">Код действует всего несколько минут</string>
+    <string name="login_tip_spelling">Проверьте, правильно ли написан e-mail</string>
+    <string name="friends_listening_now">Слушает сейчас</string>
+    <string name="whats_new_badge">Новое</string>
+    <string name="live_radio_live">В эфире</string>
+    <string name="live_radio_live_radio">Радио в эфире</string>
+    <string name="live_radio_on_air">В эфире</string>
+    <string name="live_radio_previous_station">Предыдущая станция</string>
+    <string name="live_radio_next_station">Следующая станция</string>
+    <string name="automix_song_a">Трек A</string>
+    <string name="automix_song_b">Трек B</string>
+    <string name="automix_bullet_tempo">Подстраивает темп и тональность под следующий трек</string>
+    <string name="automix_bullet_moment">Выбирает лучший момент для перехода</string>
+    <string name="automix_bullet_albums">Альбомы могут звучать ровно так, как их сделал артист</string>
+    <string name="sponsorblock_what_to_skip">Что пропускать</string>
+    <string name="sponsorblock_source_note">Фрагменты берутся из базы SponsorBlock, которую ведёт сообщество.</string>
 </resources>

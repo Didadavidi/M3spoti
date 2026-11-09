@@ -68,4 +68,25 @@
         <item quantity="many">%d elementów</item>
         <item quantity="other">%d elementu</item>
     </plurals>
+    <string name="welcome_hi">Cześć.\nGramy.</string>
+    <string name="welcome_signin_title">Zaloguj się przez Spotify</string>
+    <string name="welcome_trouble">Problem z logowaniem?</string>
+    <string name="login_help_code_title">Nie dotarł kod?</string>
+    <string name="login_tip_spam">Zajrzyj do folderu spam lub oferty</string>
+    <string name="login_tip_expire">Kod działa tylko kilka minut</string>
+    <string name="login_tip_spelling">Sprawdź, czy adres e-mail jest poprawny</string>
+    <string name="friends_listening_now">Słucha teraz</string>
+    <string name="whats_new_badge">Nowość</string>
+    <string name="live_radio_live">Na żywo</string>
+    <string name="live_radio_live_radio">Radio na żywo</string>
+    <string name="live_radio_on_air">Na antenie</string>
+    <string name="live_radio_previous_station">Poprzednia stacja</string>
+    <string name="live_radio_next_station">Następna stacja</string>
+    <string name="automix_song_a">Utwór A</string>
+    <string name="automix_song_b">Utwór B</string>
+    <string name="automix_bullet_tempo">Dopasowuje tempo i tonację do następnego utworu</string>
+    <string name="automix_bullet_moment">Wybiera najlepszy moment na przejście</string>
+    <string name="automix_bullet_albums">Albumy mogą zostać dokładnie takie, jakie zrobił je artysta</string>
+    <string name="sponsorblock_what_to_skip">Co pomijać</string>
+    <string name="sponsorblock_source_note">Fragmenty pochodzą z prowadzonej przez społeczność bazy SponsorBlock.</string>
 </resources>

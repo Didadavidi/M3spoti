@@ -66,4 +66,25 @@
         <item quantity="many">%d elementi</item>
         <item quantity="other">%d elementi</item>
     </plurals>
+    <string name="welcome_hi">Ciao.\nSi suona.</string>
+    <string name="welcome_signin_title">Accedi con Spotify</string>
+    <string name="welcome_trouble">Problemi ad accedere?</string>
+    <string name="login_help_code_title">Non ti è arrivato il codice?</string>
+    <string name="login_tip_spam">Guarda nella cartella spam o promozioni</string>
+    <string name="login_tip_expire">Un codice vale solo pochi minuti</string>
+    <string name="login_tip_spelling">Controlla che l\'email sia scritta bene</string>
+    <string name="friends_listening_now">In ascolto ora</string>
+    <string name="whats_new_badge">Nuovo</string>
+    <string name="live_radio_live">Live</string>
+    <string name="live_radio_live_radio">Radio live</string>
+    <string name="live_radio_on_air">In onda</string>
+    <string name="live_radio_previous_station">Stazione precedente</string>
+    <string name="live_radio_next_station">Stazione successiva</string>
+    <string name="automix_song_a">Brano A</string>
+    <string name="automix_song_b">Brano B</string>
+    <string name="automix_bullet_tempo">Adatta tempo e tonalità al brano successivo</string>
+    <string name="automix_bullet_moment">Sceglie il momento migliore per il passaggio</string>
+    <string name="automix_bullet_albums">Gli album possono restare come li ha fatti l\'artista</string>
+    <string name="sponsorblock_what_to_skip">Cosa saltare</string>
+    <string name="sponsorblock_source_note">I segmenti arrivano dal database di SponsorBlock, curato dalla community.</string>
 </resources>

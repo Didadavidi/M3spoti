@@ -123,6 +123,12 @@ fun PlayerScreen(navController: NavController) {
 
     DarkSystemBars()
 
+    // A Live Radio station: the design's radio player (station colours, its mark, Live, stations).
+    com.music.spotui.radio.RadioPlayer.current()?.let { station ->
+        RadioNowPlaying(station, playing, onSleep = { showSleep = true })
+        return
+    }
+
     // The music video: looked up for the song shown, offered as a chip once ready, full screen.
     DisposableEffect(mv) {
         mv.attachPlayerScreen()
@@ -426,6 +432,122 @@ fun PlayerScreen(navController: NavController) {
 private fun clockOf(ms: Long): String {
     val t = (ms / 1000).coerceAtLeast(0)
     return if (t >= 3600) "%d:%02d:%02d".format(t / 3600, t / 60 % 60, t % 60) else "%d:%02d".format(t / 60, t % 60)
+}
+
+/**
+ * The design's radio player: the station's colours (from its logo), a dot field, "● LIVE RADIO",
+ * the station's mark set huge and narrow on a deep card, its name wide, a Live card with what the
+ * directory says of it, previous / stop / next through the favourites (else the popular picks),
+ * and Favourite, Sleep, Share. Pulled down, it closes like the song player.
+ */
+@Composable
+private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playing: Boolean, onSleep: () -> Unit) {
+    val album = ExpressiveColor.scheme
+    val context = LocalContext.current
+    val reveal = com.music.spotui.ui.navigation.LocalPlayerReveal.current
+    var pull by remember { mutableFloatStateOf(0f) }
+    val fav = com.music.spotui.radio.RadioFavoritesStore.favorites.containsKey(station.stationUuid)
+    val favorites = com.music.spotui.radio.RadioFavoritesStore.list()
+    val ring = if (favorites.any { it.stationUuid == station.stationUuid }) favorites else com.music.spotui.radio.RadioBrowserApi.curatedPopular
+    val at = ring.indexOfFirst { it.stationUuid == station.stationUuid }
+    fun step(by: Int) {
+        if (ring.isEmpty()) return
+        val next = if (at < 0) 0 else Math.floorMod(at + by, ring.size)
+        com.music.spotui.radio.RadioPlayer.play(ring[next])
+    }
+    MaterialTheme(colorScheme = album, typography = MaterialTheme.typography) {
+        Box(
+            Modifier.fillMaxSize().graphicsLayer { translationY = pull }.background(album.surface)
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures(
+                        onDragEnd = { if (pull > 140.dp.toPx()) com.music.spotui.ui.navigation.PlayerSheet.close(); pull = 0f },
+                        onDragCancel = { pull = 0f },
+                    ) { change, dy -> if (pull + dy >= 0f) { change.consume(); pull += dy } }
+                },
+        ) {
+            Box(Modifier.fillMaxWidth().height(460.dp)) {
+                DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
+            }
+            com.music.spotui.ui.theme.StatusBarScrim(album.surface)
+            Column(Modifier.fillMaxSize().graphicsLayer { alpha = reveal() }.statusBarsPadding().navigationBarsPadding()) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp)) {
+                    RoundIcon(DesignIcons.Down, stringResource(R.string.player_close), album.surfaceContainerLowest, album.onSurface) {
+                        com.music.spotui.ui.navigation.PlayerSheet.close()
+                    }
+                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(album.surfaceContainerLowest).padding(horizontal = 16.dp, vertical = 10.dp),
+                        ) {
+                            Box(Modifier.size(9.dp).clip(CircleShape).background(album.error))
+                            Text(stringResource(R.string.live_radio_live_radio).uppercase(), color = album.onSurface, fontSize = 13.sp,
+                                fontWeight = FontWeight.Black, letterSpacing = 1.2.sp, modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+                    RoundIcon(DesignIcons.Share, stringResource(R.string.action_share_label), album.surfaceContainerLowest, album.onSurface) {
+                        com.music.spotui.radio.RadioPlayer.share(context)
+                    }
+                }
+                // The station's mark, huge and narrow, on a deep card.
+                Box(
+                    Modifier.padding(start = 24.dp, top = 28.dp).clip(RoundedCornerShape(32.dp)).background(album.surface.copy(alpha = 0.92f))
+                        .padding(horizontal = 18.dp, vertical = 6.dp),
+                ) {
+                    Text(com.music.spotui.radio.ui.stationMark(station.name), color = album.primary, fontFamily = FlexCondensed,
+                        fontWeight = FontWeight.Medium, fontSize = 120.sp, lineHeight = 116.sp, maxLines = 1)
+                }
+                Spacer(Modifier.weight(1f))
+                Column(Modifier.padding(horizontal = 24.dp)) {
+                    com.music.spotui.ui.components.FitText(
+                        station.name, fontSize = 40.sp, minSize = 26.sp, fontWeight = FontWeight.Black, maxLines = 2,
+                        color = album.onSurface, fontFamily = FlexWide,
+                    )
+                    val sub = listOfNotNull(station.tags.firstOrNull()?.takeIf { it.isNotBlank() }?.replaceFirstChar { it.uppercase() },
+                        station.country.takeIf { it.isNotBlank() }).joinToString(" · ")
+                    if (sub.isNotBlank()) Text(sub, color = album.onSurfaceVariant, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 2.dp))
+                }
+                // Live: what the directory says of the stream (no programme guide exists for stations).
+                Column(
+                    Modifier.padding(start = 16.dp, end = 16.dp, top = 18.dp).fillMaxWidth().clip(RoundedCornerShape(24.dp))
+                        .background(album.surfaceContainerHigh).padding(horizontal = 18.dp, vertical = 14.dp),
+                ) {
+                    Text(stringResource(R.string.live_radio_on_air).uppercase(), color = album.primary, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp)
+                    val stream = listOfNotNull(station.codec.takeIf { it.isNotBlank() }, station.bitrateKbps.takeIf { it > 0 }?.let { "$it kbps" },
+                        station.language.takeIf { it.isNotBlank() }?.replaceFirstChar { it.uppercase() }).joinToString(" · ")
+                    Text(station.name, color = album.onSurface, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp))
+                    if (stream.isNotBlank()) Text(stream, color = album.onSurfaceVariant, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                }
+                // Previous / stop / next: through the favourites, else the popular picks.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                    modifier = Modifier.fillMaxWidth().padding(top = 26.dp),
+                ) {
+                    BigPill(DesignIcons.Previous, stringResource(R.string.live_radio_previous_station), album.surfaceContainerHigh, album.onSurface, Modifier.width(96.dp)) { step(-1) }
+                    MorphPlayButton(
+                        playing = playing,
+                        onClick = { if (playing) SongPlayer.pause() else SongPlayer.play() },
+                        container = album.primary, content = album.onPrimary,
+                        width = 104.dp, playingRadius = 52.dp, pausedRadius = 32.dp, iconSize = 38.dp,
+                        label = stringResource(if (playing) R.string.notif_action_pause else R.string.notif_action_play),
+                    )
+                    BigPill(DesignIcons.Next, stringResource(R.string.live_radio_next_station), album.surfaceContainerHigh, album.onSurface, Modifier.width(96.dp)) { step(1) }
+                }
+                Spacer(Modifier.weight(1f))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ChipGap, Alignment.CenterHorizontally),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+                ) {
+                    PlayerChip(if (fav) DesignIcons.Heart else DesignIcons.HeartOutline,
+                        stringResource(if (fav) R.string.live_radio_unfavorite else R.string.live_radio_favorite), album, highlighted = fav) {
+                        com.music.spotui.radio.RadioFavoritesStore.toggle(station)
+                    }
+                    PlayerChip(DesignIcons.Sleep, stringResource(R.string.player_sleep), album, onClick = onSleep)
+                }
+            }
+        }
+    }
 }
 
 @Composable

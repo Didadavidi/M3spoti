@@ -64,4 +64,25 @@
         <item quantity="one">%d στοιχείο</item>
         <item quantity="other">%d στοιχεία</item>
     </plurals>
+    <string name="welcome_hi">Γεια.\nΠάμε.</string>
+    <string name="welcome_signin_title">Σύνδεση με Spotify</string>
+    <string name="welcome_trouble">Πρόβλημα με τη σύνδεση;</string>
+    <string name="login_help_code_title">Δεν ήρθε ο κωδικός;</string>
+    <string name="login_tip_spam">Κοίτα στον φάκελο ανεπιθύμητων ή προωθήσεων</string>
+    <string name="login_tip_expire">Ένας κωδικός ισχύει μόνο λίγα λεπτά</string>
+    <string name="login_tip_spelling">Έλεγξε ότι το email σου είναι σωστά γραμμένο</string>
+    <string name="friends_listening_now">Ακούει τώρα</string>
+    <string name="whats_new_badge">Νέο</string>
+    <string name="live_radio_live">Ζωντανά</string>
+    <string name="live_radio_live_radio">Ζωντανό ραδιόφωνο</string>
+    <string name="live_radio_on_air">Στον αέρα</string>
+    <string name="live_radio_previous_station">Προηγούμενος σταθμός</string>
+    <string name="live_radio_next_station">Επόμενος σταθμός</string>
+    <string name="automix_song_a">Τραγούδι Α</string>
+    <string name="automix_song_b">Τραγούδι Β</string>
+    <string name="automix_bullet_tempo">Ταιριάζει τέμπο και τονικότητα με το επόμενο τραγούδι</string>
+    <string name="automix_bullet_moment">Βρίσκει την καλύτερη στιγμή για τη μίξη</string>
+    <string name="automix_bullet_albums">Τα άλμπουμ μένουν ακριβώς όπως τα έφτιαξε ο καλλιτέχνης</string>
+    <string name="sponsorblock_what_to_skip">Τι παραλείπεται</string>
+    <string name="sponsorblock_source_note">Τα τμήματα προέρχονται από τη βάση δεδομένων SponsorBlock της κοινότητας.</string>
 </resources>

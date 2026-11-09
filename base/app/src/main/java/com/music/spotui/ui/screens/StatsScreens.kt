@@ -1,5 +1,6 @@
 package com.music.spotui.ui.screens
 
+import com.music.spotui.ui.theme.coral
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -268,81 +269,110 @@ fun FriendActivityScreen(navController: NavController) {
         state = runCatching { MyspotiRuntime.api.users.friendActivity() }
     }
     val now = remember(state) { System.currentTimeMillis() }
-    Column(Modifier.fillMaxSize().background(AppBackground).statusBarsPadding()) {
-        // Opened from Home's header (no longer a tab): back to it.
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(4.dp, 12.dp, 8.dp, 8.dp)) {
-            androidx.compose.material3.IconButton(onClick = { navController.popBackStack() }) {
-                Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.accessibility_navigate_back), tint = AppText)
+    val sc = com.music.spotui.ui.theme.SystemColors.scheme
+    Column(Modifier.fillMaxSize().background(sc.surface).statusBarsPadding()) {
+        // Opened from Home's header (no longer a tab): back to it; refresh at the other end.
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp)) {
+            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(sc.surfaceContainerHigh).clickable { navController.popBackStack() },
+                contentAlignment = Alignment.Center) {
+                Icon(com.music.spotui.ui.dots.DesignIcons.Back, stringResource(R.string.accessibility_navigate_back), tint = sc.onSurface, modifier = Modifier.size(22.dp))
             }
-            Text(stringResource(R.string.friends_title), fontWeight = FontWeight.Bold, color = AppText, fontSize = 22.sp, maxLines = 1,
-                overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-            Icon(Icons.Filled.Refresh, stringResource(R.string.friends_refresh), tint = AppText,
-                modifier = Modifier.size(40.dp).clip(CircleShape).clickable { state = null; attempt++ }.padding(8.dp))
+            Spacer(Modifier.weight(1f))
+            Box(Modifier.size(48.dp).clip(CircleShape).background(sc.surfaceContainerHigh).clickable { state = null; attempt++ },
+                contentAlignment = Alignment.Center) {
+                Icon(Icons.Filled.Refresh, stringResource(R.string.friends_refresh), tint = sc.onSurface, modifier = Modifier.size(22.dp))
+            }
         }
+        Text(stringResource(R.string.friends_title), color = sc.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            style = androidx.compose.material3.MaterialTheme.typography.displayMedium,
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 8.dp))
         val s = state
         val friends = s?.getOrNull()
-        LazyColumn(contentPadding = PaddingValues(bottom = com.music.spotui.ui.components.bottomBarsSpace())) {
+        val nowList = friends.orEmpty().filter { it.isNowPlaying(now) }
+        val earlier = friends.orEmpty().filterNot { it.isNowPlaying(now) }
+        LazyColumn(
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = com.music.spotui.ui.components.bottomBarsSpace()),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             when {
                 s == null -> item { com.music.spotui.ui.components.SkeletonList(count = 6, round = true) }
                 friends == null -> item {
                     com.music.spotui.ui.components.ErrorRetry(stringResource(R.string.friends_failed)) { state = null; attempt++ }
                 }
                 friends.isEmpty() -> item {
-                    Text(stringResource(R.string.friends_empty), color = StatsSubtle, fontSize = 14.sp, modifier = Modifier.padding(16.dp))
+                    Text(stringResource(R.string.friends_empty), color = sc.onSurfaceVariant, fontSize = 15.sp, modifier = Modifier.padding(8.dp))
                 }
-                else -> items(friends, key = { it.user.uri }) { f -> FriendRow(f, now, navController) }
+                else -> {
+                    if (nowList.isNotEmpty()) {
+                        item(key = "h-now") { FriendsHeader(stringResource(R.string.friends_listening_now), live = true) }
+                        items(nowList, key = { it.user.uri }) { f -> FriendRow(f, now, navController) }
+                    }
+                    if (earlier.isNotEmpty()) {
+                        item(key = "h-earlier") { FriendsHeader(stringResource(R.string.whats_new_section_earlier), live = false) }
+                        items(earlier, key = { it.user.uri }) { f -> FriendRow(f, now, navController) }
+                    }
+                }
             }
         }
     }
 }
 
+/** "Listening now" (a coral dot before it) or "Earlier", in the design's section style. */
+@Composable
+private fun FriendsHeader(text: String, live: Boolean) {
+    val sc = com.music.spotui.ui.theme.SystemColors.scheme
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 6.dp, top = 10.dp, bottom = 2.dp)) {
+        if (live) { Box(Modifier.size(10.dp).clip(CircleShape).background(sc.coral)); Spacer(Modifier.width(8.dp)) }
+        Text(text, color = sc.primary, fontFamily = com.music.spotui.ui.theme.FlexDisplay, fontSize = 17.sp, fontWeight = FontWeight.Black)
+    }
+}
+
+/**
+ * A friend as a card: their avatar with the track's cover in halftone on its corner, their name,
+ * "Track · Artist", where or when, and a round play button. Tapping the avatar or the name opens
+ * the profile; the card or the button plays the track in its context.
+ */
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun FriendRow(f: FriendActivity, now: Long, navController: NavController) {
+    val sc = com.music.spotui.ui.theme.SystemColors.scheme
     val track = f.track
     val openProfile = { navController.navigate(profileRoute(f.user.uri.substringAfterLast(':'), f.user.name)) }
+    val play = { if (track != null) SongPlayer.playSong(track.uri, contextUri = f.contextUri) else openProfile() }
     Row(
-        verticalAlignment = Alignment.Top,
-        modifier = Modifier.fillMaxWidth()
-            .clickable { if (track != null) SongPlayer.playSong(track.uri, contextUri = f.contextUri) else openProfile() }
-            .padding(16.dp, 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(sc.surfaceContainer)
+            .clickable { play() }.padding(10.dp),
     ) {
-        Box(Modifier.clip(CircleShape).clickable(onClick = openProfile)) {
-            com.music.spotui.ui.components.ProfileAvatar(url = f.user.imageUrl, name = f.user.name, size = 48.dp)
+        Box(Modifier.size(56.dp)) {
+            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).clickable(onClick = openProfile)) {
+                com.music.spotui.ui.components.ProfileAvatar(url = f.user.imageUrl, name = f.user.name, size = 48.dp)
+            }
+            f.trackImageUrl?.let { cover ->
+                Box(Modifier.align(Alignment.BottomEnd).size(26.dp).clip(RoundedCornerShape(8.dp)).background(sc.surfaceContainer).padding(2.dp)) {
+                    com.music.spotui.ui.dots.HalftoneCover(spotifyImageUrl(cover.replaceFirst("http://", "https://")), Modifier.fillMaxSize(),
+                        RoundedCornerShape(6.dp), cells = 10f)
+                }
+            }
         }
         Column(Modifier.padding(start = 12.dp).weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // The name takes the room and the time sits at the end, by the cover (a spacer of
-                // its own shared the room with the name and left the time halfway on wide screens).
-                Box(Modifier.weight(1f)) {
-                    Text(f.user.name, color = AppText, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1,
-                        overflow = TextOverflow.Ellipsis, modifier = Modifier.clickable(onClick = openProfile))
-                }
-                if (f.isNowPlaying(now)) {
-                    Box(Modifier.size(8.dp).clip(CircleShape).background(AppAccent))
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.friends_now), color = AppAccent, fontSize = 12.sp, maxLines = 1)
-                } else if (f.timestampMs > 0) {
-                    Text(
-                        android.text.format.DateUtils.getRelativeTimeSpanString(f.timestampMs, now,
-                            android.text.format.DateUtils.MINUTE_IN_MILLIS, android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE).toString(),
-                        color = StatsSubtle, fontSize = 12.sp, maxLines = 1,
-                    )
-                }
+            Text(f.user.name, color = sc.onSurface, style = androidx.compose.material3.MaterialTheme.typography.titleMedium, maxLines = 1,
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.clickable(onClick = openProfile))
+            if (track != null) Text(listOf(track.name, track.artists.joinToString(", ") { it.name }).filter { it.isNotBlank() }.joinToString(" · "),
+                color = sc.onSurface, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val whenText = when {
+                f.isNowPlaying(now) -> stringResource(R.string.friends_listening_now)
+                f.timestampMs > 0 -> android.text.format.DateUtils.getRelativeTimeSpanString(f.timestampMs, now,
+                    android.text.format.DateUtils.MINUTE_IN_MILLIS, android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE).toString()
+                else -> null
             }
-            if (track != null) {
-                Text(listOf(track.name, track.artists.joinToString(", ") { it.name }).filter { it.isNotBlank() }.joinToString(" • "),
-                    color = AppText, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
-                val where = f.contextName ?: track.album?.name
-                if (!where.isNullOrBlank()) Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
-                    Icon(Icons.Outlined.QueueMusic, contentDescription = null, tint = StatsSubtle, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(where, color = StatsSubtle, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-            }
+            val where = f.contextName ?: track?.album?.name
+            val line = listOfNotNull(where?.takeIf { it.isNotBlank() }, whenText).joinToString(" · ")
+            if (line.isNotEmpty()) Text(line, color = sc.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        f.trackImageUrl?.let { cover ->
-            com.music.spotui.ui.dots.HalftoneCover(spotifyImageUrl(cover.replaceFirst("http://", "https://")), Modifier.padding(start = 10.dp).size(44.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
-        }
+        if (track != null) Box(
+            Modifier.padding(start = 8.dp).size(44.dp).clip(CircleShape).background(sc.surface).clickable { play() },
+            contentAlignment = Alignment.Center,
+        ) { Icon(com.music.spotui.ui.dots.DesignIcons.Play, stringResource(R.string.content_description_play_button), tint = sc.onSurface, modifier = Modifier.size(20.dp)) }
     }
 }
