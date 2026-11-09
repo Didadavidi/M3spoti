@@ -540,7 +540,7 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
                 ) {
                     PlayerChip(if (fav) DesignIcons.Heart else DesignIcons.HeartOutline,
-                        stringResource(if (fav) R.string.live_radio_unfavorite else R.string.live_radio_favorite), album, highlighted = fav) {
+                        stringResource(R.string.live_radio_favorite_chip), album, highlighted = fav) {
                         com.music.spotui.radio.RadioFavoritesStore.toggle(station)
                     }
                     PlayerChip(DesignIcons.Sleep, stringResource(R.string.player_sleep), album, onClick = onSleep)

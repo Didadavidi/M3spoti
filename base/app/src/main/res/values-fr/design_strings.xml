@@ -87,4 +87,7 @@
     <string name="automix_bullet_albums">Les albums peuvent rester tels que l\'artiste les a faits</string>
     <string name="sponsorblock_what_to_skip">Ce qu\'il faut sauter</string>
     <string name="sponsorblock_source_note">Les segments viennent de la base SponsorBlock, tenue par la communauté.</string>
+    <string name="transition_crossfade">Fondu enchaîné</string>
+    <string name="automix_intro_short">AutoMix enchaîne les titres comme un DJ. Il mixe ceux qui viennent des extensions, des téléchargements et des fichiers ; ceux de Spotify ont un court fondu.</string>
+    <string name="live_radio_favorite_chip">Favori</string>
 </resources>

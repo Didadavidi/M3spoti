@@ -87,4 +87,7 @@
     <string name="automix_bullet_albums">Os álbuns podem ficar exatamente como o artista os fez</string>
     <string name="sponsorblock_what_to_skip">O que pular</string>
     <string name="sponsorblock_source_note">Os segmentos vêm do banco de dados do SponsorBlock, mantido pela comunidade.</string>
+    <string name="transition_crossfade">Crossfade</string>
+    <string name="automix_intro_short">O AutoMix emenda as músicas como um DJ. Ele mixa as que tocam de extensões, downloads e arquivos; as do Spotify ganham um crossfade curto.</string>
+    <string name="live_radio_favorite_chip">Favorita</string>
 </resources>

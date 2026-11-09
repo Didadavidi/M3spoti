@@ -283,8 +283,11 @@ fun FriendActivityScreen(navController: NavController) {
                 Icon(Icons.Filled.Refresh, stringResource(R.string.friends_refresh), tint = sc.onSurface, modifier = Modifier.size(22.dp))
             }
         }
-        Text(stringResource(R.string.friends_title), color = sc.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            style = androidx.compose.material3.MaterialTheme.typography.displayMedium,
+        // Shrinks to fit: "Freundesaktivität" was cut to "Freundesakti…".
+        val titleStyle = androidx.compose.material3.MaterialTheme.typography.displayMedium
+        com.music.spotui.ui.components.FitText(
+            stringResource(R.string.friends_title), color = sc.onSurface, maxLines = 1,
+            fontSize = titleStyle.fontSize, minSize = 26.sp, fontWeight = titleStyle.fontWeight, fontFamily = titleStyle.fontFamily,
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 8.dp))
         val s = state
         val friends = s?.getOrNull()

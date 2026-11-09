@@ -89,4 +89,7 @@
     <string name="automix_bullet_albums">Альбомы могут звучать ровно так, как их сделал артист</string>
     <string name="sponsorblock_what_to_skip">Что пропускать</string>
     <string name="sponsorblock_source_note">Фрагменты берутся из базы SponsorBlock, которую ведёт сообщество.</string>
+    <string name="transition_crossfade">Кроссфейд</string>
+    <string name="automix_intro_short">AutoMix сводит треки, как диджей. Он микширует треки из расширений, загрузок и файлов; у треков Spotify — короткий кроссфейд.</string>
+    <string name="live_radio_favorite_chip">Избранное</string>
 </resources>

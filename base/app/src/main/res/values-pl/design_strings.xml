@@ -89,4 +89,7 @@
     <string name="automix_bullet_albums">Albumy mogą zostać dokładnie takie, jakie zrobił je artysta</string>
     <string name="sponsorblock_what_to_skip">Co pomijać</string>
     <string name="sponsorblock_source_note">Fragmenty pochodzą z prowadzonej przez społeczność bazy SponsorBlock.</string>
+    <string name="transition_crossfade">Przenikanie</string>
+    <string name="automix_intro_short">AutoMix łączy utwory jak DJ. Miksuje te z rozszerzeń, pobranych i plików; utwory ze Spotify dostają krótkie przenikanie.</string>
+    <string name="live_radio_favorite_chip">Ulubiona</string>
 </resources>

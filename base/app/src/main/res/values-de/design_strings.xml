@@ -90,4 +90,7 @@
     <string name="automix_bullet_albums">Alben können genau so bleiben, wie der Künstler sie gemacht hat</string>
     <string name="sponsorblock_what_to_skip">Was übersprungen wird</string>
     <string name="sponsorblock_source_note">Die Abschnitte stammen aus der von der Community gepflegten SponsorBlock-Datenbank.</string>
+    <string name="transition_crossfade">Crossfade</string>
+    <string name="automix_intro_short">AutoMix lässt Songs wie ein DJ ineinander übergehen. Gemischt werden Songs aus Erweiterungen, Downloads und Dateien; Spotify-Songs bekommen eine kurze Blende.</string>
+    <string name="live_radio_favorite_chip">Favorit</string>
 </resources>

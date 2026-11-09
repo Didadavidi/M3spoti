@@ -169,7 +169,8 @@ internal fun stationColors(index: Int): Pair<Color, Color> {
     val s = com.music.spotui.ui.theme.SystemColors.scheme
     val list = listOf(
         s.coral to s.onCoral,
-        s.deep() to s.onDeep(),
+        // The deep colour reads in the light theme; in the dark one it sank into the card.
+        if (com.music.spotui.ui.theme.SystemColors.dark) s.primary to s.onPrimary else s.deep() to s.onDeep(),
         s.primaryContainer to s.onPrimaryContainer,
         s.pink to s.onPink,
         s.tertiaryContainer to s.onTertiaryContainer,
@@ -191,8 +192,8 @@ private fun FavoriteCard(station: RadioStation, index: Int) {
                 letterSpacing = 1.sp, modifier = Modifier.padding(start = 6.dp))
         }
         Spacer(Modifier.weight(1f))
-        Text(stationMark(station.name), color = fg, fontFamily = com.music.spotui.ui.theme.FlexCondensed, fontWeight = FontWeight.Medium,
-            fontSize = 48.sp, lineHeight = 46.sp, maxLines = 1)
+        Text(stationMark(station.name), color = fg, fontFamily = com.music.spotui.ui.theme.FlexCondensed, fontWeight = FontWeight.Bold,
+            fontSize = 56.sp, lineHeight = 52.sp, maxLines = 1)
         Text(station.name, color = fg, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, maxLines = 2, lineHeight = 16.sp,
             overflow = TextOverflow.Ellipsis)
     }
@@ -238,8 +239,8 @@ private fun StationRow(station: RadioStation, index: Int) {
     ) {
         Box(Modifier.size(width = 64.dp, height = 52.dp).clip(RoundedCornerShape(16.dp)).background(bg), contentAlignment = Alignment.Center) {
             if (playing) com.music.spotui.ui.immersive.components.ImmersivePlayingBars(Modifier.align(Alignment.Center))
-            else Text(stationMark(station.name), color = fg, fontFamily = com.music.spotui.ui.theme.FlexCondensed, fontWeight = FontWeight.Medium,
-                fontSize = 24.sp, maxLines = 1)
+            else Text(stationMark(station.name), color = fg, fontFamily = com.music.spotui.ui.theme.FlexCondensed, fontWeight = FontWeight.Bold,
+                fontSize = 30.sp, lineHeight = 30.sp, maxLines = 1)
         }
         Column(Modifier.padding(start = 12.dp).weight(1f)) {
             Text(station.name, color = if (current) s.primary else s.onSurface, style = androidx.compose.material3.MaterialTheme.typography.titleMedium,

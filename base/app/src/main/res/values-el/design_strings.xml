@@ -85,4 +85,7 @@
     <string name="automix_bullet_albums">Τα άλμπουμ μένουν ακριβώς όπως τα έφτιαξε ο καλλιτέχνης</string>
     <string name="sponsorblock_what_to_skip">Τι παραλείπεται</string>
     <string name="sponsorblock_source_note">Τα τμήματα προέρχονται από τη βάση δεδομένων SponsorBlock της κοινότητας.</string>
+    <string name="transition_crossfade">Crossfade</string>
+    <string name="automix_intro_short">Το AutoMix δένει τα τραγούδια σαν DJ. Μιξάρει όσα παίζουν από επεκτάσεις, λήψεις και αρχεία· τα τραγούδια του Spotify έχουν σύντομο σβήσιμο.</string>
+    <string name="live_radio_favorite_chip">Αγαπημένο</string>
 </resources>

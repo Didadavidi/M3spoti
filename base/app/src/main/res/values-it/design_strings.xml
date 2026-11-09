@@ -87,4 +87,7 @@
     <string name="automix_bullet_albums">Gli album possono restare come li ha fatti l\'artista</string>
     <string name="sponsorblock_what_to_skip">Cosa saltare</string>
     <string name="sponsorblock_source_note">I segmenti arrivano dal database di SponsorBlock, curato dalla community.</string>
+    <string name="transition_crossfade">Dissolvenza</string>
+    <string name="automix_intro_short">AutoMix fonde i brani come un DJ. Mixa quelli da estensioni, download e file; i brani di Spotify hanno una breve dissolvenza.</string>
+    <string name="live_radio_favorite_chip">Preferito</string>
 </resources>

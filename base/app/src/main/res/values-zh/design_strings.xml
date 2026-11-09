@@ -83,4 +83,7 @@
     <string name="automix_bullet_albums">专辑可以保持艺人制作时的原样</string>
     <string name="sponsorblock_what_to_skip">要跳过的内容</string>
     <string name="sponsorblock_source_note">片段来自社区维护的 SponsorBlock 数据库。</string>
+    <string name="transition_crossfade">淡入淡出</string>
+    <string name="automix_intro_short">AutoMix 像 DJ 一样把歌曲接在一起。它混音来自扩展、下载和文件的歌曲；Spotify 歌曲只做短暂的淡入淡出。</string>
+    <string name="live_radio_favorite_chip">收藏</string>
 </resources>

@@ -715,7 +715,7 @@ private fun TransitionsRow() {
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 10.dp))
     TransitionCard(com.music.spotui.ui.dots.DesignIcons.Minus, stringResource(R.string.settings_crossfade_off),
         stringResource(R.string.settings_transition_off_detail), 0, mode == TransitionMode.OFF) { transition.set(ctx, TransitionMode.OFF) }
-    TransitionCard(com.music.spotui.ui.dots.DesignIcons.Shuffle, stringResource(R.string.settings_crossfade_title),
+    TransitionCard(com.music.spotui.ui.dots.DesignIcons.Shuffle, stringResource(R.string.transition_crossfade),
         stringResource(R.string.settings_transition_crossfade_detail), 1, mode == TransitionMode.CROSSFADE) { transition.set(ctx, TransitionMode.CROSSFADE) }
     TransitionCard(com.music.spotui.ui.dots.DesignIcons.Wave, stringResource(R.string.settings_automix_title),
         stringResource(R.string.settings_transition_automix_detail), 2, mode == TransitionMode.AUTOMIX) {
@@ -821,24 +821,27 @@ private fun AutoMixIntroSheet(onDone: () -> Unit) {
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onDone, containerColor = s.surface) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
             Box(Modifier.fillMaxWidth().height(140.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(28.dp)).background(deep)) {
-                val a = s.primaryContainer
+                // Light on the deep card in both themes: song A in the soft primary, song B in coral.
+                val a = if (com.music.spotui.ui.theme.SystemColors.dark) s.primary else s.primaryContainer
                 val b = s.coral
                 androidx.compose.foundation.Canvas(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 22.dp)) {
-                    fun wave(color: Color, from: Float, to: Float, phase: Float) {
+                    // Song A loud at the left and fading out, song B fading in to the right: the mix in between.
+                    fun wave(color: Color, fadingIn: Boolean, phase: Float) {
                         val path = androidx.compose.ui.graphics.Path()
-                        val steps = 80
+                        val steps = 90
                         for (i in 0..steps) {
                             val x = size.width * i / steps
                             val p = i / steps.toFloat()
-                            val alpha = ((p - from) / (to - from)).coerceIn(0f, 1f)
-                            val amp = size.height * 0.42f * (if (from < to) alpha else 1f - alpha)
-                            val y = size.height / 2 + amp * kotlin.math.sin(p * 14f + phase)
+                            val ramp = ((p - 0.15f) / 0.7f).coerceIn(0f, 1f)
+                            val smooth = ramp * ramp * (3f - 2f * ramp)
+                            val amp = size.height * 0.45f * (if (fadingIn) smooth else 1f - smooth)
+                            val y = size.height / 2 + amp * kotlin.math.sin(p * 16f + phase)
                             if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
                         }
                         drawPath(path, color, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 5.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round))
                     }
-                    wave(a, 1f, 0.15f, 0f)
-                    wave(b, 0.3f, 1f, 1.2f)
+                    wave(a, fadingIn = false, phase = 0f)
+                    wave(b, fadingIn = true, phase = 1.3f)
                 }
                 Text(stringResource(R.string.automix_song_a).uppercase(), color = a, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp,
                     modifier = Modifier.align(Alignment.BottomStart).padding(14.dp))
@@ -847,7 +850,8 @@ private fun AutoMixIntroSheet(onDone: () -> Unit) {
             }
             Text(stringResource(R.string.settings_automix_intro_title), color = s.onSurface, fontFamily = com.music.spotui.ui.theme.FlexDisplay,
                 fontWeight = FontWeight.Black, fontSize = 26.sp, modifier = Modifier.padding(top = 18.dp))
-            Text(stringResource(R.string.settings_automix_intro_text), color = s.onSurfaceVariant, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp))
+            // The short version of upstream's long explanation (the rest is on the Transitions page).
+            Text(stringResource(R.string.automix_intro_short), color = s.onSurfaceVariant, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp))
             listOf(R.string.automix_bullet_tempo, R.string.automix_bullet_moment, R.string.automix_bullet_albums).forEach { b ->
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 10.dp)) {
                     Box(Modifier.size(28.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).background(s.primaryContainer), contentAlignment = Alignment.Center) {
