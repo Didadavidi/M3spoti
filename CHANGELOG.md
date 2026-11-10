@@ -1,10 +1,22 @@
 # Changelog
 
-M3spoti's changes. Everything up to Myspoti 2.3.0, which M3spoti is built on, is in
+M3spoti's changes. Everything up to Myspoti 2.4.0, which M3spoti is built on, is in
 [Myspoti's changelog](https://github.com/kota-zo/myspoti/blob/main/CHANGELOG.md)
 (a copy of its detailed history: [docs/CHANGELOG-full.md](docs/CHANGELOG-full.md)).
 
-## Unreleased (based on Myspoti 2.3.0)
+## Unreleased (based on Myspoti 2.4.0)
+
+**Myspoti 2.4.0, in the new design**
+- Everything new in Myspoti 2.4.0: AutoMix, new-release notices and What's New, romanized lyrics,
+  several accounts, Friends, Jam by link or QR code, Live Radio, voice search, SponsorBlock for
+  podcasts, playlist reordering, speed-ups and fixes.
+- Its screens drawn in the design: the welcome and sign-in help, the account list, What's New,
+  Friend activity, Live Radio and its player, the Transitions page with the "What's AutoMix?" sheet,
+  SponsorBlock, and song picture-in-picture in landscape with the halftone cover.
+- Settings in the design's seven tabs (Playback, Sources, Lyrics, Downloads, Look, About,
+  Accounts) with a search; Look adds the system font.
+- Home gets What's New and Friends buttons in its top bar; Explore gets voice search beside the field.
+- The sign-in screens say M3spoti.
 
 **A new design**
 - Halftone covers everywhere: each cover becomes two-colour dots or wavy lines, whichever suits the

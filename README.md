@@ -40,8 +40,10 @@ support [Myspoti's developer](#support).
 
 ## Status
 
-A personal project. There are **no signed releases yet**: build it yourself (below). For a ready
-APK with in-app updates, use the [official Myspoti](https://github.com/kota-zo/myspoti/releases/latest).
+A personal project, in beta. Signed APKs are on the [Releases](https://github.com/Didadavidi/myspoti-m3e-rebuild/releases)
+page: `ARMv8` for almost every phone, `ARMv7` for older 32-bit ones, `universal` for both, `TV` for
+Android TV (a preview of the TV design). Builds from the Releases page tell you in the app when a new one is out. M3spoti installs
+next to the official [Myspoti](https://github.com/kota-zo/myspoti/releases/latest), as its own app.
 
 ## What Myspoti is
 

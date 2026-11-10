@@ -86,4 +86,5 @@
     <string name="transition_crossfade">淡入淡出</string>
     <string name="automix_intro_short">AutoMix 像 DJ 一样把歌曲接在一起。它混音来自扩展、下载和文件的歌曲；Spotify 歌曲只做短暂的淡入淡出。</string>
     <string name="live_radio_favorite_chip">收藏</string>
+    <string name="automix_limit_intro">混音适用于来自音频源扩展的歌曲、已下载的歌曲和手机上的文件。Spotify 歌曲只会淡入淡出。</string>
 </resources>

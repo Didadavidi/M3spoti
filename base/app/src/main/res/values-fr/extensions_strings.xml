@@ -169,7 +169,7 @@
     <string name="extension_rate_down">La noter mal</string>
     <string name="extension_rated">Merci : votre vote est sur GitHub</string>
     <string name="extension_signin_title">Connexion à GitHub</string>
-    <string name="extension_signin_body">Ouvrez %1$s et tapez ce code. Myspoti ne voit jamais votre mot de passe.</string>
+    <string name="extension_signin_body">Ouvrez %1$s et tapez ce code. M3spoti ne voit jamais votre mot de passe.</string>
     <string name="extension_signin_open">Ouvrir GitHub</string>
     <string name="extension_report">Signaler</string>
     <string name="extension_detail_github">GitHub</string>

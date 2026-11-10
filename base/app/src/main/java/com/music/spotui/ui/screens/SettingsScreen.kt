@@ -860,6 +860,7 @@ private fun AutoMixIntroSheet(onDone: () -> Unit) {
                     Text(stringResource(b), color = s.onSurface, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 12.dp))
                 }
             }
+            Text(stringResource(R.string.automix_limit_intro), color = s.onSurfaceVariant, fontSize = 13.sp, modifier = Modifier.padding(top = 14.dp))
             Text(
                 stringResource(R.string.settings_automix_intro_ok), color = s.onPrimary, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,

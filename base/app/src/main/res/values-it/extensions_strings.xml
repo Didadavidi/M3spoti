@@ -165,7 +165,7 @@
     <string name="extension_rate_down">Valutala male</string>
     <string name="extension_rated">Grazie: il tuo voto è su GitHub</string>
     <string name="extension_signin_title">Accedi a GitHub</string>
-    <string name="extension_signin_body">Apri %1$s e digita questo codice. Myspoti non vede mai la tua password.</string>
+    <string name="extension_signin_body">Apri %1$s e digita questo codice. M3spoti non vede mai la tua password.</string>
     <string name="extension_signin_open">Apri GitHub</string>
     <string name="extension_report">Segnala</string>
     <string name="extension_detail_github">GitHub</string>

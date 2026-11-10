@@ -165,7 +165,7 @@
     <string name="extension_rate_down">差评</string>
     <string name="extension_rated">谢谢：你的投票已记录在 GitHub</string>
     <string name="extension_signin_title">登录 GitHub</string>
-    <string name="extension_signin_body">打开 %1$s 并输入此验证码。Myspoti 不会看到你的密码。</string>
+    <string name="extension_signin_body">打开 %1$s 并输入此验证码。M3spoti 不会看到你的密码。</string>
     <string name="extension_signin_open">打开 GitHub</string>
     <string name="extension_report">举报</string>
     <string name="extension_detail_github">GitHub</string>

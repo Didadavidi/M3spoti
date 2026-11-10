@@ -93,4 +93,5 @@
     <string name="transition_crossfade">Crossfade</string>
     <string name="automix_intro_short">AutoMix lässt Songs wie ein DJ ineinander übergehen. Gemischt werden Songs aus Erweiterungen, Downloads und Dateien; Spotify-Songs bekommen eine kurze Blende.</string>
     <string name="live_radio_favorite_chip">Favorit</string>
+    <string name="automix_limit_intro">Der Übergang funktioniert bei Songs aus einer Audioquellen-Erweiterung, Downloads und Dateien auf deinem Handy. Spotify-Songs werden nur übergeblendet.</string>
 </resources>

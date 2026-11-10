@@ -124,8 +124,8 @@ object UpdateChecker {
 
     /**
      * The release's APK download link for this app's channel and this phone. A release carries
-     * `Myspoti-<version>-ARMv8.apk`, `-ARMv7.apk`, `-universal.apk` and `-TV.apk` (betas:
-     * `Myspoti-Beta-<version>-...`), and the first of [abis] (the phone's, most preferred first)
+     * `M3spoti-<version>-ARMv8.apk`, `-ARMv7.apk`, `-universal.apk` and `-TV.apk` (betas:
+     * `M3spoti-Beta-<version>-...`), and the first of [abis] (the phone's, most preferred first)
      * that has one wins, so a 64-bit phone that also runs armeabi-v7a takes ARMv8. The names of
      * 2.3.x and before come next (older releases): `myspoti-<beta|stable>-<version>-<abi>.apk`, then one APK without an ABI, `myspoti-<beta|stable>-<version>.apk`
      * or `myspoti-<version>.apk`. Only this channel's APK: a release carrying both must not hand a
@@ -135,7 +135,8 @@ object UpdateChecker {
     internal fun apkAsset(release: JSONObject, beta: Boolean = isBeta, abis: List<String> = deviceAbis): String {
         val assets = release.optJSONArray("assets") ?: return ""
         val version = release.optString("tag_name").removePrefix("v")
-        val named = "${if (beta) "Myspoti-Beta" else "Myspoti"}-$version"
+        // M3spoti's own names (collectApks): M3spoti-<version>-ARMv8.apk, M3spoti-Beta-<version>-...
+        val named = "${if (beta) "M3spoti-Beta" else "M3spoti"}-$version"
         val channel = "myspoti-${if (beta) "beta" else "stable"}-$version"
         val byName = (0 until assets.length()).map { assets.getJSONObject(it) }.associateBy { it.optString("name") }
         val ours = abis.filter { it in RELEASE_ABIS }

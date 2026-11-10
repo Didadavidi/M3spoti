@@ -170,7 +170,7 @@
     <string name="extension_rate_down">Rate it bad</string>
     <string name="extension_rated">Thanks: your vote is on GitHub</string>
     <string name="extension_signin_title">Sign in to GitHub</string>
-    <string name="extension_signin_body">Open %1$s and type this code. Myspoti never sees your password.</string>
+    <string name="extension_signin_body">Open %1$s and type this code. M3spoti never sees your password.</string>
     <string name="extension_signin_open">Open GitHub</string>
     <string name="extension_report">Report</string>
     <string name="extension_detail_github">GitHub</string>
