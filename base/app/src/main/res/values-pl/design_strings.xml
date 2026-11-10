@@ -92,4 +92,5 @@
     <string name="transition_crossfade">Przenikanie</string>
     <string name="automix_intro_short">AutoMix łączy utwory jak DJ. Miksuje te z rozszerzeń, pobranych i plików; utwory ze Spotify dostają krótkie przenikanie.</string>
     <string name="live_radio_favorite_chip">Ulubiona</string>
+    <string name="automix_limit_intro">Miks działa dla utworów z rozszerzenia źródła audio, pobranych i plików w twoim telefonie. Utwory ze Spotify tylko płynnie się przenikają.</string>
 </resources>

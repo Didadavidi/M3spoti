@@ -90,4 +90,5 @@
     <string name="transition_crossfade">Crossfade</string>
     <string name="automix_intro_short">O AutoMix emenda as músicas como um DJ. Ele mixa as que tocam de extensões, downloads e arquivos; as do Spotify ganham um crossfade curto.</string>
     <string name="live_radio_favorite_chip">Favorita</string>
+    <string name="automix_limit_intro">A mistura funciona com músicas de uma extensão de fonte de áudio, transferências e ficheiros no teu telemóvel. As músicas do Spotify só fazem esbatimento.</string>
 </resources>

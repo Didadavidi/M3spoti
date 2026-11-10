@@ -90,4 +90,5 @@
     <string name="transition_crossfade">Fondu enchaîné</string>
     <string name="automix_intro_short">AutoMix enchaîne les titres comme un DJ. Il mixe ceux qui viennent des extensions, des téléchargements et des fichiers ; ceux de Spotify ont un court fondu.</string>
     <string name="live_radio_favorite_chip">Favori</string>
+    <string name="automix_limit_intro">Le mix fonctionne pour les titres d\'une extension de source audio, les téléchargements et les fichiers de ton téléphone. Les titres Spotify ne font que s\'enchaîner en fondu.</string>
 </resources>
