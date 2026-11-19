@@ -5,6 +5,8 @@ import com.music.spotui.ui.look.lastPress
 import com.music.spotui.ui.look.tapTime
 import com.music.spotui.ui.look.toSwept
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.PressScale
+import com.music.spotui.ui.components.squeezeButton
 import androidx.compose.ui.res.stringResource
 
 import android.content.Context
@@ -570,9 +572,7 @@ fun LyricsScreen(
             meaning?.takeIf { !it.about.isNullOrBlank() }?.let { m ->
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(48.dp).clickable(
-                        interactionSource = remember { MutableInteractionSource() }, indication = null,
-                    ) { meaningOpen = true },
+                    modifier = Modifier.size(48.dp).pressable(PressScale.ICON) { meaningOpen = true },
                 ) {
                     Icon(Icons.Outlined.Lightbulb, contentDescription = stringResource(R.string.lyrics_meaning_title), tint = palette.highlight)
                 }
@@ -581,9 +581,7 @@ fun LyricsScreen(
             Box {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(48.dp).clickable(
-                        interactionSource = remember { MutableInteractionSource() }, indication = null,
-                    ) { menu = true },
+                    modifier = Modifier.size(48.dp).pressable(PressScale.ICON) { menu = true },
                 ) {
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.content_description_context_menu), tint = palette.highlight)
                 }
@@ -605,9 +603,8 @@ fun LyricsScreen(
             }
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(end = 10.dp).size(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
-                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh)
-                    .clickable(onClick = onClose),
+                modifier = Modifier.padding(end = 10.dp).size(48.dp).pressable(PressScale.ICON, onClick = onClose).clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh),
             ) {
                 Icon(com.music.spotui.ui.dots.DesignIcons.Close, contentDescription = stringResource(R.string.lyrics_fullscreen_close_button_readout_value), tint = palette.highlight, modifier = Modifier.size(22.dp))
             }
@@ -835,9 +832,7 @@ private fun LyricsChip(label: String, icon: Painter?, active: Boolean, loading: 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(if (active) palette.highlight else Color.Black.copy(alpha = 0.22f))
-            .clickable(enabled = !loading, onClick = onClick)
+            .squeezeButton(if (active) palette.highlight else Color.Black.copy(alpha = 0.22f), 16.dp, 9.dp, enabled = !loading, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp),
     ) {
         if (loading) CircularProgressIndicator(color = palette.highlight, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
@@ -902,9 +897,9 @@ private fun LyricsControls(
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 4.dp)
                 .size(60.dp)
+                .pressable(0.92f) { if (SongPlayer.isPlaying()) SongPlayer.pause() else SongPlayer.play() }
                 .clip(CircleShape)
-                .background(palette.highlight)
-                .pressable(0.92f) { if (SongPlayer.isPlaying()) SongPlayer.pause() else SongPlayer.play() },
+                .background(palette.highlight),
         ) {
             com.music.spotui.ui.components.PlayPauseIcon(
                 playing = playing,
@@ -984,9 +979,9 @@ fun InlineLyrics(
             .padding(16.dp, 8.dp, 16.dp, 40.dp)
             // The card's live bounds are read when the lyrics open / close (see LyricsOverlay).
             .onGloballyPositioned { LyricsCardAnchor.coords = it }
+            .pressable(PressScale.CARD) { onExpand() }
             .clip(RoundedCornerShape(12.dp))
             .background(palette.background)
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onExpand() }
             .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -1027,9 +1022,7 @@ fun InlineLyrics(
             Spacer(Modifier.height(16.dp))
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(palette.highlight)
-                    .clickable { onExpand() }
+                    .squeezeButton(palette.highlight, 16.dp, 9.dp) { onExpand() }
                     .padding(16.dp, 8.dp),
             ) {
                 Text(stringResource(R.string.lyrics_card_show_lyrics_button), color = palette.background, fontSize = 13.sp, fontWeight = FontWeight.Bold)
@@ -1044,9 +1037,9 @@ private fun CardIconButton(palette: LyricsPalette, description: String, icon: @C
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(32.dp)
+            .pressable(PressScale.ICON, onClick = onClick)
             .clip(CircleShape)
-            .background(Color.Black.copy(alpha = 0.25f))
-            .clickable(onClick = onClick),
+            .background(Color.Black.copy(alpha = 0.25f)),
     ) { icon() }
 }
 

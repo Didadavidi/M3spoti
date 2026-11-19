@@ -1,5 +1,7 @@
 package com.music.spotui.ui.screens
 
+import com.music.spotui.ui.components.PressScale
+import com.music.spotui.ui.components.squeezeButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,9 +88,8 @@ internal fun DesignChip(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .height(42.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(container)
-            .clickable(onClick = onClick)
+            // Springs under the finger, its corners squeezing while held.
+            .squeezeButton(container, 16.dp, 9.dp, PressScale.ICON, onClick = onClick)
             .padding(horizontal = if (icon != null) 16.dp else 18.dp),
     ) {
         if (icon != null) Icon(icon, null, tint = content, modifier = Modifier.size(20.dp))
@@ -101,9 +102,9 @@ internal fun DesignChip(
 internal fun HeaderButton(icon: ImageVector, label: String, round: Boolean = true, filled: Boolean = false, onClick: () -> Unit) {
     val s = SystemColors.scheme
     Box(
-        Modifier.size(52.dp).clip(if (round) CircleShape else RoundedCornerShape(18.dp))
-            .background(if (filled) s.primaryContainer else s.surfaceContainerHigh)
-            .pressable(0.92f, onClick = onClick),
+        // The spring first, so the whole button bounces, not only its icon.
+        Modifier.size(52.dp).pressable(0.92f, onClick = onClick).clip(if (round) CircleShape else RoundedCornerShape(18.dp))
+            .background(if (filled) s.primaryContainer else s.surfaceContainerHigh),
         contentAlignment = Alignment.Center,
     ) { Icon(icon, label, tint = if (filled) s.onPrimaryContainer else s.onSurface, modifier = Modifier.size(22.dp)) }
 }

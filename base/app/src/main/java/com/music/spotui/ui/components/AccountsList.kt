@@ -14,7 +14,6 @@ import com.music.spotui.ui.theme.pink
 import com.music.spotui.ui.theme.onPink
 import com.music.spotui.ui.theme.soft
 import com.music.spotui.ui.theme.onSoft
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -105,9 +103,9 @@ fun AccountsList(onLeave: () -> Unit = {}) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
+                    .pressable(PressScale.CARD, enabled = !active) { switchTo = account }
                     .clip(RoundedCornerShape(if (i == 0) 24.dp else 18.dp))
                     .background(if (active) s.primaryContainer.copy(alpha = 0.55f) else s.surfaceContainer)
-                    .clickable(enabled = !active, role = Role.Button) { switchTo = account }
                     .padding(start = 12.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
             ) {
                 val (bg, fg) = badges[i % badges.size]
@@ -211,7 +209,7 @@ private fun AccountAction(icon: androidx.compose.ui.graphics.vector.ImageVector,
     val s = com.music.spotui.ui.theme.SystemColors.scheme
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 4.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD, onClick = onClick).clip(RoundedCornerShape(18.dp)).padding(horizontal = 4.dp, vertical = 8.dp),
     ) {
         Box(Modifier.size(44.dp).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) {
             Icon(icon, contentDescription = null, tint = fg, modifier = Modifier.size(22.dp))
@@ -233,7 +231,7 @@ fun AccountsSheet(onDismiss: () -> Unit, onLeave: () -> Unit = onDismiss) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 16.dp, bottom = 12.dp)) {
                 Text(stringResource(R.string.accounts_title), color = s.onSurface, modifier = Modifier.weight(1f),
                     fontFamily = com.music.spotui.ui.theme.FlexDisplay, fontWeight = FontWeight.Black, fontSize = 28.sp)
-                Box(Modifier.size(44.dp).clip(CircleShape).background(s.surfaceContainerHigh).clickable(onClick = onDismiss), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(44.dp).pressable(PressScale.ICON, onClick = onDismiss).clip(CircleShape).background(s.surfaceContainerHigh), contentAlignment = Alignment.Center) {
                     Icon(com.music.spotui.ui.dots.DesignIcons.Close, stringResource(R.string.bottom_actions_close), tint = s.onSurface, modifier = Modifier.size(20.dp))
                 }
             }

@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.zIndex
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -225,8 +224,8 @@ fun DevicesSheet(onDismiss: () -> Unit) {
                         if (remote == null) Text(
                             stringResource(streamingLabel(com.music.spotui.data.preferences.getStreamingQuality(context, com.music.spotui.data.DataSaver.metered))),
                             color = Color(0xFFDDDDDD), fontSize = 12.sp, fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(start = 8.dp).clip(RoundedCornerShape(6.dp)).background(Color(0xFF4A4A4A))
-                                .clickable { quality = true }.padding(horizontal = 6.dp, vertical = 2.dp),
+                            modifier = Modifier.padding(start = 8.dp).pressable(PressScale.ICON) { quality = true }.clip(RoundedCornerShape(6.dp)).background(Color(0xFF4A4A4A))
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
                         )
                     }
                     val title = Graph.currentSongState.title.value
@@ -285,8 +284,8 @@ fun DevicesSheet(onDismiss: () -> Unit) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)
-                    .clip(RoundedCornerShape(12.dp)).background(tone(0xFF333333))
-                    .clickable { AudioRoute.openBluetooth(context) }.padding(14.dp),
+                    .pressable(PressScale.CARD) { AudioRoute.openBluetooth(context) }
+                    .clip(RoundedCornerShape(12.dp)).background(tone(0xFF333333)).padding(14.dp),
             ) {
                 Icon(Icons.Default.Bluetooth, null, tint = Green, modifier = Modifier.size(26.dp))
                 Text(stringResource(R.string.label_bluetooth), color = Green, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
@@ -299,7 +298,7 @@ fun DevicesSheet(onDismiss: () -> Unit) {
 private fun DeviceRow(icon: ImageVector, name: String, detail: String?, current: Boolean = false, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 20.dp, vertical = 14.dp),
+        modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD, onClick = onClick).padding(horizontal = 20.dp, vertical = 14.dp),
     ) {
         Icon(icon, contentDescription = null, tint = if (current) Green else AppText, modifier = Modifier.size(28.dp))
         Spacer(Modifier.width(16.dp))
@@ -358,7 +357,7 @@ fun QualitySheet(onDismiss: () -> Unit) {
             var why by remember { androidx.compose.runtime.mutableStateOf(false) }
             if (extId != null) {
                 Text(stringResource(R.string.why_source_title), color = AppText, fontSize = 15.sp,
-                    modifier = Modifier.fillMaxWidth().clickable { why = true }.padding(horizontal = 20.dp, vertical = 12.dp))
+                    modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) { why = true }.padding(horizontal = 20.dp, vertical = 12.dp))
                 if (why) WhySourceSheet(extId, detectedLabel(com.music.spotui.di.LocalPlayer.audioFormat())) { why = false }
             }
             // Another audio source for this song and the next ones, until the app restarts.
@@ -399,7 +398,7 @@ private fun JamSection(onDismiss: () -> Unit) {
             if (!s.isHost) Text(stringResource(if (s.listensHere) R.string.jam_plays_here else R.string.jam_plays_on_host),
                 color = AppMuted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp, bottom = 4.dp))
             Text(stringResource(R.string.jam_invite), color = AppText, fontSize = 15.sp,
-                modifier = Modifier.fillMaxWidth().clickable {
+                modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) {
                     scope.launch {
                         val url = runCatching { jam.inviteLink() }.getOrNull() ?: return@launch failed()
                         val send = android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_TEXT, url)
@@ -407,13 +406,13 @@ private fun JamSection(onDismiss: () -> Unit) {
                     }
                 }.padding(vertical = 10.dp))
             Text(stringResource(R.string.jam_leave), color = AppText, fontSize = 15.sp,
-                modifier = Modifier.fillMaxWidth().clickable {
+                modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) {
                     scope.launch { runCatching { if (s.isHost) jam.end() else jam.leave() }; onDismiss() }
                 }.padding(vertical = 10.dp))
             return@Column
         }
         if (availability == app.myspoti.api.JamAvailability.AVAILABLE) Text(stringResource(R.string.jam_start), color = Green, fontSize = 15.sp,
-            modifier = Modifier.fillMaxWidth().clickable {
+            modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) {
                 scope.launch { if (runCatching { jam.start() }.isFailure) failed() }
             }.padding(vertical = 10.dp))
         // Spotify refuses to start a Jam on a free account (FREE_USER_NOT_ALLOWED); joining one works.
@@ -421,7 +420,7 @@ private fun JamSection(onDismiss: () -> Unit) {
             color = AppMuted, fontSize = 13.sp, modifier = Modifier.padding(vertical = 6.dp))
         // Join: scan the QR code another phone shows in its Jam.
         Text(stringResource(R.string.jam_scan), color = Green, fontSize = 15.sp,
-            modifier = Modifier.fillMaxWidth().clickable {
+            modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) {
                 com.google.mlkit.vision.codescanner.GmsBarcodeScanning.getClient(context).startScan()
                     .addOnSuccessListener { code ->
                         val raw = code.rawValue.orEmpty()
@@ -432,7 +431,7 @@ private fun JamSection(onDismiss: () -> Unit) {
             }.padding(vertical = 10.dp))
         // Join: an invite link copied from a message.
         Text(stringResource(R.string.jam_paste_link), color = Green, fontSize = 15.sp,
-            modifier = Modifier.fillMaxWidth().clickable {
+            modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) {
                 val clip = context.getSystemService(android.content.ClipboardManager::class.java)?.primaryClip
                 val raw = clip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
                 joinJam(context, raw, onDismiss)
@@ -510,7 +509,7 @@ fun SleepTimerSheet(onDismiss: () -> Unit) {
                     color = AppText, fontSize = 16.sp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { SongPlayer.setSleepTimer(minutes); onDismiss() }
+                        .pressable(PressScale.CARD) { SongPlayer.setSleepTimer(minutes); onDismiss() }
                         .padding(horizontal = 20.dp, vertical = 14.dp),
                 )
             }
@@ -520,7 +519,7 @@ fun SleepTimerSheet(onDismiss: () -> Unit) {
                     color = Green, fontSize = 16.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { SongPlayer.setSleepTimer(null); onDismiss() }
+                        .pressable(PressScale.CARD) { SongPlayer.setSleepTimer(null); onDismiss() }
                         .padding(horizontal = 20.dp, vertical = 14.dp),
                 )
             }
@@ -576,9 +575,9 @@ fun QueueSheet(contextName: String, onDismiss: () -> Unit) {
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier
                                     .size(36.dp)
+                                    .pressable(PressScale.ICON) { if (playing) SongPlayer.pause() else SongPlayer.play() }
                                     .clip(CircleShape)
-                                    .background(AppText)
-                                    .clickable { if (playing) SongPlayer.pause() else SongPlayer.play() },
+                                    .background(AppText),
                             ) {
                                 Icon(
                                     if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
@@ -615,9 +614,7 @@ private fun PillButton(label: String, onClick: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(tone(0xFF3E3E3E))
-            .clickable(onClick = onClick)
+            .squeezeButton(tone(0xFF3E3E3E), 18.dp, 10.dp, onClick = onClick)
             .padding(horizontal = 18.dp, vertical = 8.dp),
     ) { Text(label, color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
 }
@@ -852,7 +849,7 @@ private fun QueueList(
                         color = AppText, fontSize = 13.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .padding(end = 20.dp)
-                            .clickable {
+                            .pressable(PressScale.BUTTON) {
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm)
                                 queued = emptyList(); SongPlayer.clearQueue()
                             },
@@ -897,7 +894,7 @@ private fun QueueList(
                                     modifier = Modifier
                                         .padding(end = 12.dp)
                                         .size(24.dp)
-                                        .clickable {
+                                        .pressable(PressScale.ICON) {
                                             if (e.queued) queued = queued - item else nextUp = nextUp - item
                                             SongPlayer.removeFromQueue(item)
                                         },
@@ -1015,7 +1012,7 @@ private fun QueueSheetRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(QueueRowHeight)
-            .clickable(onClick = onClick)
+            .pressable(PressScale.CARD, onClick = onClick)
             .padding(horizontal = 20.dp),
     ) {
         leading()
@@ -1043,7 +1040,7 @@ private fun QueueSheetRow(
             Icons.Outlined.AddCircleOutline,
             contentDescription = stringResource(R.string.smart_shuffle_add),
             tint = AppText,
-            modifier = Modifier.padding(end = 12.dp).size(26.dp).clip(CircleShape).clickable { com.music.spotui.ui.screens.SmartShuffle.keep(context, song) },
+            modifier = Modifier.padding(end = 12.dp).size(26.dp).pressable(PressScale.ICON) { com.music.spotui.ui.screens.SmartShuffle.keep(context, song) }.clip(CircleShape),
         )
         trailing()
     }
@@ -1054,9 +1051,9 @@ private fun QueueAction(icon: ImageVector, label: String, active: Boolean, modif
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .pressable(PressScale.BUTTON, onClick = onClick)
             .clip(RoundedCornerShape(8.dp))
             .background(tone(0xFF3E3E3E))
-            .clickable(onClick = onClick)
             .padding(vertical = 10.dp),
     ) {
         Icon(icon, contentDescription = null, tint = if (active) Green else AppText, modifier = Modifier.size(26.dp))

@@ -9,14 +9,12 @@ import com.music.spotui.ui.theme.AppMuted
 import kotlinx.coroutines.launch
 import com.music.spotui.ui.components.SearchClearButton
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.pressableLong
 import com.music.spotui.ui.components.launchVoiceSearch
 import androidx.compose.ui.res.stringResource
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -299,8 +297,8 @@ fun SumUpSearchScreen(
                         val q = suggestions[i]
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clip(RoundedCornerShape(50)).background(tone(0xFF2A2A2A))
-                                .pressable(0.96f) { searchViewModel.search(q) }
+                            modifier = Modifier.pressable(0.96f) { searchViewModel.search(q) }
+                                .clip(RoundedCornerShape(50)).background(tone(0xFF2A2A2A))
                                 .padding(horizontal = 12.dp, vertical = 7.dp),
                         ) {
                             Icon(androidx.compose.material.icons.Icons.Default.Search, null, tint = AppMuted, modifier = Modifier.size(14.dp))
@@ -457,9 +455,9 @@ private fun SearchFilterChips(selected: SearchFilter, onSelect: (SearchFilter) -
             val on = f == selected
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.height(42.dp).clip(RoundedCornerShape(16.dp))
+                modifier = Modifier.height(42.dp).pressable(0.96f) { onSelect(if (on && f != SearchFilter.Top) SearchFilter.Top else f) }
+                    .clip(RoundedCornerShape(16.dp))
                     .background(if (on) com.music.spotui.ui.theme.SystemColors.scheme.primary else com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
-                    .pressable(0.96f) { onSelect(if (on && f != SearchFilter.Top) SearchFilter.Top else f) }
                     .padding(horizontal = 18.dp),
             ) {
                 Text(stringResource(f.label), color = if (on) com.music.spotui.ui.theme.SystemColors.scheme.onPrimary else AppText, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
@@ -564,30 +562,26 @@ fun SearchSongRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 3.dp).clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp)
+            .padding(horizontal = 12.dp, vertical = 3.dp)
             // A mouse's right click opens the same menu as the long press (DeX, tablets).
             .secondaryClick(onLongClick)
-            .combinedClickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onLongClick = onLongClick,
-                onClick = {
-                    onPlayed()
-                    // Start a radio from the tapped track (queue = this song + Spotify
-                    // recommendations) rather than queuing the whole search list.
-                    searchViewModel.startRadioFromSong(song)
-                    SongPlayer.playSong(song.url, context, songs = listOf(song), alone = true)
-                    searchViewModel.updateSongState(
-                        song.coverUri,
-                        song.title,
-                        song.singer,
-                        true,
-                        song.id,
-                        0,
-                        song.album,
-                    )
-                },
-            ),
+            .pressableLong(com.music.spotui.ui.components.PressScale.CARD, onLongClick = onLongClick) {
+                onPlayed()
+                // Start a radio from the tapped track (queue = this song + Spotify
+                // recommendations) rather than queuing the whole search list.
+                searchViewModel.startRadioFromSong(song)
+                SongPlayer.playSong(song.url, context, songs = listOf(song), alone = true)
+                searchViewModel.updateSongState(
+                    song.coverUri,
+                    song.title,
+                    song.singer,
+                    true,
+                    song.id,
+                    0,
+                    song.album,
+                )
+            }
+            .clip(RoundedCornerShape(22.dp)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh).padding(10.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -753,12 +747,9 @@ private fun BrowseCategoryTile(
     Box(
         modifier = modifier
             .height(112.dp)
+            .pressable(com.music.spotui.ui.components.PressScale.CARD) { onClick() }
             .clip(RoundedCornerShape(28.dp))
-            .background(tonal)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) { onClick() },
+            .background(tonal),
     ) {
         // A tile with no artwork of its own (New releases) gets the design's banded art from its name.
         com.music.spotui.ui.dots.HalftoneCover(
@@ -870,9 +861,9 @@ fun SearchStickyBar(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(56.dp)
+                .pressable(0.9f) { launchVoiceSearch(context) }
                 .clip(CircleShape)
-                .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
-                .pressable(0.9f) { launchVoiceSearch(context) },
+                .background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh),
         ) {
             Icon(
                 imageVector = Icons.Outlined.Mic,

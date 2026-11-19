@@ -139,8 +139,8 @@ fun WelcomeScreen(onLogin: () -> Unit) {
             // What goes wrong at sign-in, and the way to a report: the app's login help.
             androidx.compose.foundation.layout.Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 14.dp).clip(RoundedCornerShape(50))
-                    .pressable(0.96f) { help = true }.padding(horizontal = 14.dp, vertical = 10.dp),
+                modifier = Modifier.padding(top = 14.dp).pressable(0.96f) { help = true }
+                    .clip(RoundedCornerShape(50)).padding(horizontal = 14.dp, vertical = 10.dp),
             ) {
                 androidx.compose.material3.Icon(
                     androidx.compose.material.icons.Icons.AutoMirrored.Outlined.HelpOutline, null,

@@ -66,6 +66,7 @@ import com.music.spotui.data.api.TopStats
 import com.music.spotui.data.local.ListenHistory
 import com.music.spotui.di.SongPlayer
 import com.music.spotui.ui.components.spotifyImageUrl
+import com.music.spotui.ui.components.pressable
 import com.music.spotui.ui.navigation.artistRoute
 import com.music.spotui.ui.navigation.profileRoute
 import com.music.spotui.ui.theme.AppAccent
@@ -143,8 +144,9 @@ internal fun SpotifyStatsTab(navController: NavController) {
                             itemsIndexed(top.artists, key = { _, a -> a.uri }) { i, a ->
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.width(120.dp).clip(RoundedCornerShape(8.dp))
-                                        .clickable { navController.navigate(artistRoute(a.name, a.uri.substringAfterLast(':'))) },
+                                    modifier = Modifier.width(120.dp)
+                                        .pressable(com.music.spotui.ui.components.PressScale.CARD) { navController.navigate(artistRoute(a.name, a.uri.substringAfterLast(':'))) }
+                                        .clip(RoundedCornerShape(8.dp)),
                                 ) {
                                     com.music.spotui.ui.components.ProfileAvatar(
                                         url = spotifyImageUrl(a.images.best(300)?.url), name = a.name, size = 120.dp)
@@ -161,7 +163,7 @@ internal fun SpotifyStatsTab(navController: NavController) {
                     itemsIndexed(top.tracks, key = { _, t -> t.uri }) { i, t ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().clickable { SongPlayer.playSong(t.uri) }.padding(16.dp, 6.dp),
+                            modifier = Modifier.fillMaxWidth().pressable(com.music.spotui.ui.components.PressScale.CARD) { SongPlayer.playSong(t.uri) }.padding(16.dp, 6.dp),
                         ) {
                             Text("${i + 1}", color = StatsSubtle, fontSize = 16.sp, modifier = Modifier.width(32.dp))
                             GlideImage(transition = CrossFade, model = spotifyImageUrl(t.album?.images?.best(160)?.url), contentDescription = null,
@@ -273,12 +275,12 @@ fun FriendActivityScreen(navController: NavController) {
     Column(Modifier.fillMaxSize().background(sc.surface).statusBarsPadding()) {
         // Opened from Home's header (no longer a tab): back to it; refresh at the other end.
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp)) {
-            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(sc.surfaceContainerHigh).clickable { navController.popBackStack() },
+            Box(Modifier.size(48.dp).pressable(com.music.spotui.ui.components.PressScale.ICON) { navController.popBackStack() }.clip(RoundedCornerShape(16.dp)).background(sc.surfaceContainerHigh),
                 contentAlignment = Alignment.Center) {
                 Icon(com.music.spotui.ui.dots.DesignIcons.Back, stringResource(R.string.accessibility_navigate_back), tint = sc.onSurface, modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.weight(1f))
-            Box(Modifier.size(48.dp).clip(CircleShape).background(sc.surfaceContainerHigh).clickable { state = null; attempt++ },
+            Box(Modifier.size(48.dp).pressable(com.music.spotui.ui.components.PressScale.ICON) { state = null; attempt++ }.clip(CircleShape).background(sc.surfaceContainerHigh),
                 contentAlignment = Alignment.Center) {
                 Icon(Icons.Filled.Refresh, stringResource(R.string.friends_refresh), tint = sc.onSurface, modifier = Modifier.size(22.dp))
             }
@@ -344,11 +346,11 @@ private fun FriendRow(f: FriendActivity, now: Long, navController: NavController
     val play = { if (track != null) SongPlayer.playSong(track.uri, contextUri = f.contextUri) else openProfile() }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(sc.surfaceContainer)
-            .clickable { play() }.padding(10.dp),
+        modifier = Modifier.fillMaxWidth().pressable(com.music.spotui.ui.components.PressScale.CARD) { play() }
+            .clip(RoundedCornerShape(22.dp)).background(sc.surfaceContainer).padding(10.dp),
     ) {
         Box(Modifier.size(56.dp)) {
-            Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).clickable(onClick = openProfile)) {
+            Box(Modifier.size(48.dp).pressable(com.music.spotui.ui.components.PressScale.ICON, onClick = openProfile).clip(RoundedCornerShape(16.dp))) {
                 com.music.spotui.ui.components.ProfileAvatar(url = f.user.imageUrl, name = f.user.name, size = 48.dp)
             }
             f.trackImageUrl?.let { cover ->
@@ -374,7 +376,7 @@ private fun FriendRow(f: FriendActivity, now: Long, navController: NavController
             if (line.isNotEmpty()) Text(line, color = sc.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         if (track != null) Box(
-            Modifier.padding(start = 8.dp).size(44.dp).clip(CircleShape).background(sc.surface).clickable { play() },
+            Modifier.padding(start = 8.dp).size(44.dp).pressable(com.music.spotui.ui.components.PressScale.ICON) { play() }.clip(CircleShape).background(sc.surface),
             contentAlignment = Alignment.Center,
         ) { Icon(com.music.spotui.ui.dots.DesignIcons.Play, stringResource(R.string.content_description_play_button), tint = sc.onSurface, modifier = Modifier.size(20.dp)) }
     }

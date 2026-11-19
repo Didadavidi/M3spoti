@@ -60,6 +60,8 @@ import androidx.navigation.NavController
 import app.myspoti.engine.R
 import com.music.spotui.di.SongPlayer
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.PressScale
+import com.music.spotui.ui.components.squeezeButton
 import com.music.spotui.ui.dots.DesignIcons
 import com.music.spotui.ui.dots.DotShapes
 import com.music.spotui.ui.dots.HalftoneCover
@@ -96,7 +98,7 @@ fun QueueScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
         ) {
             Box(
-                Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh).pressable(0.9f) { navController.navigateUp() },
+                Modifier.size(48.dp).pressable(0.9f) { navController.navigateUp() }.clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh),
                 contentAlignment = Alignment.Center,
             ) { Icon(DesignIcons.Down, stringResource(R.string.bottom_actions_close), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
             Text(
@@ -106,8 +108,7 @@ fun QueueScreen(navController: NavController) {
             if (q.queued.isNotEmpty()) Text(
                 stringResource(R.string.queue_clear),
                 color = s.onSurface, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.clip(RoundedCornerShape(22.dp)).background(s.surfaceContainerHigh)
-                    .clickable { SongPlayer.clearQueue() }.padding(horizontal = 18.dp, vertical = 12.dp),
+                modifier = Modifier.squeezeButton(s.surfaceContainerHigh, 22.dp, 12.dp) { SongPlayer.clearQueue() }.padding(horizontal = 18.dp, vertical = 12.dp),
             )
         }
 
@@ -150,9 +151,8 @@ fun QueueScreen(navController: NavController) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.clip(RoundedCornerShape(14.dp))
-                            .background(if (shuffle) s.tertiaryContainer else s.surfaceContainerHigh)
-                            .clickable { vm.updateShuffleState(!shuffle) }
+                        modifier = Modifier
+                            .squeezeButton(if (shuffle) s.tertiaryContainer else s.surfaceContainerHigh, 14.dp, 8.dp) { vm.updateShuffleState(!shuffle) }
                             .padding(horizontal = 14.dp, vertical = 10.dp),
                     ) {
                         val fg = if (shuffle) s.onTertiaryContainer else s.onSurface
@@ -268,9 +268,9 @@ private fun QueueRow(song: com.music.spotui.data.entity.SongsModel, index: Int, 
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .pressable(PressScale.CARD) { onClick() }
             .clip(RoundedCornerShape(18.dp))
             .background(s.surfaceContainer)
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onClick() }
             .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
     ) {
         val first = index == 0

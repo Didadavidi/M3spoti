@@ -81,8 +81,8 @@ fun AboutSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 12.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
-                    .background(AppAccent).pressable(0.96f) { SupportReminder.open(context) },
+                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth().height(48.dp).pressable(0.96f) { SupportReminder.open(context) }.clip(RoundedCornerShape(50))
+                    .background(AppAccent),
             ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
             GitHubSponsorButton(Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp))
         }
@@ -95,9 +95,9 @@ fun GitHubSponsorButton(modifier: Modifier = Modifier, onClick: (() -> Unit)? = 
     val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
-            .border(1.dp, AppText.copy(alpha = 0.6f), RoundedCornerShape(50))
-            .pressable(0.96f) { onClick?.invoke() ?: SupportReminder.openSponsors(context) },
+        modifier = modifier.fillMaxWidth().height(48.dp).pressable(0.96f) { onClick?.invoke() ?: SupportReminder.openSponsors(context) }
+            .clip(RoundedCornerShape(50))
+            .border(1.dp, AppText.copy(alpha = 0.6f), RoundedCornerShape(50)),
     ) { Text(stringResource(R.string.support_github_action), color = AppText, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
 }
 
@@ -118,8 +118,8 @@ fun SupportSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(top = 10.dp, bottom = 18.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
-                    .background(AppAccent).pressable(0.96f) { onDismiss(); SupportReminder.open(context) },
+                modifier = Modifier.fillMaxWidth().height(48.dp).pressable(0.96f) { onDismiss(); SupportReminder.open(context) }.clip(RoundedCornerShape(50))
+                    .background(AppAccent),
             ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
             GitHubSponsorButton(Modifier.padding(top = 10.dp)) { onDismiss(); SupportReminder.openSponsors(context) }
         }

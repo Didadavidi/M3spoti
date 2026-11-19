@@ -20,6 +20,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -77,12 +80,89 @@ fun Modifier.pressHint(onHint: () -> Unit): Modifier = composed {
 /** The shrink of [pressable], for a control whose clickable sits further down the chain. */
 fun Modifier.pressScale(source: MutableInteractionSource, pressedScale: Float = 0.9f): Modifier = composed {
     val pressed by source.collectIsPressedAsState()
+    // Reduced motion (the phone's setting or the app's): no bounce, the control stays put.
+    val reduce = com.music.spotui.ui.look.rememberReduceMotion()
     val scale by animateFloatAsState(
-        if (pressed) pressedScale else 1f,
+        if (pressed && !reduce) pressedScale else 1f,
         spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
         label = "press",
     )
     graphicsLayer { scaleX = scale; scaleY = scale }
+}
+
+/**
+ * The press scale for size: a small control (icon, chip) 0.9, a button 0.94, a card or a row
+ * as wide as the screen 0.97 (a big thing shrinking far looks like it falls away).
+ */
+object PressScale {
+    const val ICON = 0.9f
+    const val BUTTON = 0.94f
+    const val CARD = 0.97f
+}
+
+/**
+ * [pressable] for an element that also has a long press (a song's menu): the same spring under
+ * the finger, a tap calls [onClick], holding calls [onLongClick].
+ */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+fun Modifier.pressableLong(
+    pressedScale: Float = PressScale.CARD,
+    enabled: Boolean = true,
+    onLongClick: (() -> Unit)?,
+    onClick: () -> Unit,
+): Modifier = composed {
+    val source = remember { MutableInteractionSource() }
+    pressScale(source, pressedScale).combinedClickable(
+        interactionSource = source, indication = null, enabled = enabled,
+        role = androidx.compose.ui.semantics.Role.Button, onLongClick = onLongClick, onClick = onClick,
+    )
+}
+
+/**
+ * The design's squeeze for a pill or rounded button: while it is held its corners spring from
+ * [rest] to [pressed] (a pill becomes a rounded square), then bounce back. Clip and fill the
+ * button with the returned shape and give its clickable the same [source]:
+ *
+ *     val source = remember { MutableInteractionSource() }
+ *     val shape = rememberSqueezeShape(source, 28.dp, 16.dp)
+ *     Modifier.pressScale(source, PressScale.BUTTON).clip(shape).background(c)
+ *         .clickable(source, indication = null) { … }
+ */
+@androidx.compose.runtime.Composable
+fun rememberSqueezeShape(
+    source: MutableInteractionSource,
+    rest: androidx.compose.ui.unit.Dp,
+    pressed: androidx.compose.ui.unit.Dp,
+): androidx.compose.ui.graphics.Shape {
+    val down by source.collectIsPressedAsState()
+    val reduce = com.music.spotui.ui.look.rememberReduceMotion()
+    val corner by androidx.compose.animation.core.animateDpAsState(
+        if (down && !reduce) pressed else rest,
+        spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow),
+        label = "squeeze",
+    )
+    return androidx.compose.foundation.shape.RoundedCornerShape(corner)
+}
+
+/**
+ * A pill or rounded button in one call: springy scale, corners squeezing from [rest] to
+ * [pressed] while held, filled with [color]. Put it where the button's clip, background and
+ * clickable were; padding and content come after it.
+ */
+fun Modifier.squeezeButton(
+    color: Color,
+    rest: androidx.compose.ui.unit.Dp,
+    pressed: androidx.compose.ui.unit.Dp,
+    pressedScale: Float = PressScale.BUTTON,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+): Modifier = composed {
+    val source = remember { MutableInteractionSource() }
+    val shape = rememberSqueezeShape(source, rest, pressed)
+    pressScale(source, pressedScale)
+        .then(androidx.compose.ui.Modifier.clip(shape))
+        .then(androidx.compose.ui.Modifier.background(color, shape))
+        .clickable(source, indication = null, enabled = enabled, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
 }
 
 /**

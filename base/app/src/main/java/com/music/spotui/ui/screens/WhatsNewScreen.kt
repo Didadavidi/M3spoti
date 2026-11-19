@@ -1,6 +1,5 @@
 package com.music.spotui.ui.screens
 
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.height
 import com.music.spotui.ui.theme.deep
@@ -8,7 +7,6 @@ import com.music.spotui.ui.theme.onDeep
 import com.music.spotui.ui.theme.coral
 import com.music.spotui.ui.theme.onCoral
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,6 +64,9 @@ import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.music.spotui.ui.components.wideClickable
+import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.pressableLong
+import com.music.spotui.ui.components.squeezeButton
 import com.music.spotui.data.api.Response
 import com.music.spotui.di.Graph
 import com.music.spotui.di.SongPlayer
@@ -277,8 +278,8 @@ fun WhatsNewScreen(navController: NavController) {
 
     Column(Modifier.fillMaxSize().background(s.surface).statusBarsPadding()) {
         Box(
-            Modifier.padding(start = 16.dp, top = 12.dp).size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh)
-                .clickable { navController.popBackStack() },
+            Modifier.padding(start = 16.dp, top = 12.dp).size(48.dp)
+                .pressable(com.music.spotui.ui.components.PressScale.ICON) { navController.popBackStack() }.clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh),
             contentAlignment = Alignment.Center,
         ) { Icon(com.music.spotui.ui.dots.DesignIcons.Back, stringResource(R.string.accessibility_navigate_back), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
         Text(
@@ -308,7 +309,7 @@ fun WhatsNewScreen(navController: NavController) {
                 Text(stringResource(R.string.whats_new_failed, feed.failure.orEmpty()), color = s.onSurfaceVariant, fontSize = 14.sp)
                 Text(
                     stringResource(R.string.home_retry), color = s.primary, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(top = 12.dp).clickable { attempt++ },
+                    modifier = Modifier.padding(top = 12.dp).pressable(com.music.spotui.ui.components.PressScale.BUTTON) { attempt++ },
                 )
             }
             sections == null -> com.music.spotui.ui.components.SkeletonList(count = 9)
@@ -353,8 +354,8 @@ private fun WhatsNewHero(item: WhatsNewItem, onClick: () -> Unit) {
     if (menu) WhatsNewOptionsSheet(item, saved) { menu = false }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(32.dp)).background(deep)
-            .combinedClickable(onClick = onClick, onLongClick = { menu = true }).padding(16.dp),
+        modifier = Modifier.fillMaxWidth().pressableLong(com.music.spotui.ui.components.PressScale.CARD, onLongClick = { menu = true }) { onClick() }
+            .clip(RoundedCornerShape(32.dp)).background(deep).padding(16.dp),
     ) {
         com.music.spotui.ui.dots.HalftoneCover(item.coverUrl, Modifier.size(116.dp), com.music.spotui.ui.dots.DotShapes.cookie(10, 0.1f), cells = 22f, fallbackSeed = item.title)
         Column(Modifier.weight(1f).padding(start = 16.dp)) {
@@ -368,8 +369,8 @@ private fun WhatsNewHero(item: WhatsNewItem, onClick: () -> Unit) {
                 color = onDeep.copy(alpha = 0.8f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 10.dp).clip(RoundedCornerShape(50)).background(s.primaryContainer)
-                    .clickable { item.togglePlay(playback) }.padding(start = 12.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                modifier = Modifier.padding(top = 10.dp)
+                    .squeezeButton(s.primaryContainer, 18.dp, 10.dp) { item.togglePlay(playback) }.padding(start = 12.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
             ) {
                 Icon(if (playback.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, null, tint = s.onPrimaryContainer, modifier = Modifier.size(20.dp))
                 Text(
@@ -395,8 +396,8 @@ private fun WhatsNewRow(item: WhatsNewItem, fresh: Boolean, onClick: () -> Unit)
     if (menu) WhatsNewOptionsSheet(item, saved) { menu = false }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(s.surfaceContainer)
-            .combinedClickable(onClick = onClick, onLongClick = { menu = true }).padding(10.dp),
+        modifier = Modifier.fillMaxWidth().pressableLong(com.music.spotui.ui.components.PressScale.CARD, onLongClick = { menu = true }) { onClick() }
+            .clip(RoundedCornerShape(22.dp)).background(s.surfaceContainer).padding(10.dp),
     ) {
         com.music.spotui.ui.dots.HalftoneCover(item.coverUrl, Modifier.size(64.dp), RoundedCornerShape(18.dp), cells = 14f, fallbackSeed = item.title)
         Column(Modifier.padding(start = 14.dp).weight(1f)) {
@@ -410,7 +411,8 @@ private fun WhatsNewRow(item: WhatsNewItem, fresh: Boolean, onClick: () -> Unit)
         }
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.padding(start = 8.dp).size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.primary).clickable { item.togglePlay(playback) },
+            modifier = Modifier.padding(start = 8.dp).size(48.dp)
+                .pressable(com.music.spotui.ui.components.PressScale.ICON) { item.togglePlay(playback) }.clip(RoundedCornerShape(16.dp)).background(s.primary),
         ) {
             Icon(
                 if (playback.playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -425,9 +427,8 @@ private fun WhatsNewRow(item: WhatsNewItem, fresh: Boolean, onClick: () -> Unit)
 private fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
     val s = com.music.spotui.ui.theme.SystemColors.scheme
     Box(
-        Modifier.height(40.dp).clip(RoundedCornerShape(16.dp))
+        Modifier.height(40.dp).pressable(com.music.spotui.ui.components.PressScale.ICON, onClick = onClick).clip(RoundedCornerShape(16.dp))
             .then(if (selected) Modifier.background(s.primary) else Modifier.border(2.dp, s.outlineVariant, RoundedCornerShape(16.dp)))
-            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
     ) {

@@ -28,7 +28,7 @@ fun ErrorRetry(message: String, modifier: Modifier = Modifier, onRetry: () -> Un
         Text(message, color = AppText, fontSize = 15.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(14.dp))
         Text(stringResource(R.string.retry_button), color = com.music.spotui.ui.theme.AppBackground, fontSize = 14.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.clip(RoundedCornerShape(50)).background(AppText)
-                .pressable(0.96f) { onRetry() }.padding(horizontal = 22.dp, vertical = 10.dp))
+            modifier = Modifier.pressable(0.96f) { onRetry() }
+                .clip(RoundedCornerShape(50)).background(AppText).padding(horizontal = 22.dp, vertical = 10.dp))
     }
 }

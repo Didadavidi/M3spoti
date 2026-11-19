@@ -544,9 +544,9 @@ fun SumUpLibraryScreen(
                         if (dragged) { scaleX = 1.03f; scaleY = 1.03f }
                     }
                     .padding(horizontal = 12.dp, vertical = 3.dp)
+                    .pressable(0.97f, onPressHint = { prefetchLibraryEntry(entry) }) { openLibraryEntry(entry, navController) }
                     .clip(RoundedCornerShape(22.dp))
                     .background(if (dragged) com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHighest else com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
-                    .pressable(0.97f, onPressHint = { prefetchLibraryEntry(entry) }) { openLibraryEntry(entry, navController) }
                     // Inside the clickable, so a long press that ends without moving opens nothing.
                     .then(if (!movable) Modifier else Modifier.pointerInput(key) {
                         try { detectDragGesturesAfterLongPress(
@@ -577,7 +577,7 @@ fun SumUpLibraryScreen(
                     }
                 }
                 if (entry.uri.isNotBlank() && !LibraryEdits.isPending(entry.spotifyId)) Icon(Icons.Default.MoreVert, stringResource(R.string.content_description_context_menu),
-                    tint = AppMuted, modifier = Modifier.size(36.dp).clip(CircleShape).clickable { itemMenu = entry }.padding(6.dp))
+                    tint = AppMuted, modifier = Modifier.size(36.dp).pressable(com.music.spotui.ui.components.PressScale.ICON) { itemMenu = entry }.clip(CircleShape).padding(6.dp))
             }
         }
         // ── Artists the user follows on Spotify ──
@@ -951,7 +951,7 @@ private fun AccountRow(label: String, tint: Color = AppText, onClick: () -> Unit
         fontSize = 15.sp,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .pressable(com.music.spotui.ui.components.PressScale.CARD) { onClick() }
             .padding(20.dp, 16.dp)
     )
 }
@@ -975,7 +975,7 @@ private fun LibrarySortSheet(onDismiss: () -> Unit) {
             for (sort in LibraryOrder.Sort.entries) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable { LibraryOrder.choose(sort); onDismiss() }
+                    modifier = Modifier.fillMaxWidth().pressable(com.music.spotui.ui.components.PressScale.CARD) { LibraryOrder.choose(sort); onDismiss() }
                         .padding(horizontal = 20.dp, vertical = 14.dp),
                 ) {
                     val selected = LibraryOrder.sort == sort
@@ -987,7 +987,7 @@ private fun LibrarySortSheet(onDismiss: () -> Unit) {
             Text(stringResource(R.string.library_reorder_hint), color = AppMuted, fontSize = 13.sp,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
             Text(stringResource(R.string.library_reorder_reset), color = AppText, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.fillMaxWidth().clickable { LibraryOrder.reset(); onDismiss() }.padding(horizontal = 20.dp, vertical = 14.dp))
+                modifier = Modifier.fillMaxWidth().pressable(com.music.spotui.ui.components.PressScale.CARD) { LibraryOrder.reset(); onDismiss() }.padding(horizontal = 20.dp, vertical = 14.dp))
         }
     }
 }

@@ -64,6 +64,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.OndemandVideo
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.squeezeButton
 import com.music.spotui.ui.dots.DesignIcons
 import com.music.spotui.ui.dots.DotField
 import com.music.spotui.ui.dots.DotFieldBackground
@@ -204,9 +205,7 @@ fun PlayerScreen(navController: NavController) {
                         modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .widthIn(max = 220.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(album.surfaceContainerLowest)
-                            .clickable { contextRoute(np)?.let { navController.navigate(it); PlayerSheet.close() } }
+                            .squeezeButton(album.surfaceContainerLowest, 20.dp, 11.dp) { contextRoute(np)?.let { navController.navigate(it); PlayerSheet.close() } }
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                     )
                 }
@@ -299,9 +298,9 @@ fun PlayerScreen(navController: NavController) {
                     val liked = isLiked.value
                     val radius by androidx.compose.animation.core.animateDpAsState(if (liked) 20.dp else 28.dp, com.music.spotui.ui.dots.bouncy(), label = "like")
                     Box(
-                        Modifier.size(56.dp).clip(RoundedCornerShape(radius))
+                        Modifier.size(56.dp).pressable(0.9f) { vm.updateLikeState(!liked) }
+                            .clip(RoundedCornerShape(radius))
                             .background(if (liked) album.tertiaryContainer else album.surfaceContainerHigh)
-                            .pressable(0.9f) { vm.updateLikeState(!liked) }
                             .semantics { contentDescription = context.getString(if (liked) R.string.player_unlike else R.string.player_like) },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -552,7 +551,7 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
 
 @Composable
 private fun RoundIcon(icon: ImageVector, label: String, bg: Color, fg: Color, onClick: () -> Unit) {
-    Box(Modifier.size(52.dp).clip(CircleShape).background(bg).pressable(0.9f, onClick = onClick), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(52.dp).pressable(0.9f, onClick = onClick).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) {
         Icon(icon, label, tint = fg, modifier = Modifier.size(22.dp))
     }
 }
@@ -560,7 +559,7 @@ private fun RoundIcon(icon: ImageVector, label: String, bg: Color, fg: Color, on
 /** Shuffle / repeat: an icon that turns the primary colour (with a dot under it) when on. */
 @Composable
 private fun ToggleIcon(icon: ImageVector, label: String, on: Boolean, onColor: Color, offColor: Color, badge: String? = null, onClick: () -> Unit) {
-    Box(Modifier.size(48.dp).clip(CircleShape).pressable(0.9f, onClick = onClick), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(48.dp).pressable(0.9f, onClick = onClick).clip(CircleShape), contentAlignment = Alignment.Center) {
         Icon(icon, label, tint = if (on) onColor else offColor, modifier = Modifier.size(24.dp))
         if (badge != null) Text(badge, color = onColor, fontSize = 9.sp, fontWeight = FontWeight.Black, modifier = Modifier.align(Alignment.TopEnd).padding(top = 6.dp, end = 6.dp))
         if (on) Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp).size(4.dp).clip(CircleShape).background(onColor))
@@ -570,7 +569,7 @@ private fun ToggleIcon(icon: ImageVector, label: String, on: Boolean, onColor: C
 /** Previous / next: the design's big rounded pills. */
 @Composable
 private fun BigPill(icon: ImageVector, label: String, bg: Color, fg: Color, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.height(72.dp).clip(RoundedCornerShape(24.dp)).background(bg).pressable(0.94f, onClick = onClick), contentAlignment = Alignment.Center) {
+    Box(modifier.height(72.dp).pressable(0.94f, onClick = onClick).clip(RoundedCornerShape(24.dp)).background(bg), contentAlignment = Alignment.Center) {
         Icon(icon, label, tint = fg, modifier = Modifier.size(28.dp))
     }
 }
@@ -593,7 +592,7 @@ private fun PlayerChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
         modifier = Modifier.height(46.dp).then(if (showLabel) Modifier else Modifier.width(46.dp))
-            .clip(RoundedCornerShape(23.dp)).background(bg).clickable(onClick = onClick)
+            .squeezeButton(bg, 23.dp, 13.dp, onClick = onClick)
             .padding(horizontal = if (showLabel) ChipPadding else 0.dp),
     ) {
         when {
