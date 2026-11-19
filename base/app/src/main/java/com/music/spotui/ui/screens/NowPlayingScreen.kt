@@ -1,5 +1,9 @@
 package com.music.spotui.ui.screens
 
+import com.music.spotui.ui.components.rememberSqueezeShape
+import com.music.spotui.ui.components.pressScale
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -340,14 +344,18 @@ fun PlayerScreen(navController: NavController) {
                 )
             }
 
-            // Shuffle, previous, next, repeat.
+            // Shuffle, previous, next, repeat: a connected group. The button under the finger grows
+            // and pushes its neighbours narrower, then they all spring back.
+            val groupSources = List(4) { remember { MutableInteractionSource() } }
+            val groupWidths = transportGroupWidths(groupSources, listOf(0.6f, 1f, 1f, 0.6f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
                 val smartOn = SmartShuffle.on.value != null && SmartShuffle.on.value == np.contextUri
-                ToggleIcon(DesignIcons.Shuffle, stringResource(R.string.play_mode_item_shuffle_title), shuffle || smartOn, album.primary, album.onSurface) {
+                ToggleIcon(DesignIcons.Shuffle, stringResource(R.string.play_mode_item_shuffle_title), shuffle || smartOn, album.primary, album.onSurface,
+                    modifier = Modifier.weight(groupWidths[0]), source = groupSources[0]) {
                     // As in Spotify: off → shuffle → Smart Shuffle (playlists, Liked Songs) → off.
                     val ctx = np.contextUri
                     when {
@@ -365,14 +373,17 @@ fun PlayerScreen(navController: NavController) {
                         else -> vm.updateShuffleState(!shuffle)
                     }
                 }
-                BigPill(DesignIcons.Previous, stringResource(R.string.np_content_desc_prev), album.surfaceContainerHigh, album.onSurface, Modifier.weight(1f)) {
+                BigPill(DesignIcons.Previous, stringResource(R.string.np_content_desc_prev), album.surfaceContainerHigh, album.onSurface,
+                    Modifier.weight(groupWidths[1]), source = groupSources[1], pressedScale = 1f) {
                     vm.playPreviousSong(queueSongs, context)
                 }
-                BigPill(DesignIcons.Next, stringResource(R.string.np_content_desc_next), album.surfaceContainerHigh, album.onSurface, Modifier.weight(1f)) {
+                BigPill(DesignIcons.Next, stringResource(R.string.np_content_desc_next), album.surfaceContainerHigh, album.onSurface,
+                    Modifier.weight(groupWidths[2]), source = groupSources[2], pressedScale = 1f) {
                     vm.playNextSongs(queueSongs, context)
                 }
                 ToggleIcon(DesignIcons.Repeat, stringResource(R.string.np_content_desc_repeat), repeatMode != 0, album.primary, album.onSurface,
-                    badge = when (repeatMode) { 2 -> "1"; 3 -> "1×"; else -> null }) { SongPlayer.cycleRepeat() }
+                    badge = when (repeatMode) { 2 -> "1"; 3 -> "1×"; else -> null },
+                    modifier = Modifier.weight(groupWidths[3]), source = groupSources[3]) { SongPlayer.cycleRepeat() }
             }
 
             Spacer(Modifier.weight(1f))
@@ -556,20 +567,63 @@ private fun RoundIcon(icon: ImageVector, label: String, bg: Color, fg: Color, on
     }
 }
 
+/**
+ * The widths of a connected button group, as row weights from [base]: the button whose [sources]
+ * is pressed grows by a third, its direct neighbours give way, on a bouncy spring. Reduced
+ * motion keeps them still.
+ */
+@Composable
+private fun transportGroupWidths(sources: List<MutableInteractionSource>, base: List<Float>): List<Float> {
+    val reduce = com.music.spotui.ui.look.rememberReduceMotion()
+    val held = sources.map { it.collectIsPressedAsState().value }.indexOf(true).takeUnless { reduce } ?: -1
+    return base.mapIndexed { i, w ->
+        val target = w * when {
+            held == i -> 1.32f
+            held >= 0 && kotlin.math.abs(held - i) == 1 -> 0.8f
+            else -> 1f
+        }
+        androidx.compose.animation.core.animateFloatAsState(
+            target,
+            androidx.compose.animation.core.spring(dampingRatio = 0.55f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
+            label = "groupWidth$i",
+        ).value
+    }
+}
+
 /** Shuffle / repeat: an icon that turns the primary colour (with a dot under it) when on. */
 @Composable
-private fun ToggleIcon(icon: ImageVector, label: String, on: Boolean, onColor: Color, offColor: Color, badge: String? = null, onClick: () -> Unit) {
-    Box(Modifier.size(48.dp).pressable(0.9f, onClick = onClick).clip(CircleShape), contentAlignment = Alignment.Center) {
+private fun ToggleIcon(
+    icon: ImageVector, label: String, on: Boolean, onColor: Color, offColor: Color, badge: String? = null,
+    modifier: Modifier = Modifier.size(48.dp),
+    source: MutableInteractionSource = remember { MutableInteractionSource() },
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier.height(48.dp).pressScale(source, 0.9f).clip(CircleShape)
+            .clickable(source, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
         Icon(icon, label, tint = if (on) onColor else offColor, modifier = Modifier.size(24.dp))
         if (badge != null) Text(badge, color = onColor, fontSize = 9.sp, fontWeight = FontWeight.Black, modifier = Modifier.align(Alignment.TopEnd).padding(top = 6.dp, end = 6.dp))
         if (on) Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp).size(4.dp).clip(CircleShape).background(onColor))
     }
 }
 
-/** Previous / next: the design's big rounded pills. */
+/** Previous / next: the design's big rounded pills; held, their corners squeeze. */
 @Composable
-private fun BigPill(icon: ImageVector, label: String, bg: Color, fg: Color, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.height(72.dp).pressable(0.94f, onClick = onClick).clip(RoundedCornerShape(24.dp)).background(bg), contentAlignment = Alignment.Center) {
+private fun BigPill(
+    icon: ImageVector, label: String, bg: Color, fg: Color, modifier: Modifier,
+    source: MutableInteractionSource = remember { MutableInteractionSource() },
+    /** In a connected group the pill widens instead (1 = no shrink). */
+    pressedScale: Float = 0.96f,
+    onClick: () -> Unit,
+) {
+    val shape = rememberSqueezeShape(source, 24.dp, 14.dp)
+    Box(
+        modifier.height(72.dp).pressScale(source, pressedScale).clip(shape).background(bg)
+            .clickable(source, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
         Icon(icon, label, tint = fg, modifier = Modifier.size(28.dp))
     }
 }
