@@ -9,9 +9,10 @@ https://github.com/ianshulyadav/PixelMusic (commit `991f7c5`)
 By Ian Shulyadav. The album colours
 (`base/app/src/main/java/com/music/spotui/ui/theme/ExpressiveColor.kt`) follow the same
 QuantizerCelebi/Score/DynamicScheme approach as PixelMusic's `ColorRoles.kt`, and the Roboto Flex
-font file below was taken from its repository. An earlier version of this fork's UI was styled
-after PixelMusic; the current design (halftone dot art, wide Roboto Flex type, album and system
-colours) is the fork owner's own. No PixelMusic code, images or brand assets are included.
+font file below was taken from its repository. No PixelMusic code, images or brand assets are
+included. The design (halftone dot art, wide Roboto Flex type, album and system colours, springy
+buttons) is the fork owner's own, inspired by PixelPlayer (https://github.com/PixelPlayerHQ/PixelPlayer),
+which is not open source: nothing of it is included.
 Myspoti's own data, playback and extension layers are unchanged.
 
 ## Roboto Flex — SIL Open Font License 1.1
