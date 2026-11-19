@@ -52,8 +52,17 @@ object ExpressiveColor {
     private var started = false
     private var animation: Job? = null
 
-    /** Starts watching the playing cover, process-wide. Safe to call more than once. */
-    fun start(context: Context, scope: CoroutineScope) {
+    /**
+     * The watcher's own scope, as long as the process: not a screen's. A screen's scope ends when
+     * Android recreates the activity (rotation, picture-in-picture, back to the app while the music
+     * played on), and with [started] set nothing started the watcher again: the player kept the
+     * last cover's colours for good.
+     */
+    private val scope: CoroutineScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Main.immediate)
+
+    /** Starts watching the playing cover, process-wide. Safe to call more than once; [caller] is not kept. */
+    @Suppress("UNUSED_PARAMETER")
+    fun start(context: Context, caller: CoroutineScope) {
         if (started) return
         started = true
         scope.launch {
