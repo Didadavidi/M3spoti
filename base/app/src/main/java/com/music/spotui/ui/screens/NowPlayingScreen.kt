@@ -1,5 +1,6 @@
 package com.music.spotui.ui.screens
 
+import androidx.compose.ui.graphics.drawscope.scale
 import com.music.spotui.ui.components.rememberSqueezeShape
 import com.music.spotui.ui.components.pressScale
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -182,6 +183,7 @@ fun PlayerScreen(navController: NavController) {
         Box(Modifier.fillMaxWidth().height(520.dp)) {
             DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
         }
+        PlayerBloom(album.primary, dotsEnd = 440.dp)
         // The white status bar icons over pale dots were hard to read.
         com.music.spotui.ui.theme.StatusBarScrim(album.surface)
         Column(
@@ -478,6 +480,7 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
             Box(Modifier.fillMaxWidth().height(460.dp)) {
                 DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
             }
+            PlayerBloom(album.primary, dotsEnd = 400.dp)
             com.music.spotui.ui.theme.StatusBarScrim(album.surface)
             Column(Modifier.fillMaxSize().graphicsLayer { alpha = reveal() }.statusBarsPadding().navigationBarsPadding()) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp)) {
@@ -587,6 +590,36 @@ private fun transportGroupWidths(sources: List<MutableInteractionSource>, base: 
             androidx.compose.animation.core.spring(dampingRatio = 0.55f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
             label = "groupWidth$i",
         ).value
+    }
+}
+
+/**
+ * The bloom under the dots: a soft oval glow of the cover's [color], centred on the bottom edge and
+ * reaching up to where the dot field ends ([dotsEnd]), so the page does not go flat under the
+ * dots. It follows the album colours as they change, so it fades with each new song.
+ */
+@Composable
+private fun PlayerBloom(color: Color, dotsEnd: androidx.compose.ui.unit.Dp) {
+    androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+        val span = size.height - dotsEnd.toPx()
+        if (span <= 0f) return@Canvas
+        val center = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height)
+        val rx = size.width * 0.85f
+        val ry = span * 1.05f
+        val peak = 0.42f
+        // A smooth fall-off (smoothstep), strongest at the bottom centre.
+        val brush = androidx.compose.ui.graphics.Brush.radialGradient(
+            0f to color.copy(alpha = peak),
+            0.25f to color.copy(alpha = peak * 0.84f),
+            0.5f to color.copy(alpha = peak * 0.5f),
+            0.75f to color.copy(alpha = peak * 0.16f),
+            1f to Color.Transparent,
+            center = center, radius = rx,
+        )
+        // The circle stretched into an oval as tall as the space under the dots.
+        scale(scaleX = 1f, scaleY = ry / rx, pivot = center) {
+            drawRect(brush, topLeft = androidx.compose.ui.geometry.Offset(0f, center.y - rx), size = androidx.compose.ui.geometry.Size(size.width, rx))
+        }
     }
 }
 
