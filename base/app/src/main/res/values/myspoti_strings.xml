@@ -906,4 +906,5 @@
     <string name="automix_intro_short">AutoMix blends songs into each other like a DJ. It mixes the songs that play from extensions, downloads and files; Spotify songs get a short crossfade.</string>
     <string name="live_radio_favorite_chip">Favorite</string>
     <string name="automix_limit_intro">The blend works for songs from an audio-source extension, downloads and files on your phone. Spotify songs only fade.</string>
+    <string name="lyrics_haptics">Vibrate on each line</string>
 </resources>

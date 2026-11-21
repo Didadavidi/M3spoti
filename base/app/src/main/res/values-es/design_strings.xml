@@ -91,4 +91,5 @@
     <string name="automix_intro_short">AutoMix mezcla las canciones como un DJ. Mezcla las que suenan desde extensiones, descargas y archivos; las de Spotify tienen un fundido corto.</string>
     <string name="live_radio_favorite_chip">Favorita</string>
     <string name="automix_limit_intro">La mezcla funciona con canciones de una extensión de fuente de audio, descargas y archivos de tu teléfono. Las canciones de Spotify solo se funden.</string>
+    <string name="lyrics_haptics">Vibrar en cada línea</string>
 </resources>

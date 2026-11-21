@@ -1,5 +1,7 @@
 package com.music.spotui.ui.screens
 
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
 import com.music.spotui.ui.components.secondaryClick
 import com.music.spotui.ui.look.lastPress
 import com.music.spotui.ui.look.tapTime
@@ -213,6 +215,26 @@ private fun sungChars(words: List<LyricWord>, starts: List<Int>, p: Long): Float
     return out
 }
 
+/**
+ * Word times for a line that only has a line time: the words share the line's time up to the next
+ * line (82 % of it, the rest is the breath before it), the longer the word, the more. An estimate,
+ * enough for the words to light one after another; null for one word or no next line.
+ */
+private fun estimatedWords(line: LyricLine, nextMs: Long?): List<LyricWord>? {
+    if (nextMs == null || line.text.isBlank()) return null
+    val tokens = Regex("\\S+\\s*").findAll(line.text.trimEnd()).map { it.value }.toList()
+    if (tokens.size < 2) return null
+    val span = (nextMs - line.timeMs).coerceIn(500L, 8000L) * 0.82f
+    val weights = tokens.map { it.trim().length + 1f }
+    val total = weights.sum()
+    var t = line.timeMs.toFloat()
+    return tokens.mapIndexed { i, w -> LyricWord(t.toLong(), 0L, w).also { t += span * weights[i] / total } }
+}
+
+/** The hop of a word as it lights: up to +18 % within 90 ms, settled after half a second. */
+private fun wordPop(ageS: Float): Float =
+    if (ageS < 0f || ageS > 0.5f) 1f else (1f + 0.18f * kotlin.math.sin(ageS * 18f) * kotlin.math.exp(-ageS * 7f)).coerceAtLeast(1f)
+
 /** Seek to a tapped synced line and make sure we're playing. */
 private fun jumpTo(timeMs: Long) {
     com.music.spotui.di.Haptics.click()
@@ -310,6 +332,8 @@ private fun LyricLineText(
     onHold: (() -> Unit)? = null,
     /** Picked to be shared: the line sits on a soft pill. */
     selected: Boolean = false,
+    /** When the next line starts: words get estimated times when the source only timed the line. */
+    nextTimeMs: Long? = null,
 ) {
     val target = when (state) {
         1 -> palette.text
@@ -319,6 +343,15 @@ private fun LyricLineText(
     }
     // The line being sung sits on the design's tilted pill, a little bigger.
     val current by animateFloatAsState(if (state == 0) 1f else 0f, tween(260), label = "lyricCurrent")
+    // Becoming the sung line: it grows with a small bounce.
+    val reduce = com.music.spotui.ui.look.rememberReduceMotion()
+    val jelly = remember { androidx.compose.animation.core.Animatable(1f) }
+    LaunchedEffect(state == 0) {
+        if (state == 0 && !reduce) {
+            jelly.snapTo(0f)
+            jelly.animateTo(1f, androidx.compose.animation.core.spring(dampingRatio = 0.42f, stiffness = 380f))
+        }
+    }
     val lineSize = if (state == 0) (fontSize.value * 1.14f).sp else fontSize
     val color by animateColorAsState(target, tween(220), label = "lyricColor")
     // Explained by Genius: a light dotted line under each row of the text.
@@ -331,7 +364,12 @@ private fun LyricLineText(
     val align = if (duet && line.voice == 2) TextAlign.End else TextAlign.Start
     val lineModifier = modifier
         .fillMaxWidth()
-        .graphicsLayer { rotationZ = -1.5f * current }
+        .graphicsLayer {
+            rotationZ = -1.5f * current
+            val pop = 0.96f + 0.04f * jelly.value
+            scaleX = pop; scaleY = pop
+            transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0.5f)
+        }
         .drawBehind {
             if (current > 0f) {
                 val r = 24.dp.toPx()
@@ -372,7 +410,8 @@ private fun LyricLineText(
         }
     }
     Column(lineModifier) {
-        val words = line.words
+        val estimated = remember(line, nextTimeMs) { if (line.words == null) estimatedWords(line, nextTimeMs) else null }
+        val words = line.words ?: estimated.takeIf { LyricsApi.wordSync }
         if (state == 0 && words != null && words.any { it.text.isNotBlank() }) {
             // Karaoke: each word goes straight from the upcoming colour to white as it is sung (drawn
             // on each frame, the line is not recomposed). Words in another colour were hard to tell apart.
@@ -415,6 +454,24 @@ private fun LyricLineText(
                         for (r in 0 until row) path.addRect(androidx.compose.ui.geometry.Rect(0f, l.getLineTop(r), size.width, l.getLineBottom(r)))
                         path.addRect(androidx.compose.ui.geometry.Rect(0f, l.getLineTop(row), x, l.getLineBottom(row)))
                         clipPath(path) { this@drawWithContent.drawContent() }
+                        // The word just lit hops: drawn again over itself, a little bigger, settling.
+                        val p = position() + LINE_LEAD_MS
+                        val wi = words.indexOfLast { it.startMs <= p }
+                        if (wi >= 0 && !reduce) {
+                            val s = wordPop((p - words[wi].startMs) / 1000f)
+                            val a = starts[wi]
+                            val b = (a + words[wi].text.trimEnd().length).coerceAtMost(shown.length)
+                            if (s > 1.002f && b > a && l.getLineForOffset(a) == l.getLineForOffset(b - 1)) {
+                                val r0 = l.getLineForOffset(a)
+                                val x0 = l.getBoundingBox(a).left
+                                val x1 = l.getBoundingBox(b - 1).right
+                                val top = l.getLineTop(r0)
+                                val bottom = l.getLineBottom(r0)
+                                scale(s, s, pivot = Offset((x0 + x1) / 2f, (top + bottom) / 2f)) {
+                                    clipRect(x0 - 2f, top, x1 + 2f, bottom) { this@drawWithContent.drawContent() }
+                                }
+                            }
+                        }
                     },
                 )
             }
@@ -655,6 +712,14 @@ fun LyricsScreen(
                 val active by remember(l) { derivedStateOf { activeIndexFor(l, position()) } }
                 val notes = remember(l, meaning) { meaning?.let { m -> com.music.spotui.ui.components.notesByLine(m, l.lines.map { it.text }) }.orEmpty() }
                 val listState = rememberLazyListState()
+                // A light tick as the next line comes (not when the screen opens on one).
+                val tickReady = remember { mutableStateOf(false) }
+                LaunchedEffect(active) {
+                    if (!tickReady.value) { tickReady.value = true; return@LaunchedEffect }
+                    if (active > 0 && SongPlayer.isPlaying() && com.music.spotui.data.preferences.isLyricsHaptics(context)) com.music.spotui.di.Haptics.tick()
+                }
+                val reduceWave = com.music.spotui.ui.look.rememberReduceMotion()
+                val waveStep = with(LocalDensity.current) { 56.dp.toPx() }
                 val duet = l.hasDuet
                 val romanizing = LyricsRomanizationPref.on && l.hasRomanization
                 // Lines near the current one rise in one after the other, the first just
@@ -685,6 +750,18 @@ fun LyricsScreen(
                             )
                         }
                         itemsIndexed(l.lines, key = { i, _ -> i }) { i, line ->
+                            // The wave, light: as the list moves on, the lines near the sung one trail a
+                            // touch behind (the farther, the later) and spring back into place.
+                            val lag = remember { androidx.compose.animation.core.Animatable(0f) }
+                            val waveReady = remember { mutableStateOf(false) }
+                            LaunchedEffect(active) {
+                                if (!waveReady.value) { waveReady.value = true; return@LaunchedEffect }
+                                val dist = kotlin.math.abs(i - active)
+                                if (active <= 0 || reduceWave || selecting || dist > 7 || !l.synced) return@LaunchedEffect
+                                delay(28L * dist)
+                                lag.animateTo(waveStep * (0.035f + 0.02f * dist).coerceAtMost(0.15f), tween(110))
+                                lag.animateTo(0f, androidx.compose.animation.core.spring(dampingRatio = 0.5f, stiffness = 240f))
+                            }
                             LyricLineText(
                                 line = line,
                                 state = lineState(l, i, active),
@@ -709,7 +786,9 @@ fun LyricsScreen(
                                     vm.startSelecting(i)
                                 },
                                 selected = picked?.let { i in it } == true,
-                                modifier = Modifier.revealIn(reveal, 0.35f + 0.045f * (i - staggerBase).coerceIn(0, 8), 22f),
+                                nextTimeMs = l.lines.getOrNull(i + 1)?.timeMs,
+                                modifier = Modifier.revealIn(reveal, 0.35f + 0.045f * (i - staggerBase).coerceIn(0, 8), 22f)
+                                    .graphicsLayer { translationY = lag.value },
                             )
                         }
                         l.provider?.let { p ->
@@ -770,7 +849,18 @@ private fun LyricsMenu(
     val context = LocalContext.current
     var extra by remember { mutableStateOf(isLyricsExtraSources(context)) }
     var words by remember { mutableStateOf(com.music.spotui.data.preferences.isLyricsWordSync(context)) }
+    var tick by remember { mutableStateOf(com.music.spotui.data.preferences.isLyricsHaptics(context)) }
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+        // A light vibration on each new line.
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.lyrics_haptics)) },
+            trailingIcon = { if (tick) Icon(Icons.Default.Check, contentDescription = null) },
+            onClick = {
+                tick = !tick
+                com.music.spotui.data.preferences.setLyricsHaptics(context, tick)
+                if (tick) com.music.spotui.di.Haptics.tick()
+            },
+        )
         // Word by word (karaoke) or line by line: the app then picks the source by itself.
         DropdownMenuItem(
             text = {

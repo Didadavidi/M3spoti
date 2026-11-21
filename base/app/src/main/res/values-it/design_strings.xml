@@ -91,4 +91,5 @@
     <string name="automix_intro_short">AutoMix fonde i brani come un DJ. Mixa quelli da estensioni, download e file; i brani di Spotify hanno una breve dissolvenza.</string>
     <string name="live_radio_favorite_chip">Preferito</string>
     <string name="automix_limit_intro">Il mix funziona con i brani di un\'estensione di sorgente audio, i download e i file sul tuo telefono. I brani di Spotify sfumano soltanto.</string>
+    <string name="lyrics_haptics">Vibra a ogni riga</string>
 </resources>

@@ -23,6 +23,10 @@ fun isLyricsExtraSourcesOff(c: Context): Boolean = prefs(c).let { it.contains(KE
 fun isLyricsWordSync(c: Context): Boolean = prefs(c).getBoolean("lyrics_word_sync", true)
 fun setLyricsWordSync(c: Context, v: Boolean) = prefs(c).edit().putBoolean("lyrics_word_sync", v).apply()
 
+/** A light tick of the vibration each time the lyrics move to the next line. On by default. */
+fun isLyricsHaptics(c: Context): Boolean = prefs(c).getBoolean("lyrics_haptics", true)
+fun setLyricsHaptics(c: Context, v: Boolean) = prefs(c).edit().putBoolean("lyrics_haptics", v).apply()
+
 private fun prefs(c: Context) = c.getSharedPreferences(PREF, Context.MODE_PRIVATE)
 
 /**
