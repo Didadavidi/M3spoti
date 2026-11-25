@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -25,6 +26,9 @@ class ClientTokenStoreTest {
         override suspend fun evaluate(script: String) {
             val m = Regex("""Myspoti\.call\((\d+), "([^"]+)", (.*)\)\.catch""").find(script) ?: return
             val value = """{"accessToken":"web","expiresAtMs":${System.currentTimeMillis() + 3_600_000},"clientId":"$clientId","appVersion":"1.0","isAnonymous":false}"""
+            // A shared flow drops what is sent before anyone listens: on a slow machine the bridge's
+            // reader started after this answer, and the call timed out (flaky on GitHub's runners).
+            messages.subscriptionCount.first { it > 0 }
             messages.emit("""{"type":"result","id":${m.groupValues[1]},"ok":true,"value":$value}""")
         }
     }
