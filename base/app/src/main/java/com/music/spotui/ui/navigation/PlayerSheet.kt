@@ -1,5 +1,18 @@
 package com.music.spotui.ui.navigation
 
+import kotlinx.coroutines.launch
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.pointer.util.addPointerInputChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.composed
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.Spring
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -33,6 +46,14 @@ object PlayerSheet {
 
     fun show() { open.value = true }
     fun close() { open.value = false }
+
+    /**
+     * How far a finger has pulled the open player down (px). The whole sheet follows it as a card
+     * (a little smaller, rounded corners); let go, it springs back or glides on into the mini
+     * player from right there.
+     */
+    var drag by mutableFloatStateOf(0f)
+    internal var dragBack: kotlinx.coroutines.Job? = null
 
     /** The mini player's top edge in the window (px), where the player rises from and goes back to. */
     var miniTop by mutableFloatStateOf(0f)
@@ -75,6 +96,46 @@ private const val CLOSE_MS = 300
 /** The sheet's background is fully there by this share of the way. */
 private const val SHEET_FADE = 0.3f
 private val CloseEasing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f)
+/** Let go past this, or flicked down faster than [FLING_DP_S], the pulled player closes. */
+private const val CLOSE_PULL_DP = 120
+private const val FLING_DP_S = 1100
+/** Pulled all the way, the card is this much smaller. */
+private const val PULL_SHRINK = 0.12f
+
+/**
+ * Pulling the player down to close it: the sheet follows the finger ([PlayerSheet.drag]) and,
+ * let go past the threshold or flicked, closes from where it is; otherwise it springs back.
+ */
+fun Modifier.pullDownToClosePlayer(enabled: Boolean): Modifier = composed {
+    val scope = rememberCoroutineScope()
+    if (!enabled) return@composed Modifier
+    Modifier.pointerInput(Unit) {
+        val tracker = VelocityTracker()
+        val threshold = CLOSE_PULL_DP.dp.toPx()
+        val fling = FLING_DP_S.dp.toPx()
+        fun springBack(velocity: Float) {
+            PlayerSheet.dragBack = scope.launch {
+                animate(PlayerSheet.drag, 0f, velocity, spring(dampingRatio = 0.68f, stiffness = Spring.StiffnessMediumLow)) { v, _ ->
+                    PlayerSheet.drag = v.coerceAtLeast(0f)
+                }
+            }
+        }
+        detectVerticalDragGestures(
+            onDragStart = { PlayerSheet.dragBack?.cancel(); tracker.resetTracking() },
+            onDragEnd = {
+                val v = tracker.calculateVelocity().y
+                val d = PlayerSheet.drag
+                if (d > 0f && (d > threshold || v > fling)) PlayerSheet.close() else if (d > 0f) springBack(v)
+            },
+            onDragCancel = { if (PlayerSheet.drag > 0f) springBack(0f) },
+        ) { change, dy ->
+            tracker.addPointerInputChange(change)
+            val next = PlayerSheet.drag + dy
+            if (next >= 0f) { change.consume(); PlayerSheet.drag = next }
+            else if (PlayerSheet.drag > 0f) { change.consume(); PlayerSheet.drag = 0f }
+        }
+    }
+}
 
 @Composable
 fun PlayerOverlay(navController: NavController) {
@@ -96,6 +157,8 @@ fun PlayerOverlay(navController: NavController) {
     val reduce = com.music.spotui.ui.look.rememberReduceMotion()
     LaunchedEffect(open) {
         if (open) {
+            PlayerSheet.dragBack?.cancel()
+            PlayerSheet.drag = 0f
             shown = true
             settled.value = false
             // Two frames for the player's first composition and layout before the clock runs.
@@ -104,8 +167,12 @@ fun PlayerOverlay(navController: NavController) {
             settled.value = true
         } else if (shown) {
             settled.value = false
-            if (reduce) progress.snapTo(0f) else progress.animateTo(0f, tween(CLOSE_MS, easing = CloseEasing))
+            PlayerSheet.dragBack?.cancel()
+            // Pulled down, it is already moving: it carries on fast and lands softly in the mini player.
+            val spec = if (PlayerSheet.drag > 0f) tween<Float>(CLOSE_MS - 40, easing = Decelerate) else tween(CLOSE_MS, easing = CloseEasing)
+            if (reduce) progress.snapTo(0f) else progress.animateTo(0f, spec)
             shown = false
+            PlayerSheet.drag = 0f
         }
     }
     if (!shown) return
@@ -116,7 +183,16 @@ fun PlayerOverlay(navController: NavController) {
         Modifier.fillMaxSize().onSizeChanged { heightPx = it.height }.graphicsLayer {
             val p = progress.value
             val from = PlayerSheet.miniTop.takeIf { it > 0f } ?: heightPx.toFloat()
-            translationY = (1f - p) * from
+            // Pulled: the sheet sits where the finger has it; closing, it goes on from there.
+            val d = PlayerSheet.drag
+            translationY = d + (1f - p) * (from - d)
+            // As a card: a little smaller and rounded while pulled, and on its way in or out.
+            val pulled = if (size.height > 0f) (d / size.height).coerceIn(0f, 1f) else 0f
+            val s = 1f - PULL_SHRINK * pulled
+            scaleX = s; scaleY = s
+            transformOrigin = TransformOrigin(0.5f, 0f)
+            val corner = maxOf(d / 3f, (1f - p) * 32.dp.toPx()).coerceAtMost(32.dp.toPx())
+            if (corner > 0.5f) { shape = RoundedCornerShape(corner); clip = true } else clip = false
             // A layer alpha only over the first part of the way: the open player draws plain.
             alpha = (p / SHEET_FADE).coerceIn(0f, 1f)
         },

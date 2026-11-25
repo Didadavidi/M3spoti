@@ -50,6 +50,8 @@ object InviteLinks {
     private val TOKEN = Regex("""[?&]pt=([A-Za-z0-9_-]+)""")
     private val BLEND = Regex("""spotify\.com/(?:intl-[a-z-]+/)?blend/(?:taste-match|invitation)/([A-Za-z0-9]+)""")
     private val SHORT = Regex("""https?://(?:spotify\.link|spoti\.fi)/[^\s"'<>]+""")
+    /** A Spotify item link in a page: a song, album, artist, playlist, podcast, episode or profile. */
+    private val ITEM = Regex("""(?:open|www|play)\.spotify\.com/(?:intl-[A-Za-z-]+/)?(?:(?:track|album|playlist|artist|show|episode)/[A-Za-z0-9]{22}|user/[^/?#\s"'<>]+)""")
 
     /** The invitation inside [link] (a playlist link carrying `pt`), or null. */
     fun parse(link: String): Invite? {
@@ -68,28 +70,50 @@ object InviteLinks {
         BLEND.find(link)?.let { blend.value = BlendLink(it.groupValues[1]); return true }
         val short = SHORT.find(link)?.value ?: return false
         scope.launch {
-            val target = resolve(short) ?: return@launch
-            val invite = parse(target)
+            val target = resolve(short)
+            val invite = target?.let { parse(it) }
             if (invite != null) { pending.value = invite; return@launch }
-            BLEND.find(target)?.let { blend.value = BlendLink(it.groupValues[1]); return@launch }
+            BLEND.find(target.orEmpty())?.let { blend.value = BlendLink(it.groupValues[1]); return@launch }
             // Not an invitation: the item the short link leads to opens as a direct link does.
-            SpotifyLinks.uriIn(target)?.let { uri -> kotlinx.coroutines.withContext(Dispatchers.Main) { SpotifyLinks.open(uri) } }
+            val uri = target?.let { SpotifyLinks.uriIn(it) }
+            withContext(Dispatchers.Main) {
+                // Reported: a shared short link did nothing at all. Now it opens, or says it could not.
+                if (uri != null) SpotifyLinks.open(uri)
+                else android.widget.Toast.makeText(com.music.spotui.di.Graph.app, R.string.link_open_failed, android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
         return true
     }
 
-    /** Where a short link leads: its final URL, or the playlist link inside the page it answers with. */
+    /** Where a short link leads: its final URL, or the Spotify link inside the page it answers with. */
     private suspend fun resolve(link: String): String? = withContext(Dispatchers.IO) {
         runCatching {
             http.newCall(okhttp3.Request.Builder().url(link).header("user-agent", "Mozilla/5.0").build()).execute().use { r ->
                 val final = r.request.url.toString()
-                if (PLAYLIST.containsMatchIn(final) && TOKEN.containsMatchIn(final) || BLEND.containsMatchIn(final)) final
-                else {
-                    val body = r.body.string().replace("\\/", "/")
-                    PLAYLIST.find(body.replace("&amp;", "&").replace("\\u0026", "&"))?.value?.let { "https://$it" } ?: final
-                }
+                linkInPage(final, if (isTarget(final)) "" else r.body.string())
             }
         }.onFailure { Log.w(TAG, "short link not resolved: ${it.message}") }.getOrNull()
+    }
+
+    private fun isTarget(url: String) =
+        PLAYLIST.containsMatchIn(url) && TOKEN.containsMatchIn(url) || BLEND.containsMatchIn(url) || SpotifyLinks.uriIn(url) != null
+
+    /**
+     * What a short link leads to, from where its request ended ([final]) and the page it answered
+     * with ([body]). spotify.link usually redirects to the item's link ([final] is it); when it
+     * answers with a page instead, the link is read from it: a playlist invitation first (it
+     * carries `pt`), then any Spotify item link (song, album, artist, playlist, podcast, profile).
+     * Null when there is none.
+     */
+    internal fun linkInPage(final: String, body: String): String? {
+        if (isTarget(final)) return final
+        val page = body.replace("\\/", "/").replace("&amp;", "&").replace("\\u0026", "&")
+        PLAYLIST.findAll(page).firstOrNull { TOKEN.containsMatchIn(it.groupValues[2]) }?.let { return "https://${it.value}" }
+        // Sent on to another page (Spotify's home for a dead link): that page's links are not the target.
+        if (!SHORT.containsMatchIn(final)) return null
+        BLEND.find(page)?.let { return "https://open.${it.value}" }
+        ITEM.find(page)?.let { return "https://${it.value}" }
+        return null
     }
 
     /**

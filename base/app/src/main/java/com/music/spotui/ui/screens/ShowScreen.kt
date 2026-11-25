@@ -322,9 +322,9 @@ private fun FollowPill(following: Boolean, onClick: () -> Unit) {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .height(32.dp)
+            .pressable(0.96f, onClick = onClick)
             .clip(RoundedCornerShape(16.dp))
             .background(if (following) AppText.copy(alpha = 0.12f) else Color.Transparent)
-            .pressable(0.96f, onClick = onClick)
             .padding(horizontal = 16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -482,7 +482,7 @@ private fun EpisodeRow(
             Spacer(Modifier.width(6.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(40.dp).clip(CircleShape).background(AppText).pressable(0.92f, onClick = onPlay),
+                modifier = Modifier.size(40.dp).pressable(0.92f, onClick = onPlay).clip(CircleShape).background(AppText),
             ) {
                 com.music.spotui.ui.components.PlayPauseIcon(
                     playing = playing,

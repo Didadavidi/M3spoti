@@ -152,7 +152,7 @@ internal fun HomeTopBar(navController: NavController, onProfile: () -> Unit) {
         modifier = Modifier.fillMaxWidth().height(68.dp).padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 8.dp),
     ) {
         Box(
-            Modifier.size(44.dp).clip(CircleShape).background(s.soft).pressable(0.92f, onClick = onProfile),
+            Modifier.size(44.dp).pressable(0.92f, onClick = onProfile).clip(CircleShape).background(s.soft),
             contentAlignment = Alignment.Center,
         ) {
             if (avatarUrl != null) {
@@ -169,22 +169,22 @@ internal fun HomeTopBar(navController: NavController, onProfile: () -> Unit) {
         Spacer(Modifier.weight(1f))
         // From Myspoti 2.4.0: What's New (releases of followed artists) and friend activity.
         Box(
-            Modifier.size(48.dp).clip(CircleShape).background(s.card).pressable(0.92f) { navController.navigate(Routes.WhatsNew.route) },
+            Modifier.size(48.dp).pressable(0.92f) { navController.navigate(Routes.WhatsNew.route) }.clip(CircleShape).background(s.card),
             contentAlignment = Alignment.Center,
         ) { Icon(androidx.compose.material.icons.Icons.Outlined.Notifications, stringResource(R.string.whats_new_title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
         Box(
-            Modifier.size(48.dp).clip(CircleShape).background(s.card).pressable(0.92f) { navController.navigate(Routes.Friends.route) },
+            Modifier.size(48.dp).pressable(0.92f) { navController.navigate(Routes.Friends.route) }.clip(CircleShape).background(s.card),
             contentAlignment = Alignment.Center,
         ) { Icon(androidx.compose.ui.res.painterResource(R.drawable.ic_friends_big), stringResource(R.string.friends_title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
         Box(
-            Modifier.size(48.dp).clip(CircleShape).background(s.card).pressable(0.92f) {
+            Modifier.size(48.dp).pressable(0.92f) {
                 navController.navigate(Routes.Search.route) { launchSingleTop = true }
                 TabReselect.emit(Routes.Search.route)
-            },
+            }.clip(CircleShape).background(s.card),
             contentAlignment = Alignment.Center,
         ) { Icon(DesignIcons.Search, stringResource(R.string.navigationbar_musicappitems_search_title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
         Box(
-            Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.card).pressable(0.92f) { navController.navigate(Routes.Settings.route) },
+            Modifier.size(48.dp).pressable(0.92f) { navController.navigate(Routes.Settings.route) }.clip(RoundedCornerShape(16.dp)).background(s.card),
             contentAlignment = Alignment.Center,
         ) { Icon(DesignIcons.Tune, stringResource(R.string.settings_title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
     }
@@ -229,9 +229,9 @@ internal fun HomeHero(navController: NavController, mix: HomeItem, others: List<
             .padding(horizontal = 12.dp)
             .fillMaxWidth()
             .height(420.dp)
+            .pressable(0.98f) { onHomeItemClick(navController, mix) }
             .clip(RoundedCornerShape(44.dp))
-            .background(deep)
-            .pressable(0.98f) { onHomeItemClick(navController, mix) },
+            .background(deep),
     ) {
         DotFieldBackground(
             field = DotField.HOME_HERO,
@@ -261,17 +261,34 @@ internal fun HomeHero(navController: NavController, mix: HomeItem, others: List<
             }
         }
         Column(Modifier.padding(start = 22.dp, top = 22.dp, end = 140.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                text = name,
-                color = onDeep,
-                fontFamily = FlexWide,
-                fontWeight = FontWeight.Black,
-                fontSize = titleSize,
-                lineHeight = titleSize * 0.88f,
-                letterSpacing = (-1.5).sp,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
+            // Smaller until the longest word fits on a line: a word never breaks in the middle
+            // ("Mixta / pe"), it only moves to the next line.
+            androidx.compose.foundation.layout.BoxWithConstraints {
+                val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+                val density = androidx.compose.ui.platform.LocalDensity.current
+                val widest = remember(name) { name.split(' ').filter { it.isNotBlank() }.maxByOrNull { it.length }.orEmpty() }
+                val maxPx = with(density) { maxWidth.roundToPx() }
+                val size = remember(name, maxPx, titleSize) {
+                    var s = titleSize.value
+                    while (s > 26f && measurer.measure(
+                            widest,
+                            androidx.compose.ui.text.TextStyle(fontFamily = FlexWide, fontWeight = FontWeight.Black, fontSize = s.sp, letterSpacing = (-1.5).sp),
+                            softWrap = false, maxLines = 1,
+                        ).size.width > maxPx) s -= 2f
+                    s.sp
+                }
+                Text(
+                    text = name,
+                    color = onDeep,
+                    fontFamily = FlexWide,
+                    fontWeight = FontWeight.Black,
+                    fontSize = size,
+                    lineHeight = size * 0.88f,
+                    letterSpacing = (-1.5).sp,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             val sub = mix.subtitleText
             if (sub.isNotBlank()) Text(
                 text = sub,
@@ -405,7 +422,7 @@ private fun KeepListeningCard(c: KeepCard, onDismiss: () -> Unit) {
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 14.dp)) {
             Box(
-                Modifier.weight(1f).height(50.dp).clip(RoundedCornerShape(25.dp)).background(s.surface).pressable(0.97f, onClick = c.onPill),
+                Modifier.weight(1f).height(50.dp).pressable(0.97f, onClick = c.onPill).clip(RoundedCornerShape(25.dp)).background(s.surface),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 Box(Modifier.fillMaxHeight().fillMaxWidth(c.progress.coerceAtLeast(0.001f)).background(s.soft))
@@ -415,11 +432,11 @@ private fun KeepListeningCard(c: KeepCard, onDismiss: () -> Unit) {
                 }
             }
             Box(
-                Modifier.size(50.dp).clip(CircleShape).background(s.surface).pressable(0.92f, onClick = onDismiss),
+                Modifier.size(50.dp).pressable(0.92f, onClick = onDismiss).clip(CircleShape).background(s.surface),
                 contentAlignment = Alignment.Center,
             ) { Icon(DesignIcons.Check, stringResource(R.string.home_mark_finished, c.title), tint = s.onSurface, modifier = Modifier.size(22.dp)) }
             Box(
-                Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(s.coral).pressable(0.92f, onClick = c.onCoral),
+                Modifier.size(50.dp).pressable(0.92f, onClick = c.onCoral).clip(RoundedCornerShape(16.dp)).background(s.coral),
                 contentAlignment = Alignment.Center,
             ) { Icon(c.coralIcon, c.coralLabel, tint = s.onCoral, modifier = Modifier.size(22.dp)) }
         }

@@ -91,4 +91,19 @@
     <string name="automix_intro_short">AutoMix fonde i brani come un DJ. Mixa quelli da estensioni, download e file; i brani di Spotify hanno una breve dissolvenza.</string>
     <string name="live_radio_favorite_chip">Preferito</string>
     <string name="automix_limit_intro">Il mix funziona con i brani di un\'estensione di sorgente audio, i download e i file sul tuo telefono. I brani di Spotify sfumano soltanto.</string>
+    <string name="lyrics_haptics">Vibra a ogni riga</string>
+    <string name="settings_cover_style_title">Copertine</string>
+    <string name="settings_cover_style_detail">A punti, a onde o l\'immagine così com\'è. Automatico sceglie punti o onde secondo la copertina.</string>
+    <string name="settings_cover_style_auto">Automatico</string>
+    <string name="settings_cover_style_dots">Punti</string>
+    <string name="settings_cover_style_waves">Onde</string>
+    <string name="settings_cover_style_original">Originale</string>
+    <string name="settings_field_style_title">Sfondi</string>
+    <string name="settings_field_style_detail">Dietro Home, pagine e player: i punti in movimento, o lo stesso motivo come sfumatura ferma, più leggera per la batteria.</string>
+    <string name="settings_field_style_gradient">Sfumatura</string>
+    <string name="about_credits_title">Crediti</string>
+    <string name="about_credit_myspoti">L\'app stessa: tutto tranne il design</string>
+    <string name="about_credit_pixelplayer">Ispirazione per le forme e i pulsanti elastici</string>
+    <string name="about_credit_pixelmusic">Colori dell\'album e il font Roboto Flex</string>
+    <string name="link_open_failed">Impossibile aprire questo link di Spotify</string>
 </resources>

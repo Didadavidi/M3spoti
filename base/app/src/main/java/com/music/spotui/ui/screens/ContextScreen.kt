@@ -30,6 +30,9 @@ import kotlinx.coroutines.async
 import com.music.spotui.ui.components.SkeletonKind
 import com.music.spotui.ui.components.animatedRow
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.pressableLong
+import com.music.spotui.ui.components.PressScale
+import com.music.spotui.ui.components.squeezeButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -846,7 +849,7 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                             Icon(com.music.spotui.ui.dots.DesignIcons.Back, contentDescription = stringResource(R.string.accessibility_navigate_back), tint = onDeep, modifier = Modifier.size(22.dp))
                         }
                         if (p.type == "playlist" || p.type == "album" || liked) {
-                            Box(Modifier.size(52.dp).clip(CircleShape).background(deep).pressable(0.9f) { if (p.type == "playlist") playlistMenu = true else albumMenu = true }, contentAlignment = Alignment.Center) {
+                            Box(Modifier.size(52.dp).pressable(0.9f) { if (p.type == "playlist") playlistMenu = true else albumMenu = true }.clip(CircleShape).background(deep), contentAlignment = Alignment.Center) {
                                 Icon(com.music.spotui.ui.dots.DesignIcons.More, contentDescription = stringResource(R.string.content_description_context_menu), tint = onDeep, modifier = Modifier.size(22.dp))
                             }
                         }
@@ -964,9 +967,9 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.height(50.dp).clip(RoundedCornerShape(25.dp))
+                                modifier = Modifier.height(50.dp).pressable(0.95f) { vm.toggleContextSaved(p) }
+                                    .clip(RoundedCornerShape(25.dp))
                                     .background(if (isSaved) scheme.primaryContainer else scheme.pink)
-                                    .pressable(0.95f) { vm.toggleContextSaved(p) }
                                     .padding(start = 16.dp, end = 22.dp),
                             ) {
                                 val fg = if (isSaved) scheme.onPrimaryContainer else scheme.onPink
@@ -1005,9 +1008,8 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                         val shuffleOn = shuffle || smart
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(50.dp).clip(RoundedCornerShape(16.dp))
-                                .background(if (shuffleOn) scheme.coral else scheme.surfaceContainerHigh)
-                                .clickable {
+                            modifier = Modifier.size(50.dp)
+                                .squeezeButton(if (shuffleOn) scheme.coral else scheme.surfaceContainerHigh, 16.dp, 9.dp) {
                                     when {
                                         smart -> { SmartShuffle.on.value = null; playerVm.updateShuffleState(false) }
                                         shuffle && (p.type == "playlist" || p.type == "liked") -> {
@@ -1034,7 +1036,7 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                         if (p.type == "playlist" && vm.editableContext.value && !p.isBlend) {
                             Box(
                                 contentAlignment = Alignment.Center,
-                                modifier = Modifier.size(50.dp).clip(CircleShape).background(scheme.surfaceContainerHigh).pressable(0.9f) { addingSongs = true },
+                                modifier = Modifier.size(50.dp).pressable(0.9f) { addingSongs = true }.clip(CircleShape).background(scheme.surfaceContainerHigh),
                             ) {
                                 Icon(com.music.spotui.ui.dots.DesignIcons.Plus, contentDescription = stringResource(R.string.add_songs_title), tint = scheme.onSurface, modifier = Modifier.size(22.dp))
                             }
@@ -1047,7 +1049,7 @@ private fun ContextContent(navController: NavController, vm: ContextViewModel, p
                         // "Move": a handle on each song of an own playlist, to put them in another order (again: done).
                         if (canMove) {
                             Box(
-                                Modifier.size(50.dp).clip(CircleShape).background(if (moving) scheme.primary else scheme.surfaceContainerHigh).pressable(0.9f) { moving = !moving },
+                                Modifier.size(50.dp).pressable(0.9f) { moving = !moving }.clip(CircleShape).background(if (moving) scheme.primary else scheme.surfaceContainerHigh),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(Icons.Default.DragHandle,
@@ -1295,7 +1297,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.recommendedItems(vm: 
 private fun RecommendedRow(song: SongsModel, isCurrent: Boolean, onPlay: () -> Unit, onAdd: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth().clickable(onClick = onPlay).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+        modifier = modifier.fillMaxWidth().pressable(PressScale.CARD, onClick = onPlay).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
     ) {
         com.music.spotui.ui.dots.HalftoneCover(song.coverUri, Modifier.size(48.dp).clip(RoundedCornerShape(4.dp)), androidx.compose.ui.graphics.RectangleShape, cells = 16f)
         Column(Modifier.weight(1f).padding(start = 12.dp, end = 8.dp)) {
@@ -1330,7 +1332,7 @@ internal fun MembersSheet(
             members.forEach { m ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable {
+                    modifier = Modifier.fillMaxWidth().pressable(PressScale.CARD) {
                         onDismiss(); navController.navigate(com.music.spotui.ui.navigation.profileRoute(m.username, m.name))
                     }.padding(horizontal = 20.dp, vertical = 10.dp),
                 ) {
@@ -1349,7 +1351,7 @@ internal fun MembersSheet(
                         var open by remember { mutableStateOf(false) }
                         Box {
                             Icon(Icons.Default.MoreVert, contentDescription = null, tint = AppText,
-                                modifier = Modifier.size(40.dp).clip(CircleShape).clickable { open = true }.padding(8.dp))
+                                modifier = Modifier.size(40.dp).pressable(PressScale.ICON) { open = true }.clip(CircleShape).padding(8.dp))
                             androidx.compose.material3.DropdownMenu(expanded = open, onDismissRequest = { open = false }, containerColor = tone(0xFF282828)) {
                                 @Composable fun item(label: Int, action: () -> Unit) = androidx.compose.material3.DropdownMenuItem(
                                     text = { Text(stringResource(label), color = AppText) },
@@ -1422,9 +1424,9 @@ private fun TrackRow(
             .padding(horizontal = 16.dp, vertical = 2.dp)
             // A song marked "Not interested" is dimmed too (lists skip it; a tap still plays it).
             .then(if (song.playable && !com.music.spotui.data.preferences.HiddenSongs.isHidden(song.spotifyTrackId)) Modifier else Modifier.alpha(0.4f))
+            .pressableLong(PressScale.CARD, onLongClick = onMore, onClick = tap)
             .clip(RoundedCornerShape(if (first) big else small, if (first) big else small, if (last) big else small, if (last) big else small))
             .background(s.surfaceContainerHigh)
-            .combinedClickable(onClick = tap, onLongClick = onMore)
             .padding(start = 16.dp, end = 10.dp, top = 14.dp, bottom = 16.dp),
     ) {
         Row(verticalAlignment = Alignment.Top) {
@@ -1454,14 +1456,14 @@ private fun TrackRow(
                 com.music.spotui.ui.dots.DesignIcons.More,
                 contentDescription = stringResource(R.string.content_description_context_menu),
                 tint = s.onSurfaceVariant,
-                modifier = Modifier.padding(start = 2.dp).size(36.dp).clip(CircleShape).clickable { onMore() }.padding(8.dp),
+                modifier = Modifier.padding(start = 2.dp).size(36.dp).pressable(PressScale.ICON) { onMore() }.clip(CircleShape).padding(8.dp),
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 12.dp, end = 6.dp)) {
             val frame = com.music.spotui.ui.components.rememberFrameClock(isCurrent && playing, fps = 1)
             Box(
-                Modifier.weight(1f).height(48.dp).clip(RoundedCornerShape(24.dp)).background(s.surface)
-                    .clickable { if (isCurrent) { if (playing) SongPlayer.pause() else SongPlayer.play() } else tap() },
+                Modifier.weight(1f).height(48.dp)
+                    .squeezeButton(s.surface, 24.dp, 14.dp) { if (isCurrent) { if (playing) SongPlayer.pause() else SongPlayer.play() } else tap() },
                 contentAlignment = Alignment.CenterStart,
             ) {
                 frame.value
@@ -1477,7 +1479,7 @@ private fun TrackRow(
                 }
             }
             Box(
-                Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(s.primary).clickable(onClick = onQueue),
+                Modifier.size(48.dp).squeezeButton(s.primary, 16.dp, 9.dp, onClick = onQueue),
                 contentAlignment = Alignment.Center,
             ) { Icon(com.music.spotui.ui.dots.DesignIcons.AddToQueue, stringResource(R.string.add_to_queue_action_content_description), tint = s.onPrimary, modifier = Modifier.size(22.dp)) }
             // An own playlist being reordered: the handle a drag carries the song by.

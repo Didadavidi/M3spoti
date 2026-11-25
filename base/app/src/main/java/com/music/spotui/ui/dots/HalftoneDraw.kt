@@ -132,21 +132,36 @@ enum class DotField { HOME_HERO, PAGE_HEADER, PLAYER }
  */
 fun DrawScope.drawDotField(field: DotField, inkA: Color, inkB: Color, stepPx: Float, t: Float) {
     val beat = if (t == 0f) 1f else beatOf(t)
+    val (a, b) = fieldCoverage(field, t)
+    dotScreen(inkA, stepPx, 0.52f, beat, 0f, a)
+    dotScreen(inkB, stepPx, 1.31f, 1f, 0f, b)
+}
+
+/**
+ * How much of each ink a dot field has at (u, v) (0..1 across and down) at the dot clock [t]:
+ * ink A, then ink B. The dots and the gradient (the "Backgrounds" setting) draw the same pattern.
+ */
+fun fieldCoverage(field: DotField, t: Float): Pair<(Float, Float) -> Float, (Float, Float) -> Float> {
+    val beat = if (t == 0f) 1f else beatOf(t)
     val b = Halftone::band
-    when (field) {
-        DotField.HOME_HERO -> {
-            dotScreen(inkA, stepPx, 0.52f, beat, 0f) { u, v -> b(u, v, 0.6f, 0.8f, 0.78f + 0.06f * sin(t * 0.4f), 0.06f, 0.12f, t) + 0.05f / beat }
-            dotScreen(inkB, stepPx, 1.31f, 1f, 0f) { u, v -> b(u, v, -0.5f, 1f, 0.35f, 0.025f, 0.08f, t * 1.2f + 2f) * 0.95f }
-        }
+    return when (field) {
+        DotField.HOME_HERO -> Pair(
+            { u, v -> b(u, v, 0.6f, 0.8f, 0.78f + 0.06f * sin(t * 0.4f), 0.06f, 0.12f, t) + 0.05f / beat },
+            { u, v -> b(u, v, -0.5f, 1f, 0.35f, 0.025f, 0.08f, t * 1.2f + 2f) * 0.95f },
+        )
         DotField.PAGE_HEADER -> {
             val fade = { v: Float -> ((0.92f - v) * 1.8f).coerceIn(0f, 1f) }
-            dotScreen(inkA, stepPx, 0.52f, beat, 0f) { u, v -> (b(u, v, 0.85f, 0.6f, 0.5f + 0.05f * sin(t * 0.4f), 0.06f, 0.1f, t) + 0.06f / beat) * fade(v) }
-            dotScreen(inkB, stepPx, 1.31f, 1f, 0f) { u, v -> b(u, v, 1f, -0.45f, 0.1f, 0.025f, 0.08f, t * 1.2f + 2f) * fade(v) * 0.9f }
+            Pair(
+                { u, v -> (b(u, v, 0.85f, 0.6f, 0.5f + 0.05f * sin(t * 0.4f), 0.06f, 0.1f, t) + 0.06f / beat) * fade(v) },
+                { u, v -> b(u, v, 1f, -0.45f, 0.1f, 0.025f, 0.08f, t * 1.2f + 2f) * fade(v) * 0.9f },
+            )
         }
         DotField.PLAYER -> {
             val fade = { v: Float -> ((0.86f - v) * 1.7f).coerceIn(0f, 1f) }
-            dotScreen(inkA, stepPx, 0.52f, beat, 0f) { u, v -> (b(u, v, 0.85f, 0.55f, 0.62f + 0.06f * sin(t * 0.4f), 0.07f, 0.1f, t) + 0.07f / beat) * fade(v) }
-            dotScreen(inkB, stepPx, 1.31f, 1f, 0f) { u, v -> b(u, v, 1f, -0.45f, 0.12f, 0.03f, 0.08f, t * 1.2f + 2f) * fade(v) * 0.9f }
+            Pair(
+                { u, v -> (b(u, v, 0.85f, 0.55f, 0.62f + 0.06f * sin(t * 0.4f), 0.07f, 0.1f, t) + 0.07f / beat) * fade(v) },
+                { u, v -> b(u, v, 1f, -0.45f, 0.12f, 0.03f, 0.08f, t * 1.2f + 2f) * fade(v) * 0.9f },
+            )
         }
     }
 }

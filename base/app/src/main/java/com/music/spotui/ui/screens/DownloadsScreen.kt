@@ -174,8 +174,8 @@ fun DownloadsScreen(navController: NavController) {
                     stringResource(R.string.downloads_need_source),
                     color = AppText, fontSize = 14.sp, lineHeight = 19.sp,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)).background(tone(0xFF2A2A2A))
                         .pressable(0.98f) { navController.navigate(com.music.spotui.ui.navigation.Routes.Extensions.route) }
+                        .clip(RoundedCornerShape(8.dp)).background(tone(0xFF2A2A2A))
                         .padding(14.dp),
                 )
             }
@@ -184,8 +184,8 @@ fun DownloadsScreen(navController: NavController) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clip(RoundedCornerShape(8.dp)).background(tone(0xFF2A2A2A))
                         .pressable(0.98f) { OfflineDownloader.stopAll() }
+                        .clip(RoundedCornerShape(8.dp)).background(tone(0xFF2A2A2A))
                         .padding(horizontal = 14.dp, vertical = 10.dp),
                 ) {
                     Column(Modifier.weight(1f)) {

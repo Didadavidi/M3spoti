@@ -93,4 +93,19 @@
     <string name="automix_intro_short">AutoMix łączy utwory jak DJ. Miksuje te z rozszerzeń, pobranych i plików; utwory ze Spotify dostają krótkie przenikanie.</string>
     <string name="live_radio_favorite_chip">Ulubiona</string>
     <string name="automix_limit_intro">Miks działa dla utworów z rozszerzenia źródła audio, pobranych i plików w twoim telefonie. Utwory ze Spotify tylko płynnie się przenikają.</string>
+    <string name="lyrics_haptics">Wibracja przy każdym wersie</string>
+    <string name="settings_cover_style_title">Okładki</string>
+    <string name="settings_cover_style_detail">Z kropek, z fal albo sam obraz. Automatycznie dobiera kropki lub fale do okładki.</string>
+    <string name="settings_cover_style_auto">Automatycznie</string>
+    <string name="settings_cover_style_dots">Kropki</string>
+    <string name="settings_cover_style_waves">Fale</string>
+    <string name="settings_cover_style_original">Oryginał</string>
+    <string name="settings_field_style_title">Tła</string>
+    <string name="settings_field_style_detail">Za stroną główną, stronami i odtwarzaczem: ruchome kropki albo ten sam wzór jako nieruchomy gradient, oszczędniejszy dla baterii.</string>
+    <string name="settings_field_style_gradient">Gradient</string>
+    <string name="about_credits_title">Podziękowania</string>
+    <string name="about_credit_myspoti">Sama aplikacja: wszystko poza wyglądem</string>
+    <string name="about_credit_pixelplayer">Inspiracja dla kształtów i sprężystych przycisków</string>
+    <string name="about_credit_pixelmusic">Kolory albumu i czcionka Roboto Flex</string>
+    <string name="link_open_failed">Nie udało się otworzyć tego linku do Spotify</string>
 </resources>

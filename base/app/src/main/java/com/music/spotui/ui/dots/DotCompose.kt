@@ -1,5 +1,6 @@
 package com.music.spotui.ui.dots
 
+import androidx.compose.ui.graphics.asImageBitmap
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.LruCache
@@ -112,6 +113,12 @@ fun HalftoneCover(
 ) {
     val context = LocalContext.current
     val key = url.orEmpty()
+    val coverMode = com.music.spotui.data.preferences.CoverStylePref.mode
+    // "Covers: Original": the picture itself, no halftone (a cover without a picture keeps the design's art).
+    if (coverMode == com.music.spotui.data.preferences.CoverStylePref.ORIGINAL && key.isNotBlank()) {
+        OriginalCover(key, modifier.clip(shape).background(placeholder))
+        return
+    }
     val art by produceState(cachedHalftone(key) ?: if (key.isBlank()) Halftone.synthetic(fallbackSeed) else null, key) {
         // The initial value only counts for the first cover: on a new one (a skipped song in the
         // player) the state still held the old art, so nothing loaded and the old cover stayed.
@@ -119,7 +126,14 @@ fun HalftoneCover(
         if (key.isNotBlank() && value == null) value = loadHalftone(context, key) ?: Halftone.synthetic(fallbackSeed.ifBlank { key })
     }
     val box = modifier.clip(shape)
-    val a = art
+    // "Covers: Dots / Waves": every cover in that style; "Automatic": whichever suits the picture.
+    val a = art?.let {
+        when (coverMode) {
+            com.music.spotui.data.preferences.CoverStylePref.DOTS -> it.withStyle(HalftoneArt.Style.DOTS)
+            com.music.spotui.data.preferences.CoverStylePref.WAVES -> it.withStyle(HalftoneArt.Style.LINES)
+            else -> it
+        }
+    }
     if (a == null) {
         Box(box.background(placeholder))
         return
@@ -128,7 +142,7 @@ fun HalftoneCover(
         val t = rememberDotTime()
         Canvas(box) { drawHalftone(a, cells, t.value) }
     } else {
-        StaticHalftone(a, "$key|$fallbackSeed|$cells", cells, box)
+        StaticHalftone(a, "$key|$fallbackSeed|$cells|${a.style}", cells, box)
     }
 }
 
@@ -166,9 +180,58 @@ fun DotFieldBackground(
     step: Float = 8f,
     animate: Boolean = true,
 ) {
+    if (com.music.spotui.data.preferences.FieldStylePref.gradient) {
+        GradientField(field, inkA, inkB, modifier)
+        return
+    }
     val t = rememberDotTime(animate)
     val density = LocalDensity.current.density
     Canvas(modifier.fillMaxSize()) { drawDotField(field, inkA, inkB, step * density, t.value) }
+}
+
+/** A cover as the picture itself (the "Covers: Original" setting), cropped to fill. */
+@OptIn(com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi::class)
+@Composable
+private fun OriginalCover(url: String, modifier: Modifier) {
+    com.bumptech.glide.integration.compose.GlideImage(
+        model = url, contentDescription = null,
+        contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = modifier,
+    )
+}
+
+/**
+ * A dot field as a soft, still gradient: the same pattern as the dots ([fieldCoverage]), computed
+ * on a small grid once per size and colours and drawn stretched with smooth filtering.
+ */
+@Composable
+private fun GradientField(field: DotField, inkA: Color, inkB: Color, modifier: Modifier) {
+    androidx.compose.foundation.layout.Spacer(modifier.fillMaxSize().drawWithCache {
+        val gw = 40
+        val gh = (gw * size.height / size.width.coerceAtLeast(1f)).toInt().coerceIn(8, 120)
+        val (covA, covB) = fieldCoverage(field, 0f)
+        val px = IntArray(gw * gh)
+        for (y in 0 until gh) for (x in 0 until gw) {
+            val u = (x + 0.5f) / gw
+            val v = (y + 0.5f) / gh
+            // A dot covers about 80 % of its cell at full ink: the gradient matches that density.
+            val ab = (covB(u, v) * 0.8f).coerceIn(0f, 1f)
+            val aa = (covA(u, v) * 0.8f).coerceIn(0f, 1f)
+            // Ink A over ink B over nothing.
+            val outA = aa + ab * (1 - aa)
+            fun ch(ca: Float, cb: Float) = if (outA <= 0f) 0f else (ca * aa + cb * ab * (1 - aa)) / outA
+            val r = ch(inkA.red, inkB.red)
+            val g = ch(inkA.green, inkB.green)
+            val b = ch(inkA.blue, inkB.blue)
+            px[y * gw + x] = (((outA * 255).toInt() shl 24) or ((r * 255).toInt() shl 16) or ((g * 255).toInt() shl 8) or (b * 255).toInt())
+        }
+        val img = android.graphics.Bitmap.createBitmap(px, gw, gh, android.graphics.Bitmap.Config.ARGB_8888).asImageBitmap()
+        onDrawBehind {
+            drawImage(
+                img, dstSize = androidx.compose.ui.unit.IntSize(size.width.toInt(), size.height.toInt()),
+                filterQuality = androidx.compose.ui.graphics.FilterQuality.High,
+            )
+        }
+    })
 }
 
 /** The Lyrics screen's moiré of thin wavy lines, in [color]. */

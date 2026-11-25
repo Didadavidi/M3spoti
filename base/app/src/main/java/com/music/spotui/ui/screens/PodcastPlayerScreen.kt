@@ -310,9 +310,9 @@ fun PodcastPlayerScreen(navController: NavController) {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(width = 44.dp, height = 28.dp)
+                        .pressable(0.92f) { showSpeed = true }
                         .clip(RoundedCornerShape(14.dp))
-                        .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                        .pressable(0.92f) { showSpeed = true },
+                        .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(14.dp)),
                 ) {
                     Text(
                         stringResource(R.string.player_speed_chip, speedLabel(SongPlayer.speed.value)),
@@ -326,11 +326,11 @@ fun PodcastPlayerScreen(navController: NavController) {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(64.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
                         .pressable(0.92f) {
                             if (playing) SongPlayer.pause() else SongPlayer.play()
-                        },
+                        }
+                        .clip(CircleShape)
+                        .background(Color.White),
                 ) {
                     com.music.spotui.ui.components.PlayPauseIcon(
                         playing = playing,

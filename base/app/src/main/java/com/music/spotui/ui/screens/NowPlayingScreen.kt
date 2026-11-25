@@ -1,5 +1,11 @@
 package com.music.spotui.ui.screens
 
+import com.music.spotui.ui.navigation.pullDownToClosePlayer
+import androidx.compose.ui.graphics.drawscope.scale
+import com.music.spotui.ui.components.rememberSqueezeShape
+import com.music.spotui.ui.components.pressScale
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -64,6 +70,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.OndemandVideo
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.squeezeButton
 import com.music.spotui.ui.dots.DesignIcons
 import com.music.spotui.ui.dots.DotField
 import com.music.spotui.ui.dots.DotFieldBackground
@@ -155,8 +162,7 @@ fun PlayerScreen(navController: NavController) {
             if (d > 0) (mv.position().toFloat() / d).coerceIn(0f, 1f) else 0f
         }
     }
-    // Pulled down, the player follows the finger and closes past a threshold (as the back button).
-    var pull by remember { mutableFloatStateOf(0f) }
+    // Pulled down, the player follows the finger as a card and closes past a threshold or on a flick.
     val pullEnabled = !showLyrics && !mv.fullscreen.value
     val reveal = com.music.spotui.ui.navigation.LocalPlayerReveal.current
 
@@ -164,19 +170,13 @@ fun PlayerScreen(navController: NavController) {
     Box(
         Modifier
             .fillMaxSize()
-            .graphicsLayer { translationY = pull }
             .background(album.surface)
-            .pointerInput(pullEnabled) {
-                if (!pullEnabled) return@pointerInput
-                detectVerticalDragGestures(
-                    onDragEnd = { if (pull > 140.dp.toPx()) PlayerSheet.close(); pull = 0f },
-                    onDragCancel = { pull = 0f },
-                ) { change, dy -> if (pull + dy >= 0f) { change.consume(); pull += dy } }
-            }
+            .pullDownToClosePlayer(pullEnabled)
     ) {
         Box(Modifier.fillMaxWidth().height(520.dp)) {
             DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
         }
+        PlayerBloom(album.primary, dotsEnd = 440.dp)
         // The white status bar icons over pale dots were hard to read.
         com.music.spotui.ui.theme.StatusBarScrim(album.surface)
         Column(
@@ -204,9 +204,7 @@ fun PlayerScreen(navController: NavController) {
                         modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .widthIn(max = 220.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(album.surfaceContainerLowest)
-                            .clickable { contextRoute(np)?.let { navController.navigate(it); PlayerSheet.close() } }
+                            .squeezeButton(album.surfaceContainerLowest, 20.dp, 11.dp) { contextRoute(np)?.let { navController.navigate(it); PlayerSheet.close() } }
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                     )
                 }
@@ -299,9 +297,9 @@ fun PlayerScreen(navController: NavController) {
                     val liked = isLiked.value
                     val radius by androidx.compose.animation.core.animateDpAsState(if (liked) 20.dp else 28.dp, com.music.spotui.ui.dots.bouncy(), label = "like")
                     Box(
-                        Modifier.size(56.dp).clip(RoundedCornerShape(radius))
+                        Modifier.size(56.dp).pressable(0.9f) { vm.updateLikeState(!liked) }
+                            .clip(RoundedCornerShape(radius))
                             .background(if (liked) album.tertiaryContainer else album.surfaceContainerHigh)
-                            .pressable(0.9f) { vm.updateLikeState(!liked) }
                             .semantics { contentDescription = context.getString(if (liked) R.string.player_unlike else R.string.player_like) },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -341,14 +339,18 @@ fun PlayerScreen(navController: NavController) {
                 )
             }
 
-            // Shuffle, previous, next, repeat.
+            // Shuffle, previous, next, repeat: a connected group. The button under the finger grows
+            // and pushes its neighbours narrower, then they all spring back.
+            val groupSources = List(4) { remember { MutableInteractionSource() } }
+            val groupWidths = transportGroupWidths(groupSources, listOf(0.6f, 1f, 1f, 0.6f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
                 val smartOn = SmartShuffle.on.value != null && SmartShuffle.on.value == np.contextUri
-                ToggleIcon(DesignIcons.Shuffle, stringResource(R.string.play_mode_item_shuffle_title), shuffle || smartOn, album.primary, album.onSurface) {
+                ToggleIcon(DesignIcons.Shuffle, stringResource(R.string.play_mode_item_shuffle_title), shuffle || smartOn, album.primary, album.onSurface,
+                    modifier = Modifier.weight(groupWidths[0]), source = groupSources[0]) {
                     // As in Spotify: off → shuffle → Smart Shuffle (playlists, Liked Songs) → off.
                     val ctx = np.contextUri
                     when {
@@ -366,14 +368,17 @@ fun PlayerScreen(navController: NavController) {
                         else -> vm.updateShuffleState(!shuffle)
                     }
                 }
-                BigPill(DesignIcons.Previous, stringResource(R.string.np_content_desc_prev), album.surfaceContainerHigh, album.onSurface, Modifier.weight(1f)) {
+                BigPill(DesignIcons.Previous, stringResource(R.string.np_content_desc_prev), album.surfaceContainerHigh, album.onSurface,
+                    Modifier.weight(groupWidths[1]), source = groupSources[1], pressedScale = 1f) {
                     vm.playPreviousSong(queueSongs, context)
                 }
-                BigPill(DesignIcons.Next, stringResource(R.string.np_content_desc_next), album.surfaceContainerHigh, album.onSurface, Modifier.weight(1f)) {
+                BigPill(DesignIcons.Next, stringResource(R.string.np_content_desc_next), album.surfaceContainerHigh, album.onSurface,
+                    Modifier.weight(groupWidths[2]), source = groupSources[2], pressedScale = 1f) {
                     vm.playNextSongs(queueSongs, context)
                 }
                 ToggleIcon(DesignIcons.Repeat, stringResource(R.string.np_content_desc_repeat), repeatMode != 0, album.primary, album.onSurface,
-                    badge = when (repeatMode) { 2 -> "1"; 3 -> "1×"; else -> null }) { SongPlayer.cycleRepeat() }
+                    badge = when (repeatMode) { 2 -> "1"; 3 -> "1×"; else -> null },
+                    modifier = Modifier.weight(groupWidths[3]), source = groupSources[3]) { SongPlayer.cycleRepeat() }
             }
 
             Spacer(Modifier.weight(1f))
@@ -445,7 +450,6 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
     val album = ExpressiveColor.scheme
     val context = LocalContext.current
     val reveal = com.music.spotui.ui.navigation.LocalPlayerReveal.current
-    var pull by remember { mutableFloatStateOf(0f) }
     val fav = com.music.spotui.radio.RadioFavoritesStore.favorites.containsKey(station.stationUuid)
     val favorites = com.music.spotui.radio.RadioFavoritesStore.list()
     val ring = if (favorites.any { it.stationUuid == station.stationUuid }) favorites else com.music.spotui.radio.RadioBrowserApi.curatedPopular
@@ -457,17 +461,13 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
     }
     MaterialTheme(colorScheme = album, typography = MaterialTheme.typography) {
         Box(
-            Modifier.fillMaxSize().graphicsLayer { translationY = pull }.background(album.surface)
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onDragEnd = { if (pull > 140.dp.toPx()) com.music.spotui.ui.navigation.PlayerSheet.close(); pull = 0f },
-                        onDragCancel = { pull = 0f },
-                    ) { change, dy -> if (pull + dy >= 0f) { change.consume(); pull += dy } }
-                },
+            Modifier.fillMaxSize().background(album.surface)
+                .pullDownToClosePlayer(true),
         ) {
             Box(Modifier.fillMaxWidth().height(460.dp)) {
                 DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
             }
+            PlayerBloom(album.primary, dotsEnd = 400.dp)
             com.music.spotui.ui.theme.StatusBarScrim(album.surface)
             Column(Modifier.fillMaxSize().graphicsLayer { alpha = reveal() }.statusBarsPadding().navigationBarsPadding()) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 12.dp)) {
@@ -552,25 +552,98 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
 
 @Composable
 private fun RoundIcon(icon: ImageVector, label: String, bg: Color, fg: Color, onClick: () -> Unit) {
-    Box(Modifier.size(52.dp).clip(CircleShape).background(bg).pressable(0.9f, onClick = onClick), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(52.dp).pressable(0.9f, onClick = onClick).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) {
         Icon(icon, label, tint = fg, modifier = Modifier.size(22.dp))
+    }
+}
+
+/**
+ * The widths of a connected button group, as row weights from [base]: the button whose [sources]
+ * is pressed grows by a third, its direct neighbours give way, on a bouncy spring. Reduced
+ * motion keeps them still.
+ */
+@Composable
+internal fun transportGroupWidths(sources: List<MutableInteractionSource>, base: List<Float>): List<Float> {
+    val reduce = com.music.spotui.ui.look.rememberReduceMotion()
+    val held = sources.map { it.collectIsPressedAsState().value }.indexOf(true).takeUnless { reduce } ?: -1
+    return base.mapIndexed { i, w ->
+        val target = w * when {
+            held == i -> 1.32f
+            held >= 0 && kotlin.math.abs(held - i) == 1 -> 0.8f
+            else -> 1f
+        }
+        androidx.compose.animation.core.animateFloatAsState(
+            target,
+            androidx.compose.animation.core.spring(dampingRatio = 0.55f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
+            label = "groupWidth$i",
+        ).value
+    }
+}
+
+/**
+ * The bloom under the dots: a soft oval glow of the cover's [color], centred on the bottom edge and
+ * reaching up to where the dot field ends ([dotsEnd]), so the page does not go flat under the
+ * dots. It follows the album colours as they change, so it fades with each new song.
+ */
+@Composable
+private fun PlayerBloom(color: Color, dotsEnd: androidx.compose.ui.unit.Dp) {
+    androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+        val span = size.height - dotsEnd.toPx()
+        if (span <= 0f) return@Canvas
+        val center = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height)
+        val rx = size.width * 0.85f
+        val ry = span * 1.05f
+        val peak = 0.42f
+        // A smooth fall-off (smoothstep), strongest at the bottom centre.
+        val brush = androidx.compose.ui.graphics.Brush.radialGradient(
+            0f to color.copy(alpha = peak),
+            0.25f to color.copy(alpha = peak * 0.84f),
+            0.5f to color.copy(alpha = peak * 0.5f),
+            0.75f to color.copy(alpha = peak * 0.16f),
+            1f to Color.Transparent,
+            center = center, radius = rx,
+        )
+        // The circle stretched into an oval as tall as the space under the dots.
+        scale(scaleX = 1f, scaleY = ry / rx, pivot = center) {
+            drawRect(brush, topLeft = androidx.compose.ui.geometry.Offset(0f, center.y - rx), size = androidx.compose.ui.geometry.Size(size.width, rx))
+        }
     }
 }
 
 /** Shuffle / repeat: an icon that turns the primary colour (with a dot under it) when on. */
 @Composable
-private fun ToggleIcon(icon: ImageVector, label: String, on: Boolean, onColor: Color, offColor: Color, badge: String? = null, onClick: () -> Unit) {
-    Box(Modifier.size(48.dp).clip(CircleShape).pressable(0.9f, onClick = onClick), contentAlignment = Alignment.Center) {
+private fun ToggleIcon(
+    icon: ImageVector, label: String, on: Boolean, onColor: Color, offColor: Color, badge: String? = null,
+    modifier: Modifier = Modifier.size(48.dp),
+    source: MutableInteractionSource = remember { MutableInteractionSource() },
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier.height(48.dp).pressScale(source, 0.9f).clip(CircleShape)
+            .clickable(source, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
         Icon(icon, label, tint = if (on) onColor else offColor, modifier = Modifier.size(24.dp))
         if (badge != null) Text(badge, color = onColor, fontSize = 9.sp, fontWeight = FontWeight.Black, modifier = Modifier.align(Alignment.TopEnd).padding(top = 6.dp, end = 6.dp))
         if (on) Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp).size(4.dp).clip(CircleShape).background(onColor))
     }
 }
 
-/** Previous / next: the design's big rounded pills. */
+/** Previous / next: the design's big rounded pills; held, their corners squeeze. */
 @Composable
-private fun BigPill(icon: ImageVector, label: String, bg: Color, fg: Color, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.height(72.dp).clip(RoundedCornerShape(24.dp)).background(bg).pressable(0.94f, onClick = onClick), contentAlignment = Alignment.Center) {
+private fun BigPill(
+    icon: ImageVector, label: String, bg: Color, fg: Color, modifier: Modifier,
+    source: MutableInteractionSource = remember { MutableInteractionSource() },
+    /** In a connected group the pill widens instead (1 = no shrink). */
+    pressedScale: Float = 0.96f,
+    onClick: () -> Unit,
+) {
+    val shape = rememberSqueezeShape(source, 24.dp, 14.dp)
+    Box(
+        modifier.height(72.dp).pressScale(source, pressedScale).clip(shape).background(bg)
+            .clickable(source, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
         Icon(icon, label, tint = fg, modifier = Modifier.size(28.dp))
     }
 }
@@ -593,7 +666,7 @@ private fun PlayerChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
         modifier = Modifier.height(46.dp).then(if (showLabel) Modifier else Modifier.width(46.dp))
-            .clip(RoundedCornerShape(23.dp)).background(bg).clickable(onClick = onClick)
+            .squeezeButton(bg, 23.dp, 13.dp, onClick = onClick)
             .padding(horizontal = if (showLabel) ChipPadding else 0.dp),
     ) {
         when {

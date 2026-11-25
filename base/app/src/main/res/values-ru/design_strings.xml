@@ -93,4 +93,19 @@
     <string name="automix_intro_short">AutoMix сводит треки, как диджей. Он микширует треки из расширений, загрузок и файлов; у треков Spotify — короткий кроссфейд.</string>
     <string name="live_radio_favorite_chip">Избранное</string>
     <string name="automix_limit_intro">Сведение работает для треков из расширения аудиоисточника, загрузок и файлов на твоём телефоне. Треки Spotify только плавно затухают.</string>
+    <string name="lyrics_haptics">Вибрация на каждой строке</string>
+    <string name="settings_cover_style_title">Обложки</string>
+    <string name="settings_cover_style_detail">Точками, волнами или как есть. «Авто» выбирает точки или волны под каждую обложку.</string>
+    <string name="settings_cover_style_auto">Авто</string>
+    <string name="settings_cover_style_dots">Точки</string>
+    <string name="settings_cover_style_waves">Волны</string>
+    <string name="settings_cover_style_original">Оригинал</string>
+    <string name="settings_field_style_title">Фоны</string>
+    <string name="settings_field_style_detail">За главной, страницами и плеером: движущиеся точки или тот же узор неподвижным градиентом — бережнее к батарее.</string>
+    <string name="settings_field_style_gradient">Градиент</string>
+    <string name="about_credits_title">Благодарности</string>
+    <string name="about_credit_myspoti">Само приложение: всё, кроме дизайна</string>
+    <string name="about_credit_pixelplayer">Вдохновение для форм и пружинящих кнопок</string>
+    <string name="about_credit_pixelmusic">Цвета альбома и шрифт Roboto Flex</string>
+    <string name="link_open_failed">Не удалось открыть эту ссылку Spotify</string>
 </resources>

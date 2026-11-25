@@ -73,8 +73,7 @@ fun LoginHelpButton() {
         Text(
             stringResource(R.string.login_help_button),
             color = com.music.spotui.ui.theme.SystemColors.scheme.onSurface, fontFamily = AppSans, fontWeight = FontWeight.Bold, fontSize = 13.sp,
-            modifier = Modifier.clip(RoundedCornerShape(50)).background(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh)
-                .clickable { open = true }.padding(horizontal = 14.dp, vertical = 7.dp),
+            modifier = Modifier.squeezeButton(com.music.spotui.ui.theme.SystemColors.scheme.surfaceContainerHigh, 18.dp, 10.dp) { open = true }.padding(horizontal = 14.dp, vertical = 7.dp),
         )
     }
     if (open) LoginHelpDialog(onClose = { open = false })
@@ -100,7 +99,7 @@ fun LoginHelpDialog(onClose: () -> Unit) {
                     fontFamily = com.music.spotui.ui.theme.FlexDisplay, fontWeight = FontWeight.Black, fontSize = 22.sp,
                 )
                 androidx.compose.foundation.layout.Box(
-                    Modifier.size(40.dp).clip(CircleShape).background(onDeep.copy(alpha = 0.12f)).clickable(onClick = onClose),
+                    Modifier.size(40.dp).pressable(PressScale.ICON, onClick = onClose).clip(CircleShape).background(onDeep.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center,
                 ) { androidx.compose.material3.Icon(com.music.spotui.ui.dots.DesignIcons.Close, stringResource(R.string.bottom_actions_close), tint = onDeep, modifier = Modifier.size(18.dp)) }
             }
@@ -129,14 +128,13 @@ fun LoginHelpDialog(onClose: () -> Unit) {
                 Text(
                     stringResource(R.string.login_help_restart), color = s.onCoral, fontFamily = AppSans, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(50)).background(s.coral)
-                        .clickable { onClose(); MyspotiRuntime.host.retryLogin() }.padding(vertical = 14.dp),
+                    modifier = Modifier.weight(1f).squeezeButton(s.coral, 25.dp, 14.dp) { onClose(); MyspotiRuntime.host.retryLogin() }.padding(vertical = 14.dp),
                 )
                 Text(
                     stringResource(R.string.login_help_send), color = onDeep, fontFamily = AppSans, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(50)).border(2.dp, onDeep, RoundedCornerShape(50))
-                        .clickable { onClose(); sendLoginReport(ctx) }.padding(vertical = 12.dp),
+                    modifier = Modifier.weight(1f).pressable(PressScale.BUTTON) { onClose(); sendLoginReport(ctx) }.clip(RoundedCornerShape(50)).border(2.dp, onDeep, RoundedCornerShape(50))
+                        .padding(vertical = 12.dp),
                 )
             }
         }

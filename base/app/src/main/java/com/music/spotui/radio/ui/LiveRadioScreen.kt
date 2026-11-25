@@ -183,8 +183,8 @@ internal fun stationColors(index: Int): Pair<Color, Color> {
 private fun FavoriteCard(station: RadioStation, index: Int) {
     val (bg, fg) = stationColors(index)
     Column(
-        Modifier.size(width = 136.dp, height = 156.dp).clip(RoundedCornerShape(28.dp)).background(bg)
-            .pressable(0.96f) { RadioPlayer.play(station) }.padding(14.dp),
+        Modifier.size(width = 136.dp, height = 156.dp).pressable(0.96f) { RadioPlayer.play(station) }
+            .clip(RoundedCornerShape(28.dp)).background(bg).padding(14.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(7.dp).clip(CircleShape).background(com.music.spotui.ui.theme.SystemColors.scheme.error))
@@ -233,9 +233,9 @@ private fun StationRow(station: RadioStation, index: Int) {
     val (bg, fg) = stationColors(index)
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clip(RoundedCornerShape(22.dp))
-            .background(if (current) s.primaryContainer.copy(alpha = 0.6f) else s.surfaceContainer)
-            .pressable(0.97f) { RadioPlayer.play(station) }.padding(10.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).pressable(0.97f) { RadioPlayer.play(station) }
+            .clip(RoundedCornerShape(22.dp))
+            .background(if (current) s.primaryContainer.copy(alpha = 0.6f) else s.surfaceContainer).padding(10.dp),
     ) {
         Box(Modifier.size(width = 64.dp, height = 52.dp).clip(RoundedCornerShape(16.dp)).background(bg), contentAlignment = Alignment.Center) {
             if (playing) com.music.spotui.ui.immersive.components.ImmersivePlayingBars(Modifier.align(Alignment.Center))

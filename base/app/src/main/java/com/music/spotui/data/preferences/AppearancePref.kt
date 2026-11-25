@@ -74,6 +74,42 @@ object AppFontPref {
 }
 
 /**
+ * How covers are drawn: [AUTO] in dots or in waves, whichever suits the picture (the design);
+ * always [DOTS]; always [WAVES]; or the [ORIGINAL] picture, no halftone (lighter for the phone).
+ */
+object CoverStylePref {
+    const val AUTO = 0
+    const val DOTS = 1
+    const val WAVES = 2
+    const val ORIGINAL = 3
+    private const val KEY = "cover_style"
+
+    var mode by mutableStateOf(prefs(com.music.spotui.di.Graph.app).getInt(KEY, AUTO))
+        private set
+
+    fun set(c: Context, value: Int) {
+        mode = value
+        prefs(c).edit().putInt(KEY, value).apply()
+    }
+}
+
+/**
+ * The decorative backgrounds behind the Home hero, page headers and the player: the design's dots
+ * (moving with the music), or the same pattern as a soft, still gradient (lighter for the phone).
+ */
+object FieldStylePref {
+    private const val KEY = "field_gradient"
+
+    var gradient by mutableStateOf(prefs(com.music.spotui.di.Graph.app).getBoolean(KEY, false))
+        private set
+
+    fun set(c: Context, value: Boolean) {
+        gradient = value
+        prefs(c).edit().putBoolean(KEY, value).apply()
+    }
+}
+
+/**
  * "Download lyrics with songs": a downloaded song's lyrics are looked up and kept with it, so the
  * lyrics show without a connection. On by default.
  */

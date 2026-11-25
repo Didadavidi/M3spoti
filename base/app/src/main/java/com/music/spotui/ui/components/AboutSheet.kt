@@ -77,12 +77,15 @@ fun AboutSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 8.dp))
             AboutRow(stringResource(R.string.about_discord), stringResource(R.string.about_discord_detail)) { openUrl(context, DISCORD_URL) }
             AboutRow(stringResource(R.string.about_github), stringResource(R.string.about_github_detail)) { openUrl(context, "https://github.com/$repo") }
+            Text(stringResource(R.string.about_credits_title), color = AppText, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 2.dp))
+            CreditRows()
             Text(stringResource(R.string.support_body), color = AppMuted, fontSize = 13.sp,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 12.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
-                    .background(AppAccent).pressable(0.96f) { SupportReminder.open(context) },
+                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth().height(48.dp).pressable(0.96f) { SupportReminder.open(context) }.clip(RoundedCornerShape(50))
+                    .background(AppAccent),
             ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
             GitHubSponsorButton(Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp))
         }
@@ -95,9 +98,9 @@ fun GitHubSponsorButton(modifier: Modifier = Modifier, onClick: (() -> Unit)? = 
     val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
-            .border(1.dp, AppText.copy(alpha = 0.6f), RoundedCornerShape(50))
-            .pressable(0.96f) { onClick?.invoke() ?: SupportReminder.openSponsors(context) },
+        modifier = modifier.fillMaxWidth().height(48.dp).pressable(0.96f) { onClick?.invoke() ?: SupportReminder.openSponsors(context) }
+            .clip(RoundedCornerShape(50))
+            .border(1.dp, AppText.copy(alpha = 0.6f), RoundedCornerShape(50)),
     ) { Text(stringResource(R.string.support_github_action), color = AppText, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
 }
 
@@ -118,12 +121,24 @@ fun SupportSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(top = 10.dp, bottom = 18.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50))
-                    .background(AppAccent).pressable(0.96f) { onDismiss(); SupportReminder.open(context) },
+                modifier = Modifier.fillMaxWidth().height(48.dp).pressable(0.96f) { onDismiss(); SupportReminder.open(context) }.clip(RoundedCornerShape(50))
+                    .background(AppAccent),
             ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
             GitHubSponsorButton(Modifier.padding(top = 10.dp)) { onDismiss(); SupportReminder.openSponsors(context) }
         }
     }
+}
+
+/**
+ * Who the app owes: Myspoti (the app itself), PixelPlayer (the shapes and the springy buttons
+ * inspired the design) and PixelMusic (the album colours, the font). Each opens its page.
+ */
+@Composable
+fun CreditRows() {
+    val context = LocalContext.current
+    AboutRow("Myspoti · kota-zo", stringResource(R.string.about_credit_myspoti)) { openUrl(context, "https://github.com/kota-zo/myspoti") }
+    AboutRow("PixelPlayer · Theo Vilardo", stringResource(R.string.about_credit_pixelplayer)) { openUrl(context, "https://github.com/PixelPlayerHQ/PixelPlayer") }
+    AboutRow("PixelMusic · Ian Shulyadav", stringResource(R.string.about_credit_pixelmusic)) { openUrl(context, "https://github.com/ianshulyadav/PixelMusic") }
 }
 
 @Composable

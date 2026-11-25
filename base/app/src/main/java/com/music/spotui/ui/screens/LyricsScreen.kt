@@ -1,10 +1,14 @@
 package com.music.spotui.ui.screens
 
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
 import com.music.spotui.ui.components.secondaryClick
 import com.music.spotui.ui.look.lastPress
 import com.music.spotui.ui.look.tapTime
 import com.music.spotui.ui.look.toSwept
 import com.music.spotui.ui.components.pressable
+import com.music.spotui.ui.components.PressScale
+import com.music.spotui.ui.components.squeezeButton
 import androidx.compose.ui.res.stringResource
 
 import android.content.Context
@@ -211,6 +215,26 @@ private fun sungChars(words: List<LyricWord>, starts: List<Int>, p: Long): Float
     return out
 }
 
+/**
+ * Word times for a line that only has a line time: the words share the line's time up to the next
+ * line (82 % of it, the rest is the breath before it), the longer the word, the more. An estimate,
+ * enough for the words to light one after another; null for one word or no next line.
+ */
+private fun estimatedWords(line: LyricLine, nextMs: Long?): List<LyricWord>? {
+    if (nextMs == null || line.text.isBlank()) return null
+    val tokens = Regex("\\S+\\s*").findAll(line.text.trimEnd()).map { it.value }.toList()
+    if (tokens.size < 2) return null
+    val span = (nextMs - line.timeMs).coerceIn(500L, 8000L) * 0.82f
+    val weights = tokens.map { it.trim().length + 1f }
+    val total = weights.sum()
+    var t = line.timeMs.toFloat()
+    return tokens.mapIndexed { i, w -> LyricWord(t.toLong(), 0L, w).also { t += span * weights[i] / total } }
+}
+
+/** The hop of a word as it lights: up to +18 % within 90 ms, settled after half a second. */
+private fun wordPop(ageS: Float): Float =
+    if (ageS < 0f || ageS > 0.5f) 1f else (1f + 0.18f * kotlin.math.sin(ageS * 18f) * kotlin.math.exp(-ageS * 7f)).coerceAtLeast(1f)
+
 /** Seek to a tapped synced line and make sure we're playing. */
 private fun jumpTo(timeMs: Long) {
     com.music.spotui.di.Haptics.click()
@@ -308,6 +332,8 @@ private fun LyricLineText(
     onHold: (() -> Unit)? = null,
     /** Picked to be shared: the line sits on a soft pill. */
     selected: Boolean = false,
+    /** When the next line starts: words get estimated times when the source only timed the line. */
+    nextTimeMs: Long? = null,
 ) {
     val target = when (state) {
         1 -> palette.text
@@ -317,6 +343,15 @@ private fun LyricLineText(
     }
     // The line being sung sits on the design's tilted pill, a little bigger.
     val current by animateFloatAsState(if (state == 0) 1f else 0f, tween(260), label = "lyricCurrent")
+    // Becoming the sung line: it grows with a small bounce.
+    val reduce = com.music.spotui.ui.look.rememberReduceMotion()
+    val jelly = remember { androidx.compose.animation.core.Animatable(1f) }
+    LaunchedEffect(state == 0) {
+        if (state == 0 && !reduce) {
+            jelly.snapTo(0f)
+            jelly.animateTo(1f, androidx.compose.animation.core.spring(dampingRatio = 0.42f, stiffness = 380f))
+        }
+    }
     val lineSize = if (state == 0) (fontSize.value * 1.14f).sp else fontSize
     val color by animateColorAsState(target, tween(220), label = "lyricColor")
     // Explained by Genius: a light dotted line under each row of the text.
@@ -327,17 +362,28 @@ private fun LyricLineText(
     // Duet: the second voice at the end of the row (right in left-to-right), the first and the
     // lines sung together at the start. The text fills the row so its wrapped rows align as one block.
     val align = if (duet && line.voice == 2) TextAlign.End else TextAlign.Start
+    val atEnd = align == TextAlign.End
     val lineModifier = modifier
         .fillMaxWidth()
-        .graphicsLayer { rotationZ = -1.5f * current }
+        .graphicsLayer {
+            // A line at the end of the row (the second singer) is the mirror image: it tilts the other
+            // way and grows from its right edge, so it stays against it.
+            rotationZ = (if (atEnd) 1.5f else -1.5f) * current
+            val pop = 0.96f + 0.04f * jelly.value
+            scaleX = pop; scaleY = pop
+            transformOrigin = androidx.compose.ui.graphics.TransformOrigin(if (atEnd) 1f else 0f, 0.5f)
+        }
         .drawBehind {
             if (current > 0f) {
                 val r = 24.dp.toPx()
                 val path = androidx.compose.ui.graphics.Path().apply {
+                    // The pill reaches past the text on its side, and its small corner is on that side too.
+                    val tip = CornerRadius(6.dp.toPx())
                     addRoundRect(androidx.compose.ui.geometry.RoundRect(
-                        -12.dp.toPx(), -10.dp.toPx(), size.width + 4.dp.toPx(), size.height + 10.dp.toPx(),
+                        if (atEnd) -4.dp.toPx() else -12.dp.toPx(), -10.dp.toPx(),
+                        size.width + if (atEnd) 12.dp.toPx() else 4.dp.toPx(), size.height + 10.dp.toPx(),
                         topLeftCornerRadius = CornerRadius(r), topRightCornerRadius = CornerRadius(r),
-                        bottomRightCornerRadius = CornerRadius(r), bottomLeftCornerRadius = CornerRadius(6.dp.toPx()),
+                        bottomRightCornerRadius = if (atEnd) tip else CornerRadius(r), bottomLeftCornerRadius = if (atEnd) CornerRadius(r) else tip,
                     ))
                 }
                 drawPath(path, palette.pill.copy(alpha = palette.pill.alpha * current))
@@ -370,7 +416,8 @@ private fun LyricLineText(
         }
     }
     Column(lineModifier) {
-        val words = line.words
+        val estimated = remember(line, nextTimeMs) { if (line.words == null) estimatedWords(line, nextTimeMs) else null }
+        val words = line.words ?: estimated.takeIf { LyricsApi.wordSync }
         if (state == 0 && words != null && words.any { it.text.isNotBlank() }) {
             // Karaoke: each word goes straight from the upcoming colour to white as it is sung (drawn
             // on each frame, the line is not recomposed). Words in another colour were hard to tell apart.
@@ -413,6 +460,24 @@ private fun LyricLineText(
                         for (r in 0 until row) path.addRect(androidx.compose.ui.geometry.Rect(0f, l.getLineTop(r), size.width, l.getLineBottom(r)))
                         path.addRect(androidx.compose.ui.geometry.Rect(0f, l.getLineTop(row), x, l.getLineBottom(row)))
                         clipPath(path) { this@drawWithContent.drawContent() }
+                        // The word just lit hops: drawn again over itself, a little bigger, settling.
+                        val p = position() + LINE_LEAD_MS
+                        val wi = words.indexOfLast { it.startMs <= p }
+                        if (wi >= 0 && !reduce) {
+                            val s = wordPop((p - words[wi].startMs) / 1000f)
+                            val a = starts[wi]
+                            val b = (a + words[wi].text.trimEnd().length).coerceAtMost(shown.length)
+                            if (s > 1.002f && b > a && l.getLineForOffset(a) == l.getLineForOffset(b - 1)) {
+                                val r0 = l.getLineForOffset(a)
+                                val x0 = l.getBoundingBox(a).left
+                                val x1 = l.getBoundingBox(b - 1).right
+                                val top = l.getLineTop(r0)
+                                val bottom = l.getLineBottom(r0)
+                                scale(s, s, pivot = Offset((x0 + x1) / 2f, (top + bottom) / 2f)) {
+                                    clipRect(x0 - 2f, top, x1 + 2f, bottom) { this@drawWithContent.drawContent() }
+                                }
+                            }
+                        }
                     },
                 )
             }
@@ -570,9 +635,7 @@ fun LyricsScreen(
             meaning?.takeIf { !it.about.isNullOrBlank() }?.let { m ->
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(48.dp).clickable(
-                        interactionSource = remember { MutableInteractionSource() }, indication = null,
-                    ) { meaningOpen = true },
+                    modifier = Modifier.size(48.dp).pressable(PressScale.ICON) { meaningOpen = true },
                 ) {
                     Icon(Icons.Outlined.Lightbulb, contentDescription = stringResource(R.string.lyrics_meaning_title), tint = palette.highlight)
                 }
@@ -581,9 +644,7 @@ fun LyricsScreen(
             Box {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(48.dp).clickable(
-                        interactionSource = remember { MutableInteractionSource() }, indication = null,
-                    ) { menu = true },
+                    modifier = Modifier.size(48.dp).pressable(PressScale.ICON) { menu = true },
                 ) {
                     Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.content_description_context_menu), tint = palette.highlight)
                 }
@@ -605,9 +666,8 @@ fun LyricsScreen(
             }
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(end = 10.dp).size(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
-                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh)
-                    .clickable(onClick = onClose),
+                modifier = Modifier.padding(end = 10.dp).size(48.dp).pressable(PressScale.ICON, onClick = onClose).clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(com.music.spotui.ui.theme.ExpressiveColor.scheme.surfaceContainerHigh),
             ) {
                 Icon(com.music.spotui.ui.dots.DesignIcons.Close, contentDescription = stringResource(R.string.lyrics_fullscreen_close_button_readout_value), tint = palette.highlight, modifier = Modifier.size(22.dp))
             }
@@ -658,6 +718,14 @@ fun LyricsScreen(
                 val active by remember(l) { derivedStateOf { activeIndexFor(l, position()) } }
                 val notes = remember(l, meaning) { meaning?.let { m -> com.music.spotui.ui.components.notesByLine(m, l.lines.map { it.text }) }.orEmpty() }
                 val listState = rememberLazyListState()
+                // A light tick as the next line comes (not when the screen opens on one).
+                val tickReady = remember { mutableStateOf(false) }
+                LaunchedEffect(active) {
+                    if (!tickReady.value) { tickReady.value = true; return@LaunchedEffect }
+                    if (active > 0 && SongPlayer.isPlaying() && com.music.spotui.data.preferences.isLyricsHaptics(context)) com.music.spotui.di.Haptics.tick()
+                }
+                val reduceWave = com.music.spotui.ui.look.rememberReduceMotion()
+                val waveStep = with(LocalDensity.current) { 56.dp.toPx() }
                 val duet = l.hasDuet
                 val romanizing = LyricsRomanizationPref.on && l.hasRomanization
                 // Lines near the current one rise in one after the other, the first just
@@ -688,6 +756,18 @@ fun LyricsScreen(
                             )
                         }
                         itemsIndexed(l.lines, key = { i, _ -> i }) { i, line ->
+                            // The wave, light: as the list moves on, the lines near the sung one trail a
+                            // touch behind (the farther, the later) and spring back into place.
+                            val lag = remember { androidx.compose.animation.core.Animatable(0f) }
+                            val waveReady = remember { mutableStateOf(false) }
+                            LaunchedEffect(active) {
+                                if (!waveReady.value) { waveReady.value = true; return@LaunchedEffect }
+                                val dist = kotlin.math.abs(i - active)
+                                if (active <= 0 || reduceWave || selecting || dist > 7 || !l.synced) return@LaunchedEffect
+                                delay(28L * dist)
+                                lag.animateTo(waveStep * (0.035f + 0.02f * dist).coerceAtMost(0.15f), tween(110))
+                                lag.animateTo(0f, androidx.compose.animation.core.spring(dampingRatio = 0.5f, stiffness = 240f))
+                            }
                             LyricLineText(
                                 line = line,
                                 state = lineState(l, i, active),
@@ -712,7 +792,9 @@ fun LyricsScreen(
                                     vm.startSelecting(i)
                                 },
                                 selected = picked?.let { i in it } == true,
-                                modifier = Modifier.revealIn(reveal, 0.35f + 0.045f * (i - staggerBase).coerceIn(0, 8), 22f),
+                                nextTimeMs = l.lines.getOrNull(i + 1)?.timeMs,
+                                modifier = Modifier.revealIn(reveal, 0.35f + 0.045f * (i - staggerBase).coerceIn(0, 8), 22f)
+                                    .graphicsLayer { translationY = lag.value },
                             )
                         }
                         l.provider?.let { p ->
@@ -773,7 +855,18 @@ private fun LyricsMenu(
     val context = LocalContext.current
     var extra by remember { mutableStateOf(isLyricsExtraSources(context)) }
     var words by remember { mutableStateOf(com.music.spotui.data.preferences.isLyricsWordSync(context)) }
+    var tick by remember { mutableStateOf(com.music.spotui.data.preferences.isLyricsHaptics(context)) }
     DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+        // A light vibration on each new line.
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.lyrics_haptics)) },
+            trailingIcon = { if (tick) Icon(Icons.Default.Check, contentDescription = null) },
+            onClick = {
+                tick = !tick
+                com.music.spotui.data.preferences.setLyricsHaptics(context, tick)
+                if (tick) com.music.spotui.di.Haptics.tick()
+            },
+        )
         // Word by word (karaoke) or line by line: the app then picks the source by itself.
         DropdownMenuItem(
             text = {
@@ -835,9 +928,7 @@ private fun LyricsChip(label: String, icon: Painter?, active: Boolean, loading: 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(if (active) palette.highlight else Color.Black.copy(alpha = 0.22f))
-            .clickable(enabled = !loading, onClick = onClick)
+            .squeezeButton(if (active) palette.highlight else Color.Black.copy(alpha = 0.22f), 16.dp, 9.dp, enabled = !loading, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp),
     ) {
         if (loading) CircularProgressIndicator(color = palette.highlight, strokeWidth = 2.dp, modifier = Modifier.size(14.dp))
@@ -896,24 +987,51 @@ private fun LyricsControls(
             Text(formatLyricsTime(pos * 1000), color = palette.highlight.copy(alpha = 0.75f), fontSize = 12.sp)
             Text(formatLyricsTime(durationMs), color = palette.highlight.copy(alpha = 0.75f), fontSize = 12.sp)
         }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 4.dp)
-                .size(60.dp)
-                .clip(CircleShape)
-                .background(palette.highlight)
-                .pressable(0.92f) { if (SongPlayer.isPlaying()) SongPlayer.pause() else SongPlayer.play() },
+        // Previous, play/pause, next: a connected group as in the player. The button under the
+        // finger widens and pushes its neighbours narrower, then they spring back.
+        val sources = List(3) { remember { MutableInteractionSource() } }
+        val widths = transportGroupWidths(sources, listOf(0.8f, 1.1f, 0.8f))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp).width(264.dp),
         ) {
-            com.music.spotui.ui.components.PlayPauseIcon(
-                playing = playing,
-                contentDescription = if (playing) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
-                tint = palette.background,
-                modifier = Modifier.size(30.dp),
-            )
+            LyricsTransportPill(sources[0], palette.highlight.copy(alpha = 0.16f), Modifier.weight(widths[0]),
+                onClick = { com.music.spotui.di.Haptics.click(); SongPlayer.previous() }) {
+                Icon(com.music.spotui.ui.dots.DesignIcons.Previous, stringResource(R.string.np_content_desc_prev), tint = palette.highlight, modifier = Modifier.size(26.dp))
+            }
+            LyricsTransportPill(sources[1], palette.highlight, Modifier.weight(widths[1]),
+                onClick = { if (SongPlayer.isPlaying()) SongPlayer.pause() else SongPlayer.play() }) {
+                com.music.spotui.ui.components.PlayPauseIcon(
+                    playing = playing,
+                    contentDescription = if (playing) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
+                    tint = palette.background,
+                    modifier = Modifier.size(30.dp),
+                )
+            }
+            LyricsTransportPill(sources[2], palette.highlight.copy(alpha = 0.16f), Modifier.weight(widths[2]),
+                onClick = { com.music.spotui.di.Haptics.click(); SongPlayer.next() }) {
+                Icon(com.music.spotui.ui.dots.DesignIcons.Next, stringResource(R.string.np_content_desc_next), tint = palette.highlight, modifier = Modifier.size(26.dp))
+            }
         }
     }
+}
+
+/** One button of the lyrics' transport group: a rounded pill whose corners squeeze when held. */
+@Composable
+private fun LyricsTransportPill(
+    source: MutableInteractionSource,
+    bg: Color,
+    modifier: Modifier,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val shape = com.music.spotui.ui.components.rememberSqueezeShape(source, 22.dp, 12.dp)
+    Box(
+        modifier.height(60.dp).clip(shape).background(bg)
+            .clickable(source, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { content() }
 }
 
 @Composable
@@ -984,9 +1102,9 @@ fun InlineLyrics(
             .padding(16.dp, 8.dp, 16.dp, 40.dp)
             // The card's live bounds are read when the lyrics open / close (see LyricsOverlay).
             .onGloballyPositioned { LyricsCardAnchor.coords = it }
+            .pressable(PressScale.CARD) { onExpand() }
             .clip(RoundedCornerShape(12.dp))
             .background(palette.background)
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onExpand() }
             .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -1027,9 +1145,7 @@ fun InlineLyrics(
             Spacer(Modifier.height(16.dp))
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(palette.highlight)
-                    .clickable { onExpand() }
+                    .squeezeButton(palette.highlight, 16.dp, 9.dp) { onExpand() }
                     .padding(16.dp, 8.dp),
             ) {
                 Text(stringResource(R.string.lyrics_card_show_lyrics_button), color = palette.background, fontSize = 13.sp, fontWeight = FontWeight.Bold)
@@ -1044,9 +1160,9 @@ private fun CardIconButton(palette: LyricsPalette, description: String, icon: @C
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(32.dp)
+            .pressable(PressScale.ICON, onClick = onClick)
             .clip(CircleShape)
-            .background(Color.Black.copy(alpha = 0.25f))
-            .clickable(onClick = onClick),
+            .background(Color.Black.copy(alpha = 0.25f)),
     ) { icon() }
 }
 

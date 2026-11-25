@@ -17,6 +17,18 @@ support [Myspoti's developer](#support).
 </p>
 <p align="center"><sub>Design mockups with made-up music; the app follows them closely.</sub></p>
 
+<p align="center">
+  <img src="docs/screenshots/m3spoti/mockups/flat-yellow.jpg" alt="Three phones on a yellow table showing M3spoti's Home, player and Library, with daisies and roses around them" width="100%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/m3spoti/mockups/hero.jpg" alt="Three phones standing side by side: Home, the player and the Library" width="100%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/m3spoti/mockups/player.jpg" alt="The player on a tilted phone" width="38%">
+  <img src="docs/screenshots/m3spoti/mockups/duo.jpg" alt="Home and Library on two phones" width="60%">
+</p>
+<p align="center"><sub>The real app on a Pixel 9 Pro XL, rendered in Blender. Flowers: "Marguerite flowers" and "Red rose flower" from <a href="https://www.blenderkit.com">BlenderKit</a> (royalty free).</sub></p>
+
 ## What's different from Myspoti
 
 - **Halftone covers everywhere.** Real covers become two-colour dots or wavy lines (whichever suits
@@ -112,7 +124,8 @@ The work in this app is Myspoti's. Support its developer on [Ko-fi](https://ko-f
 ## Credits
 
 - Based on [Myspoti](https://github.com/kota-zo/myspoti) (GPL-3.0) by kota-zo: everything but the design.
-- The halftone design is mine; Claude applied it to the code. [PixelMusic](https://github.com/ianshulyadav/PixelMusic) (GPL-3.0) by Ian Shulyadav inspired the album-colour pipeline and an earlier version of this UI, and supplied the Roboto Flex font file. No PixelMusic code or assets are included.
+- **Design inspiration: [PixelPlayer](https://github.com/PixelPlayerHQ/PixelPlayer) by Theo Vilardo.** The shapes (the big rounded pills, the connected play/skip button group, the rounded cards) and the springy feel of the buttons are inspired by PixelPlayer. The halftone design on top is mine; Claude applied it to the code. None of PixelPlayer's code or assets are included, only the ideas.
+- The Roboto Flex font file and the album-colour approach came from [PixelMusic](https://github.com/ianshulyadav/PixelMusic) (GPL-3.0) by Ian Shulyadav; no PixelMusic code or assets are included.
 - UI derived from [Spotui](https://github.com/Spotui/Spotui) / [Metrolist](https://github.com/MetrolistGroup/Metrolist) (GPL-3.0); Spotui also gave the DASH-to-FLAC remux.
 - Myspoti's Immersive look (still in the code, no longer shown) is ported from [BitChord](https://github.com/kushagrasinghx/BitChord) (GPL-3.0-or-later).
 - [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) (GPL-3.0): music videos.

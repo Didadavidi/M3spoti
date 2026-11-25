@@ -204,9 +204,9 @@ fun EpisodeScreen(navController: NavController, episodeId: String, fallbackName:
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .height(36.dp)
+                                .pressable(0.95f) { if (playing) SongPlayer.pause() else play() }
                                 .clip(RoundedCornerShape(18.dp))
                                 .background(AppAccent)
-                                .pressable(0.95f) { if (playing) SongPlayer.pause() else play() }
                                 .padding(horizontal = 20.dp),
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -277,9 +277,9 @@ private fun SaveEpisodeButton(saved: Boolean, onClick: () -> Unit) {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(26.dp)
+                .pressable(0.9f, onClick = onClick)
                 .clip(CircleShape)
-                .background(AppAccent)
-                .pressable(0.9f, onClick = onClick),
+                .background(AppAccent),
         ) {
             Icon(Icons.Default.Check, contentDescription = stringResource(R.string.episode_unsave), tint = com.music.spotui.ui.theme.AppOnAccent, modifier = Modifier.size(17.dp))
         }

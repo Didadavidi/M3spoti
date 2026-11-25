@@ -91,4 +91,19 @@
     <string name="automix_intro_short">AutoMix mezcla las canciones como un DJ. Mezcla las que suenan desde extensiones, descargas y archivos; las de Spotify tienen un fundido corto.</string>
     <string name="live_radio_favorite_chip">Favorita</string>
     <string name="automix_limit_intro">La mezcla funciona con canciones de una extensión de fuente de audio, descargas y archivos de tu teléfono. Las canciones de Spotify solo se funden.</string>
+    <string name="lyrics_haptics">Vibrar en cada línea</string>
+    <string name="settings_cover_style_title">Portadas</string>
+    <string name="settings_cover_style_detail">En puntos, en ondas o la imagen tal cual. Automático elige puntos u ondas según cada portada.</string>
+    <string name="settings_cover_style_auto">Automático</string>
+    <string name="settings_cover_style_dots">Puntos</string>
+    <string name="settings_cover_style_waves">Ondas</string>
+    <string name="settings_cover_style_original">Original</string>
+    <string name="settings_field_style_title">Fondos</string>
+    <string name="settings_field_style_detail">Detrás de Inicio, las páginas y el reproductor: los puntos en movimiento, o el mismo dibujo como degradado quieto, que gasta menos batería.</string>
+    <string name="settings_field_style_gradient">Degradado</string>
+    <string name="about_credits_title">Créditos</string>
+    <string name="about_credit_myspoti">La app en sí: todo menos el diseño</string>
+    <string name="about_credit_pixelplayer">Inspiración para las formas y los botones elásticos</string>
+    <string name="about_credit_pixelmusic">Colores del álbum y la fuente Roboto Flex</string>
+    <string name="link_open_failed">No se pudo abrir este enlace de Spotify</string>
 </resources>

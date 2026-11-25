@@ -1,6 +1,5 @@
 package com.music.spotui.ui.screens
 
-import androidx.compose.foundation.clickable
 import com.music.spotui.ui.theme.coral
 import com.music.spotui.ui.theme.onCoral
 import com.music.spotui.ui.theme.deep
@@ -172,8 +171,8 @@ fun LocalFilesScreen(navController: NavController) {
                                 )
                                 Box(
                                     contentAlignment = Alignment.Center,
-                                    modifier = Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(s.coral)
-                                        .pressable(0.92f) { tracks?.let { if (it.isNotEmpty()) LocalPlayer.play(it, it.indices.random(), shuffle = true) } },
+                                    modifier = Modifier.size(50.dp).pressable(0.92f) { tracks?.let { if (it.isNotEmpty()) LocalPlayer.play(it, it.indices.random(), shuffle = true) } }
+                                        .clip(RoundedCornerShape(16.dp)).background(s.coral),
                                 ) {
                                     Icon(com.music.spotui.ui.dots.DesignIcons.Shuffle, stringResource(R.string.play_mode_item_shuffle_title),
                                         tint = s.onCoral, modifier = Modifier.size(22.dp))
@@ -181,8 +180,8 @@ fun LocalFilesScreen(navController: NavController) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.height(50.dp).clip(RoundedCornerShape(25.dp)).background(s.surfaceContainerHigh)
-                                        .pressable(0.95f) { choosingFolders = true }.padding(start = 16.dp, end = 20.dp),
+                                    modifier = Modifier.height(50.dp).pressable(0.95f) { choosingFolders = true }
+                                        .clip(RoundedCornerShape(25.dp)).background(s.surfaceContainerHigh).padding(start = 16.dp, end = 20.dp),
                                 ) {
                                     Icon(com.music.spotui.ui.dots.DesignIcons.Filter, null, tint = s.onSurface, modifier = Modifier.size(20.dp))
                                     Text(stringResource(R.string.local_folders_button), color = s.onSurface, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
@@ -263,8 +262,8 @@ private fun LocalTrackRow(t: LocalTrack, first: Boolean, last: Boolean, current:
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 1.5.dp)
-            .clip(RoundedCornerShape(if (first) big else small, if (first) big else small, if (last) big else small, if (last) big else small))
-            .background(s.surfaceContainerHigh).pressable(0.98f, onClick = onClick)
+            .pressable(0.98f, onClick = onClick).clip(RoundedCornerShape(if (first) big else small, if (first) big else small, if (last) big else small, if (last) big else small))
+            .background(s.surfaceContainerHigh)
             .padding(start = 10.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
     ) {
         com.music.spotui.ui.dots.HalftoneCover(t.artUri.toString(), Modifier.size(52.dp), RoundedCornerShape(16.dp), cells = 12f, fallbackSeed = t.title)
@@ -280,7 +279,7 @@ private fun LocalTrackRow(t: LocalTrack, first: Boolean, last: Boolean, current:
         }
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(44.dp).clip(RoundedCornerShape(14.dp)).background(s.surface).pressable(0.92f, onClick = onAdd),
+            modifier = Modifier.size(44.dp).pressable(0.92f, onClick = onAdd).clip(RoundedCornerShape(14.dp)).background(s.surface),
         ) {
             Icon(com.music.spotui.ui.dots.DesignIcons.Plus, stringResource(R.string.context_menu_add_to_playlist), tint = s.onSurface, modifier = Modifier.size(20.dp))
         }
@@ -342,14 +341,14 @@ internal fun LocalFoldersSheet(onChanged: () -> Unit, onDismiss: () -> Unit) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 1.5.dp)
-                            .clip(RoundedCornerShape(if (i == 0) big else small, if (i == 0) big else small,
-                                if (i == folders.lastIndex) big else small, if (i == folders.lastIndex) big else small))
-                            .background(s.surfaceContainerHigh)
-                            .clickable {
+                            .pressable(com.music.spotui.ui.components.PressScale.CARD) {
                                 com.music.spotui.data.local.LocalFolders.set(context, folder, !shown)
                                 version++
                                 onChanged()
                             }
+                            .clip(RoundedCornerShape(if (i == 0) big else small, if (i == 0) big else small,
+                                if (i == folders.lastIndex) big else small, if (i == folders.lastIndex) big else small))
+                            .background(s.surfaceContainerHigh)
                             .padding(horizontal = 16.dp, vertical = 12.dp),
                     ) {
                         Column(Modifier.weight(1f).padding(end = 12.dp)) {

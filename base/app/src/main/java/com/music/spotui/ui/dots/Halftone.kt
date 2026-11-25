@@ -26,6 +26,9 @@ class HalftoneArt(
 ) {
     enum class Style { DOTS, LINES }
 
+    /** The same picture drawn in [s] (the "Covers" setting overrides the automatic choice). */
+    fun withStyle(s: Style): HalftoneArt = if (s == style) this else HalftoneArt(paper, inkA, inkB, s, grid, a, b)
+
     /** Ink A at (u, v) in 0..1, bilinear. */
     fun sampleA(u: Float, v: Float): Float = sample(a, u, v)
 

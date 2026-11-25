@@ -1,5 +1,6 @@
 package com.music.spotui.ui.navigation
 
+import com.music.spotui.ui.components.pressScale
 import app.myspoti.engine.R
 import com.music.spotui.ui.theme.AppMuted
 import com.music.spotui.ui.theme.AppShade
@@ -245,11 +246,13 @@ private fun NavBarTab(
     val label = item.designLabel()
     val pill by androidx.compose.animation.animateColorAsState(if (selected) scheme.primary else Color.Transparent, label = "navPill")
     val pillWidth by androidx.compose.animation.core.animateDpAsState(if (selected) 66.dp else 40.dp, com.music.spotui.ui.dots.bouncy(), label = "navPillWidth")
+    // One source for the tab's tap and its pill's spring: the pill bounces under the finger.
+    val source = remember { MutableInteractionSource() }
     Column(
         modifier = Modifier
             .width(96.dp)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = source,
                 indication = null,
                 onClickLabel = label,
                 onClick = onClick,
@@ -258,7 +261,8 @@ private fun NavBarTab(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(
-            Modifier.size(pillWidth, 34.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(17.dp)).background(pill),
+            Modifier.size(pillWidth, 34.dp).pressScale(source, com.music.spotui.ui.components.PressScale.ICON)
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(17.dp)).background(pill),
             contentAlignment = Alignment.Center,
         ) {
             Icon(

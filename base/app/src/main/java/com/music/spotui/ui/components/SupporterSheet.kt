@@ -84,8 +84,8 @@ fun SupportChoice(onChosen: (Level) -> Unit) {
         for ((level, label) in listOf(Level.ONCE to R.string.supporter_once, Level.MONTHLY to R.string.supporter_monthly)) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.height(40.dp).clip(RoundedCornerShape(50)).background(tone(0xFF3A3A3A))
-                    .pressable(0.96f) { onChosen(level) }.padding(horizontal = 18.dp),
+                modifier = Modifier.height(40.dp).pressable(0.96f) { onChosen(level) }
+                    .clip(RoundedCornerShape(50)).background(tone(0xFF3A3A3A)).padding(horizontal = 18.dp),
             ) { Text(stringResource(label), color = AppText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold) }
         }
     }
@@ -117,8 +117,8 @@ fun SupporterSheet(onDismiss: () -> Unit) {
                 else {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(50)).background(AppAccent)
-                            .pressable(0.96f) { SupportReminder.open(context) },
+                        modifier = Modifier.fillMaxWidth().height(48.dp).pressable(0.96f) { SupportReminder.open(context) }
+                            .clip(RoundedCornerShape(50)).background(AppAccent),
                     ) { Text(stringResource(R.string.support_action), color = com.music.spotui.ui.theme.AppOnAccent, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
                     GitHubSponsorButton(Modifier.padding(top = 10.dp))
                     Text(stringResource(R.string.supporter_i_supported), color = AppText, fontSize = 15.sp, fontWeight = FontWeight.Bold,

@@ -82,33 +82,14 @@ fun App() {
     }
     // A link opened from outside (a tap, Share, a short link): its page, over whatever was open.
     // A song opens on its album's page and plays there (the album goes on after it).
-    val pageLink by com.music.spotui.data.api.InviteLinks.page.collectAsState()
-    LaunchedEffect(pageLink) {
-        val uri = pageLink ?: return@LaunchedEffect
-        com.music.spotui.data.api.InviteLinks.page.value = null
-        val id = uri.substringAfterLast(':')
-        com.music.spotui.ui.navigation.PlayerSheet.close()
-        val kind = uri.split(':').getOrNull(1)
-        if (kind == "track") {
-            app.myspoti.host.android.MyspotiRuntime.api.ready.first { it }
-            val track = runCatching { app.myspoti.host.android.MyspotiRuntime.api.catalog.track(uri) }.getOrNull()
-            val album = track?.album
-            if (album != null && album.uri.startsWith("spotify:album:")) runCatching {
-                navController.navigateSingleTop(com.music.spotui.ui.navigation.albumRoute(
-                    album.name, track.artists.joinToString(", ") { it.name }, album.uri.substringAfterLast(':')))
-            }
-            com.music.spotui.di.SongPlayer.playSong(uri, contextUri = album?.uri?.takeIf { it.startsWith("spotify:album:") })
-            return@LaunchedEffect
-        }
-        runCatching {
-            navController.navigateSingleTop(when (kind) {
-                "playlist" -> com.music.spotui.ui.navigation.playlistRoute(id)
-                "album" -> com.music.spotui.ui.navigation.albumRoute("", "", id)
-                "artist" -> com.music.spotui.ui.navigation.artistRoute("artist", id)
-                "user" -> com.music.spotui.ui.navigation.profileRoute(uri.removePrefix("spotify:user:"))
-                "collection" -> com.music.spotui.ui.navigation.Routes.Liked.route
-                else -> com.music.spotui.ui.navigation.showRoute(id)
-            })
+    // Collected, not keyed on the value: clearing the link (so the same link opens again) changed
+    // the key and cancelled a song's album lookup halfway, so a shared song played on its own with
+    // no page (reported: "Spotify links don't open").
+    LaunchedEffect(Unit) {
+        com.music.spotui.data.api.InviteLinks.page.collect { next ->
+            val uri = next ?: return@collect
+            com.music.spotui.data.api.InviteLinks.page.value = null
+            launch { openLinkPage(uri, navController) }
         }
     }
     // Android 12+: Spotify links open in the browser until they are allowed for this app.
@@ -459,5 +440,38 @@ private fun UpdateDialog(
                 modifier = Modifier.padding(top = 8.dp).pressable(0.96f, onClick = onLater).padding(horizontal = 24.dp, vertical = 12.dp),
             )
         }
+    }
+}
+
+/**
+ * Opens a Spotify link's page over whatever is open: a list, artist, podcast, profile or Liked
+ * Songs on its page; a song on its album's page, playing there (the album goes on after it).
+ * A song whose album cannot be looked up still plays.
+ */
+private suspend fun openLinkPage(uri: String, navController: androidx.navigation.NavController) {
+    val id = uri.substringAfterLast(':')
+    com.music.spotui.ui.navigation.PlayerSheet.close()
+    val kind = uri.split(':').getOrNull(1)
+    if (kind == "track") {
+        app.myspoti.host.android.MyspotiRuntime.api.ready.first { it }
+        val track = runCatching { app.myspoti.host.android.MyspotiRuntime.api.catalog.track(uri) }
+            .onFailure { android.util.Log.w("SpotifyLinks", "album of $uri not found: $it") }.getOrNull()
+        val album = track?.album?.takeIf { it.uri.startsWith("spotify:album:") }
+        if (album != null) runCatching {
+            navController.navigateSingleTop(com.music.spotui.ui.navigation.albumRoute(
+                album.name, track.artists.joinToString(", ") { it.name }, album.uri.substringAfterLast(':')))
+        }
+        com.music.spotui.di.SongPlayer.playSong(uri, contextUri = album?.uri)
+        return
+    }
+    runCatching {
+        navController.navigateSingleTop(when (kind) {
+            "playlist" -> com.music.spotui.ui.navigation.playlistRoute(id)
+            "album" -> com.music.spotui.ui.navigation.albumRoute("", "", id)
+            "artist" -> com.music.spotui.ui.navigation.artistRoute("artist", id)
+            "user" -> com.music.spotui.ui.navigation.profileRoute(uri.removePrefix("spotify:user:"))
+            "collection" -> com.music.spotui.ui.navigation.Routes.Liked.route
+            else -> com.music.spotui.ui.navigation.showRoute(id)
+        })
     }
 }

@@ -31,8 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
@@ -297,7 +295,7 @@ private fun HomeHeaderRow(navController: NavController, facet: String, onFacet: 
             val s = com.music.spotui.ui.theme.SystemColors.scheme
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh).clickable { onFacet("") },
+                modifier = Modifier.size(40.dp).pressable(com.music.spotui.ui.components.PressScale.ICON) { onFacet("") }.clip(RoundedCornerShape(16.dp)).background(s.surfaceContainerHigh),
             ) {
                 Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.filter_chip_all_label),
                     tint = s.onSurface, modifier = Modifier.size(18.dp))
@@ -329,9 +327,9 @@ private fun HomePill(label: String, selected: Boolean = false, shape: androidx.c
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .height(40.dp)
+            .pressable(com.music.spotui.ui.components.PressScale.ICON, onClick = onClick)
             .clip(shape)
             .background(if (selected) s.primary else s.surfaceContainerHigh)
-            .clickable(onClick = onClick)
             .padding(horizontal = 18.dp),
     ) {
         Text(text = label, color = if (selected) s.onPrimary else s.onSurface, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
@@ -428,7 +426,7 @@ private fun WhatsNewBell(onClick: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
+            .pressable(com.music.spotui.ui.components.PressScale.ICON, onClick = onClick)
             .padding(end = 10.dp, top = 10.dp, bottom = 10.dp)
             .size(34.dp),
     ) {
@@ -465,8 +463,8 @@ private fun ProfileGroup(rows: List<ProfileRow>, firstBadge: Int) {
             val shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().clip(shape).background(s.card)
-                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = r.onClick)
+                modifier = Modifier.fillMaxWidth().pressable(com.music.spotui.ui.components.PressScale.CARD, onClick = r.onClick)
+                    .clip(shape).background(s.card)
                     .padding(horizontal = 14.dp, vertical = 12.dp),
             ) {
                 Box(
@@ -502,7 +500,8 @@ private fun ProfileSheet(onOpen: (route: String) -> Unit = {}, onDismiss: () -> 
             // Name and picture open your public profile, as in Spotify.
             val myId = com.music.spotui.data.api.ProfileCache.id
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
-                .clickable(enabled = myId != null) { myId?.let { onOpen(com.music.spotui.ui.navigation.profileRoute(it, name)) } }
+                
+                .pressable(com.music.spotui.ui.components.PressScale.CARD, enabled = myId != null) { myId?.let { onOpen(com.music.spotui.ui.navigation.profileRoute(it, name)) } }
                 .padding(horizontal = 20.dp, vertical = 8.dp)) {
                 com.music.spotui.ui.components.ProfileAvatar(url = avatar, name = name, size = 72.dp)
                 Column(Modifier.weight(1f).padding(start = 16.dp)) {

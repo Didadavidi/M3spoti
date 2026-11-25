@@ -87,4 +87,19 @@
     <string name="automix_intro_short">AutoMix 像 DJ 一样把歌曲接在一起。它混音来自扩展、下载和文件的歌曲；Spotify 歌曲只做短暂的淡入淡出。</string>
     <string name="live_radio_favorite_chip">收藏</string>
     <string name="automix_limit_intro">混音适用于来自音频源扩展的歌曲、已下载的歌曲和手机上的文件。Spotify 歌曲只会淡入淡出。</string>
+    <string name="lyrics_haptics">每换一行轻振一下</string>
+    <string name="settings_cover_style_title">封面</string>
+    <string name="settings_cover_style_detail">用圆点、波纹，或者直接显示原图。“自动”会按封面选择圆点或波纹。</string>
+    <string name="settings_cover_style_auto">自动</string>
+    <string name="settings_cover_style_dots">圆点</string>
+    <string name="settings_cover_style_waves">波纹</string>
+    <string name="settings_cover_style_original">原图</string>
+    <string name="settings_field_style_title">背景</string>
+    <string name="settings_field_style_detail">首页、页面和播放器背后：会动的圆点，或同样图案的静态渐变，更省电。</string>
+    <string name="settings_field_style_gradient">渐变</string>
+    <string name="about_credits_title">致谢</string>
+    <string name="about_credit_myspoti">应用本身：除设计外的一切</string>
+    <string name="about_credit_pixelplayer">形状与弹性按钮的灵感来源</string>
+    <string name="about_credit_pixelmusic">专辑配色与 Roboto Flex 字体</string>
+    <string name="link_open_failed">无法打开此 Spotify 链接</string>
 </resources>

@@ -157,15 +157,15 @@ fun ProfileScreen(navController: NavController, userId: String, userName: String
                     Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         p.followers?.let {
                             Text(pluralStringResource(R.plurals.profile_followers, it, it), color = AppMuted, fontSize = 14.sp,
-                                modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                                    .pressable(0.96f) { navController.navigate(followListRoute(userId, followers = true)) }
+                                modifier = Modifier.pressable(0.96f) { navController.navigate(followListRoute(userId, followers = true)) }
+                                    .clip(RoundedCornerShape(6.dp))
                                     .padding(horizontal = 6.dp, vertical = 4.dp))
                         }
                         if (p.followers != null && p.following != null) Text("•", color = AppMuted, fontSize = 14.sp)
                         p.following?.let {
                             Text(stringResource(R.string.profile_following_count, it), color = AppMuted, fontSize = 14.sp,
-                                modifier = Modifier.clip(RoundedCornerShape(6.dp))
-                                    .pressable(0.96f) { navController.navigate(followListRoute(userId, followers = false)) }
+                                modifier = Modifier.pressable(0.96f) { navController.navigate(followListRoute(userId, followers = false)) }
+                                    .clip(RoundedCornerShape(6.dp))
                                     .padding(horizontal = 6.dp, vertical = 4.dp))
                         }
                     }
@@ -176,18 +176,18 @@ fun ProfileScreen(navController: NavController, userId: String, userName: String
                     Text(
                         stringResource(R.string.stats_listening_stats),
                         color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clip(RoundedCornerShape(50))
+                        modifier = Modifier.pressable(0.96f) { navController.navigate(com.music.spotui.ui.navigation.Routes.Recap.route) }
+                            .clip(RoundedCornerShape(50))
                             .border(1.dp, AppMuted, RoundedCornerShape(50))
-                            .pressable(0.96f) { navController.navigate(com.music.spotui.ui.navigation.Routes.Recap.route) }
                             .padding(horizontal = 20.dp, vertical = 8.dp),
                     )
                     Spacer(Modifier.height(10.dp))
                     Text(
                         stringResource(R.string.extensions_title),
                         color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clip(RoundedCornerShape(50))
+                        modifier = Modifier.pressable(0.96f) { navController.navigate(com.music.spotui.ui.navigation.Routes.Extensions.route) }
+                            .clip(RoundedCornerShape(50))
                             .border(1.dp, AppMuted, RoundedCornerShape(50))
-                            .pressable(0.96f) { navController.navigate(com.music.spotui.ui.navigation.Routes.Extensions.route) }
                             .padding(horizontal = 20.dp, vertical = 8.dp),
                     )
                 }
@@ -201,9 +201,7 @@ fun ProfileScreen(navController: NavController, userId: String, userName: String
                     Text(
                         stringResource(if (f) R.string.curation_button_following_state_text else R.string.curation_button_follow_state_text),
                         color = AppText, fontSize = 14.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clip(RoundedCornerShape(50))
-                            .border(1.dp, if (f) AppText else AppMuted, RoundedCornerShape(50))
-                            .pressable(0.96f) {
+                        modifier = Modifier.pressable(0.96f) {
                                 com.music.spotui.di.Haptics.confirm()
                                 following = !f
                                 scope.launch {
@@ -212,6 +210,8 @@ fun ProfileScreen(navController: NavController, userId: String, userName: String
                                     }.onFailure { following = f }
                                 }
                             }
+                            .clip(RoundedCornerShape(50))
+                            .border(1.dp, if (f) AppText else AppMuted, RoundedCornerShape(50))
                             .padding(horizontal = 20.dp, vertical = 8.dp),
                     )
                 }
