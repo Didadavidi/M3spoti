@@ -95,4 +95,13 @@
     <string name="live_radio_favorite_chip">Favorit</string>
     <string name="automix_limit_intro">Der Übergang funktioniert bei Songs aus einer Audioquellen-Erweiterung, Downloads und Dateien auf deinem Handy. Spotify-Songs werden nur übergeblendet.</string>
     <string name="lyrics_haptics">Bei jeder Zeile vibrieren</string>
+    <string name="settings_cover_style_title">Cover</string>
+    <string name="settings_cover_style_detail">Als Punkte, als Wellen oder als Bild. Automatisch wählt je nach Cover Punkte oder Wellen.</string>
+    <string name="settings_cover_style_auto">Automatisch</string>
+    <string name="settings_cover_style_dots">Punkte</string>
+    <string name="settings_cover_style_waves">Wellen</string>
+    <string name="settings_cover_style_original">Original</string>
+    <string name="settings_field_style_title">Hintergründe</string>
+    <string name="settings_field_style_detail">Hinter Startseite, Seiten und Player: die bewegten Punkte oder dasselbe Muster als ruhiger Verlauf, schonender für den Akku.</string>
+    <string name="settings_field_style_gradient">Verlauf</string>
 </resources>

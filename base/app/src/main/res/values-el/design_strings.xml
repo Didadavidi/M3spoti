@@ -90,4 +90,13 @@
     <string name="live_radio_favorite_chip">Αγαπημένο</string>
     <string name="automix_limit_intro">Η ανάμειξη λειτουργεί για τραγούδια από επέκταση πηγής ήχου, λήψεις και αρχεία στο κινητό σου. Τα τραγούδια του Spotify απλώς σβήνουν σταδιακά.</string>
     <string name="lyrics_haptics">Δόνηση σε κάθε στίχο</string>
+    <string name="settings_cover_style_title">Εξώφυλλα</string>
+    <string name="settings_cover_style_detail">Με κουκκίδες, με κύματα ή η ίδια η εικόνα. Το Αυτόματο διαλέγει ό,τι ταιριάζει σε κάθε εξώφυλλο.</string>
+    <string name="settings_cover_style_auto">Αυτόματα</string>
+    <string name="settings_cover_style_dots">Κουκκίδες</string>
+    <string name="settings_cover_style_waves">Κύματα</string>
+    <string name="settings_cover_style_original">Πρωτότυπο</string>
+    <string name="settings_field_style_title">Φόντα</string>
+    <string name="settings_field_style_detail">Πίσω από την Αρχική, τις σελίδες και το player: οι κινούμενες κουκκίδες ή το ίδιο μοτίβο ως ακίνητη διαβάθμιση, πιο ελαφρύ για την μπαταρία.</string>
+    <string name="settings_field_style_gradient">Διαβάθμιση</string>
 </resources>

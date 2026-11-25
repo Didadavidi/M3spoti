@@ -424,6 +424,22 @@ fun SettingsScreen(navController: NavController) {
                 checked = com.music.spotui.data.preferences.HideDjPref.on,
                 onChecked = { com.music.spotui.data.preferences.HideDjPref.set(ctx, it) },
             )
+            // Covers and backgrounds: the design's halftone, or something calmer and lighter.
+            DesignChoiceRow(
+                stringResource(R.string.settings_cover_style_title), stringResource(R.string.settings_cover_style_detail),
+                listOf(
+                    com.music.spotui.data.preferences.CoverStylePref.AUTO to R.string.settings_cover_style_auto,
+                    com.music.spotui.data.preferences.CoverStylePref.DOTS to R.string.settings_cover_style_dots,
+                    com.music.spotui.data.preferences.CoverStylePref.WAVES to R.string.settings_cover_style_waves,
+                    com.music.spotui.data.preferences.CoverStylePref.ORIGINAL to R.string.settings_cover_style_original,
+                ),
+                com.music.spotui.data.preferences.CoverStylePref.mode,
+            ) { com.music.spotui.data.preferences.CoverStylePref.set(ctx, it) }
+            DesignChoiceRow(
+                stringResource(R.string.settings_field_style_title), stringResource(R.string.settings_field_style_detail),
+                listOf(0 to R.string.settings_cover_style_dots, 1 to R.string.settings_field_style_gradient),
+                if (com.music.spotui.data.preferences.FieldStylePref.gradient) 1 else 0,
+            ) { com.music.spotui.data.preferences.FieldStylePref.set(ctx, it == 1) }
             OptionRow(
                 label = stringResource(R.string.settings_system_font_title),
                 detail = stringResource(R.string.settings_system_font_detail),
@@ -917,6 +933,30 @@ private fun OrientationRow() {
                     stringResource(label),
                     color = if (selected) com.music.spotui.ui.theme.AppOnAccent else AppText, fontSize = 14.sp,
                     modifier = Modifier.squeezeButton(if (selected) com.music.spotui.ui.theme.AppAccent else tone(0xFF2A2A2A), 18.dp, 10.dp, PressScale.ICON) { pref.set(ctx, value) }
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+            }
+        }
+    }
+}
+
+/** A choice of a few, as the design's chips: the picked one filled in the primary colour. */
+@Composable
+private fun DesignChoiceRow(title: String, detail: String, options: List<Pair<Int, Int>>, selected: Int, onPick: (Int) -> Unit) {
+    val s = com.music.spotui.ui.theme.SystemColors.scheme
+    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
+        Text(title, color = s.onSurface, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+        Text(detail, color = s.onSurfaceVariant, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Row(
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 10.dp).horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+        ) {
+            for ((value, label) in options) {
+                val on = value == selected
+                Text(
+                    stringResource(label),
+                    color = if (on) s.onPrimary else s.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.squeezeButton(if (on) s.primary else s.surfaceContainerHigh, 18.dp, 10.dp, PressScale.ICON) { onPick(value) }
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 )
             }

@@ -907,4 +907,13 @@
     <string name="live_radio_favorite_chip">Favorite</string>
     <string name="automix_limit_intro">The blend works for songs from an audio-source extension, downloads and files on your phone. Spotify songs only fade.</string>
     <string name="lyrics_haptics">Vibrate on each line</string>
+    <string name="settings_cover_style_title">Covers</string>
+    <string name="settings_cover_style_detail">As dots, as waves, or the picture itself. Automatic picks dots or waves to suit each cover.</string>
+    <string name="settings_cover_style_auto">Automatic</string>
+    <string name="settings_cover_style_dots">Dots</string>
+    <string name="settings_cover_style_waves">Waves</string>
+    <string name="settings_cover_style_original">Original</string>
+    <string name="settings_field_style_title">Backgrounds</string>
+    <string name="settings_field_style_detail">Behind Home, pages and the player: the moving dots, or the same pattern as a still gradient, lighter on the battery.</string>
+    <string name="settings_field_style_gradient">Gradient</string>
 </resources>
