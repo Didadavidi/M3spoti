@@ -362,22 +362,28 @@ private fun LyricLineText(
     // Duet: the second voice at the end of the row (right in left-to-right), the first and the
     // lines sung together at the start. The text fills the row so its wrapped rows align as one block.
     val align = if (duet && line.voice == 2) TextAlign.End else TextAlign.Start
+    val atEnd = align == TextAlign.End
     val lineModifier = modifier
         .fillMaxWidth()
         .graphicsLayer {
-            rotationZ = -1.5f * current
+            // A line at the end of the row (the second singer) is the mirror image: it tilts the other
+            // way and grows from its right edge, so it stays against it.
+            rotationZ = (if (atEnd) 1.5f else -1.5f) * current
             val pop = 0.96f + 0.04f * jelly.value
             scaleX = pop; scaleY = pop
-            transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, 0.5f)
+            transformOrigin = androidx.compose.ui.graphics.TransformOrigin(if (atEnd) 1f else 0f, 0.5f)
         }
         .drawBehind {
             if (current > 0f) {
                 val r = 24.dp.toPx()
                 val path = androidx.compose.ui.graphics.Path().apply {
+                    // The pill reaches past the text on its side, and its small corner is on that side too.
+                    val tip = CornerRadius(6.dp.toPx())
                     addRoundRect(androidx.compose.ui.geometry.RoundRect(
-                        -12.dp.toPx(), -10.dp.toPx(), size.width + 4.dp.toPx(), size.height + 10.dp.toPx(),
+                        if (atEnd) -4.dp.toPx() else -12.dp.toPx(), -10.dp.toPx(),
+                        size.width + if (atEnd) 12.dp.toPx() else 4.dp.toPx(), size.height + 10.dp.toPx(),
                         topLeftCornerRadius = CornerRadius(r), topRightCornerRadius = CornerRadius(r),
-                        bottomRightCornerRadius = CornerRadius(r), bottomLeftCornerRadius = CornerRadius(6.dp.toPx()),
+                        bottomRightCornerRadius = if (atEnd) tip else CornerRadius(r), bottomLeftCornerRadius = if (atEnd) CornerRadius(r) else tip,
                     ))
                 }
                 drawPath(path, palette.pill.copy(alpha = palette.pill.alpha * current))
