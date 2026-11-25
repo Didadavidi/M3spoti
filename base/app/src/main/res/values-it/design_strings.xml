@@ -101,4 +101,8 @@
     <string name="settings_field_style_title">Sfondi</string>
     <string name="settings_field_style_detail">Dietro Home, pagine e player: i punti in movimento, o lo stesso motivo come sfumatura ferma, più leggera per la batteria.</string>
     <string name="settings_field_style_gradient">Sfumatura</string>
+    <string name="about_credits_title">Crediti</string>
+    <string name="about_credit_myspoti">L\'app stessa: tutto tranne il design</string>
+    <string name="about_credit_pixelplayer">Ispirazione per le forme e i pulsanti elastici</string>
+    <string name="about_credit_pixelmusic">Colori dell\'album e il font Roboto Flex</string>
 </resources>

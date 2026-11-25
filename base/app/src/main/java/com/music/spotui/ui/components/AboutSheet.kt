@@ -77,6 +77,9 @@ fun AboutSheet(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 8.dp))
             AboutRow(stringResource(R.string.about_discord), stringResource(R.string.about_discord_detail)) { openUrl(context, DISCORD_URL) }
             AboutRow(stringResource(R.string.about_github), stringResource(R.string.about_github_detail)) { openUrl(context, "https://github.com/$repo") }
+            Text(stringResource(R.string.about_credits_title), color = AppText, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 2.dp))
+            CreditRows()
             Text(stringResource(R.string.support_body), color = AppMuted, fontSize = 13.sp,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 12.dp))
             Box(
@@ -124,6 +127,18 @@ fun SupportSheet(onDismiss: () -> Unit) {
             GitHubSponsorButton(Modifier.padding(top = 10.dp)) { onDismiss(); SupportReminder.openSponsors(context) }
         }
     }
+}
+
+/**
+ * Who the app owes: Myspoti (the app itself), PixelPlayer (the shapes and the springy buttons
+ * inspired the design) and PixelMusic (the album colours, the font). Each opens its page.
+ */
+@Composable
+fun CreditRows() {
+    val context = LocalContext.current
+    AboutRow("Myspoti · kota-zo", stringResource(R.string.about_credit_myspoti)) { openUrl(context, "https://github.com/kota-zo/myspoti") }
+    AboutRow("PixelPlayer · Theo Vilardo", stringResource(R.string.about_credit_pixelplayer)) { openUrl(context, "https://github.com/PixelPlayerHQ/PixelPlayer") }
+    AboutRow("PixelMusic · Ian Shulyadav", stringResource(R.string.about_credit_pixelmusic)) { openUrl(context, "https://github.com/ianshulyadav/PixelMusic") }
 }
 
 @Composable

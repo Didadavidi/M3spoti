@@ -101,4 +101,8 @@
     <string name="settings_field_style_title">Fundos</string>
     <string name="settings_field_style_detail">Atrás do Início, das páginas e do player: os pontos em movimento, ou o mesmo padrão como degradê parado, mais leve para a bateria.</string>
     <string name="settings_field_style_gradient">Degradê</string>
+    <string name="about_credits_title">Créditos</string>
+    <string name="about_credit_myspoti">O app em si: tudo menos o design</string>
+    <string name="about_credit_pixelplayer">Inspiração para as formas e os botões elásticos</string>
+    <string name="about_credit_pixelmusic">Cores do álbum e a fonte Roboto Flex</string>
 </resources>

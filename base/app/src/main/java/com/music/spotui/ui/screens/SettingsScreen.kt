@@ -502,6 +502,8 @@ fun SettingsScreen(navController: NavController) {
                 Text(stringResource(R.string.diagnostic_export_title), color = AppText, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
                 Text(stringResource(R.string.diagnostic_export_detail), color = AppMuted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             }
+            Section(R.string.about_credits_title)
+            com.music.spotui.ui.components.CreditRows()
             }
             if (tab == 6) {
             // The Spotify accounts kept on the phone: switch, add, remove; and signing this one out.

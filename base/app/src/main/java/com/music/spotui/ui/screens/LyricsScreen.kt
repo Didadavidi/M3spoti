@@ -987,24 +987,51 @@ private fun LyricsControls(
             Text(formatLyricsTime(pos * 1000), color = palette.highlight.copy(alpha = 0.75f), fontSize = 12.sp)
             Text(formatLyricsTime(durationMs), color = palette.highlight.copy(alpha = 0.75f), fontSize = 12.sp)
         }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 4.dp)
-                .size(60.dp)
-                .pressable(0.92f) { if (SongPlayer.isPlaying()) SongPlayer.pause() else SongPlayer.play() }
-                .clip(CircleShape)
-                .background(palette.highlight),
+        // Previous, play/pause, next: a connected group as in the player. The button under the
+        // finger widens and pushes its neighbours narrower, then they spring back.
+        val sources = List(3) { remember { MutableInteractionSource() } }
+        val widths = transportGroupWidths(sources, listOf(0.8f, 1.1f, 0.8f))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp).width(264.dp),
         ) {
-            com.music.spotui.ui.components.PlayPauseIcon(
-                playing = playing,
-                contentDescription = if (playing) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
-                tint = palette.background,
-                modifier = Modifier.size(30.dp),
-            )
+            LyricsTransportPill(sources[0], palette.highlight.copy(alpha = 0.16f), Modifier.weight(widths[0]),
+                onClick = { com.music.spotui.di.Haptics.click(); SongPlayer.previous() }) {
+                Icon(com.music.spotui.ui.dots.DesignIcons.Previous, stringResource(R.string.np_content_desc_prev), tint = palette.highlight, modifier = Modifier.size(26.dp))
+            }
+            LyricsTransportPill(sources[1], palette.highlight, Modifier.weight(widths[1]),
+                onClick = { if (SongPlayer.isPlaying()) SongPlayer.pause() else SongPlayer.play() }) {
+                com.music.spotui.ui.components.PlayPauseIcon(
+                    playing = playing,
+                    contentDescription = if (playing) stringResource(R.string.content_description_pause_button) else stringResource(R.string.content_description_play_button),
+                    tint = palette.background,
+                    modifier = Modifier.size(30.dp),
+                )
+            }
+            LyricsTransportPill(sources[2], palette.highlight.copy(alpha = 0.16f), Modifier.weight(widths[2]),
+                onClick = { com.music.spotui.di.Haptics.click(); SongPlayer.next() }) {
+                Icon(com.music.spotui.ui.dots.DesignIcons.Next, stringResource(R.string.np_content_desc_next), tint = palette.highlight, modifier = Modifier.size(26.dp))
+            }
         }
     }
+}
+
+/** One button of the lyrics' transport group: a rounded pill whose corners squeeze when held. */
+@Composable
+private fun LyricsTransportPill(
+    source: MutableInteractionSource,
+    bg: Color,
+    modifier: Modifier,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val shape = com.music.spotui.ui.components.rememberSqueezeShape(source, 22.dp, 12.dp)
+    Box(
+        modifier.height(60.dp).clip(shape).background(bg)
+            .clickable(source, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { content() }
 }
 
 @Composable

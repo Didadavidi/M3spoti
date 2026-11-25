@@ -1,5 +1,6 @@
 package com.music.spotui.ui.screens
 
+import com.music.spotui.ui.navigation.pullDownToClosePlayer
 import androidx.compose.ui.graphics.drawscope.scale
 import com.music.spotui.ui.components.rememberSqueezeShape
 import com.music.spotui.ui.components.pressScale
@@ -161,8 +162,7 @@ fun PlayerScreen(navController: NavController) {
             if (d > 0) (mv.position().toFloat() / d).coerceIn(0f, 1f) else 0f
         }
     }
-    // Pulled down, the player follows the finger and closes past a threshold (as the back button).
-    var pull by remember { mutableFloatStateOf(0f) }
+    // Pulled down, the player follows the finger as a card and closes past a threshold or on a flick.
     val pullEnabled = !showLyrics && !mv.fullscreen.value
     val reveal = com.music.spotui.ui.navigation.LocalPlayerReveal.current
 
@@ -170,15 +170,8 @@ fun PlayerScreen(navController: NavController) {
     Box(
         Modifier
             .fillMaxSize()
-            .graphicsLayer { translationY = pull }
             .background(album.surface)
-            .pointerInput(pullEnabled) {
-                if (!pullEnabled) return@pointerInput
-                detectVerticalDragGestures(
-                    onDragEnd = { if (pull > 140.dp.toPx()) PlayerSheet.close(); pull = 0f },
-                    onDragCancel = { pull = 0f },
-                ) { change, dy -> if (pull + dy >= 0f) { change.consume(); pull += dy } }
-            }
+            .pullDownToClosePlayer(pullEnabled)
     ) {
         Box(Modifier.fillMaxWidth().height(520.dp)) {
             DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
@@ -457,7 +450,6 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
     val album = ExpressiveColor.scheme
     val context = LocalContext.current
     val reveal = com.music.spotui.ui.navigation.LocalPlayerReveal.current
-    var pull by remember { mutableFloatStateOf(0f) }
     val fav = com.music.spotui.radio.RadioFavoritesStore.favorites.containsKey(station.stationUuid)
     val favorites = com.music.spotui.radio.RadioFavoritesStore.list()
     val ring = if (favorites.any { it.stationUuid == station.stationUuid }) favorites else com.music.spotui.radio.RadioBrowserApi.curatedPopular
@@ -469,13 +461,8 @@ private fun RadioNowPlaying(station: com.music.spotui.radio.RadioStation, playin
     }
     MaterialTheme(colorScheme = album, typography = MaterialTheme.typography) {
         Box(
-            Modifier.fillMaxSize().graphicsLayer { translationY = pull }.background(album.surface)
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onDragEnd = { if (pull > 140.dp.toPx()) com.music.spotui.ui.navigation.PlayerSheet.close(); pull = 0f },
-                        onDragCancel = { pull = 0f },
-                    ) { change, dy -> if (pull + dy >= 0f) { change.consume(); pull += dy } }
-                },
+            Modifier.fillMaxSize().background(album.surface)
+                .pullDownToClosePlayer(true),
         ) {
             Box(Modifier.fillMaxWidth().height(460.dp)) {
                 DotFieldBackground(DotField.PLAYER, inkA = album.primary, inkB = album.tertiaryContainer, step = 9f)
@@ -576,7 +563,7 @@ private fun RoundIcon(icon: ImageVector, label: String, bg: Color, fg: Color, on
  * motion keeps them still.
  */
 @Composable
-private fun transportGroupWidths(sources: List<MutableInteractionSource>, base: List<Float>): List<Float> {
+internal fun transportGroupWidths(sources: List<MutableInteractionSource>, base: List<Float>): List<Float> {
     val reduce = com.music.spotui.ui.look.rememberReduceMotion()
     val held = sources.map { it.collectIsPressedAsState().value }.indexOf(true).takeUnless { reduce } ?: -1
     return base.mapIndexed { i, w ->

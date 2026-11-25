@@ -104,4 +104,8 @@
     <string name="settings_field_style_title">Hintergründe</string>
     <string name="settings_field_style_detail">Hinter Startseite, Seiten und Player: die bewegten Punkte oder dasselbe Muster als ruhiger Verlauf, schonender für den Akku.</string>
     <string name="settings_field_style_gradient">Verlauf</string>
+    <string name="about_credits_title">Credits</string>
+    <string name="about_credit_myspoti">Die App selbst: alles außer dem Design</string>
+    <string name="about_credit_pixelplayer">Inspiration für die Formen und die federnden Buttons</string>
+    <string name="about_credit_pixelmusic">Albumfarben und die Schrift Roboto Flex</string>
 </resources>

@@ -112,7 +112,7 @@ The work in this app is Myspoti's. Support its developer on [Ko-fi](https://ko-f
 ## Credits
 
 - Based on [Myspoti](https://github.com/kota-zo/myspoti) (GPL-3.0) by kota-zo: everything but the design.
-- The halftone design is mine; Claude applied it to the code. The inspiration was [PixelPlayer](https://github.com/PixelPlayerHQ/PixelPlayer) by Theo Vilardo, also for the springy feel of the buttons. PixelPlayer is not open source: none of its code or assets are included, only the idea.
+- **Design inspiration: [PixelPlayer](https://github.com/PixelPlayerHQ/PixelPlayer) by Theo Vilardo.** The shapes (the big rounded pills, the connected play/skip button group, the rounded cards) and the springy feel of the buttons are inspired by PixelPlayer. The halftone design on top is mine; Claude applied it to the code. None of PixelPlayer's code or assets are included, only the ideas.
 - The Roboto Flex font file and the album-colour approach came from [PixelMusic](https://github.com/ianshulyadav/PixelMusic) (GPL-3.0) by Ian Shulyadav; no PixelMusic code or assets are included.
 - UI derived from [Spotui](https://github.com/Spotui/Spotui) / [Metrolist](https://github.com/MetrolistGroup/Metrolist) (GPL-3.0); Spotui also gave the DASH-to-FLAC remux.
 - Myspoti's Immersive look (still in the code, no longer shown) is ported from [BitChord](https://github.com/kushagrasinghx/BitChord) (GPL-3.0-or-later).

@@ -103,4 +103,8 @@
     <string name="settings_field_style_title">Tła</string>
     <string name="settings_field_style_detail">Za stroną główną, stronami i odtwarzaczem: ruchome kropki albo ten sam wzór jako nieruchomy gradient, oszczędniejszy dla baterii.</string>
     <string name="settings_field_style_gradient">Gradient</string>
+    <string name="about_credits_title">Podziękowania</string>
+    <string name="about_credit_myspoti">Sama aplikacja: wszystko poza wyglądem</string>
+    <string name="about_credit_pixelplayer">Inspiracja dla kształtów i sprężystych przycisków</string>
+    <string name="about_credit_pixelmusic">Kolory albumu i czcionka Roboto Flex</string>
 </resources>

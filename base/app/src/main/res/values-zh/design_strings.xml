@@ -97,4 +97,8 @@
     <string name="settings_field_style_title">背景</string>
     <string name="settings_field_style_detail">首页、页面和播放器背后：会动的圆点，或同样图案的静态渐变，更省电。</string>
     <string name="settings_field_style_gradient">渐变</string>
+    <string name="about_credits_title">致谢</string>
+    <string name="about_credit_myspoti">应用本身：除设计外的一切</string>
+    <string name="about_credit_pixelplayer">形状与弹性按钮的灵感来源</string>
+    <string name="about_credit_pixelmusic">专辑配色与 Roboto Flex 字体</string>
 </resources>

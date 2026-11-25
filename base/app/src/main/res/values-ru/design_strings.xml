@@ -103,4 +103,8 @@
     <string name="settings_field_style_title">Фоны</string>
     <string name="settings_field_style_detail">За главной, страницами и плеером: движущиеся точки или тот же узор неподвижным градиентом — бережнее к батарее.</string>
     <string name="settings_field_style_gradient">Градиент</string>
+    <string name="about_credits_title">Благодарности</string>
+    <string name="about_credit_myspoti">Само приложение: всё, кроме дизайна</string>
+    <string name="about_credit_pixelplayer">Вдохновение для форм и пружинящих кнопок</string>
+    <string name="about_credit_pixelmusic">Цвета альбома и шрифт Roboto Flex</string>
 </resources>

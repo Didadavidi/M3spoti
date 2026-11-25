@@ -916,4 +916,8 @@
     <string name="settings_field_style_title">Backgrounds</string>
     <string name="settings_field_style_detail">Behind Home, pages and the player: the moving dots, or the same pattern as a still gradient, lighter on the battery.</string>
     <string name="settings_field_style_gradient">Gradient</string>
+    <string name="about_credits_title">Credits</string>
+    <string name="about_credit_myspoti">The app itself: everything but the design</string>
+    <string name="about_credit_pixelplayer">Inspiration for the shapes and the springy buttons</string>
+    <string name="about_credit_pixelmusic">Album colours and the Roboto Flex font</string>
 </resources>

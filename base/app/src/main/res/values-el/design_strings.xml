@@ -99,4 +99,8 @@
     <string name="settings_field_style_title">Φόντα</string>
     <string name="settings_field_style_detail">Πίσω από την Αρχική, τις σελίδες και το player: οι κινούμενες κουκκίδες ή το ίδιο μοτίβο ως ακίνητη διαβάθμιση, πιο ελαφρύ για την μπαταρία.</string>
     <string name="settings_field_style_gradient">Διαβάθμιση</string>
+    <string name="about_credits_title">Ευχαριστίες</string>
+    <string name="about_credit_myspoti">Η ίδια η εφαρμογή: όλα εκτός από τον σχεδιασμό</string>
+    <string name="about_credit_pixelplayer">Έμπνευση για τα σχήματα και τα ελαστικά κουμπιά</string>
+    <string name="about_credit_pixelmusic">Χρώματα άλμπουμ και η γραμματοσειρά Roboto Flex</string>
 </resources>
