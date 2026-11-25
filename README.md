@@ -17,6 +17,18 @@ support [Myspoti's developer](#support).
 </p>
 <p align="center"><sub>Design mockups with made-up music; the app follows them closely.</sub></p>
 
+<p align="center">
+  <img src="docs/screenshots/m3spoti/mockups/flat-yellow.jpg" alt="Three phones on a yellow table showing M3spoti's Home, player and Library, with daisies and roses around them" width="100%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/m3spoti/mockups/hero.jpg" alt="Three phones standing side by side: Home, the player and the Library" width="100%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/m3spoti/mockups/player.jpg" alt="The player on a tilted phone" width="38%">
+  <img src="docs/screenshots/m3spoti/mockups/duo.jpg" alt="Home and Library on two phones" width="60%">
+</p>
+<p align="center"><sub>The real app on a Pixel 9 Pro XL, rendered in Blender. Flowers: "Marguerite flowers" and "Red rose flower" from <a href="https://www.blenderkit.com">BlenderKit</a> (royalty free).</sub></p>
+
 ## What's different from Myspoti
 
 - **Halftone covers everywhere.** Real covers become two-colour dots or wavy lines (whichever suits
