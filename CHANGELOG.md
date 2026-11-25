@@ -4,6 +4,27 @@ M3spoti's changes. Everything up to Myspoti 2.4.0, which M3spoti is built on, is
 [Myspoti's changelog](https://github.com/kota-zo/myspoti/blob/main/CHANGELOG.md)
 (a copy of its detailed history: [docs/CHANGELOG-full.md](docs/CHANGELOG-full.md)).
 
+## 2.4.0-beta.2
+
+**New**
+- Look settings: covers always as dots, always as waves, or the original artwork; backgrounds as
+  the moving dots or a still gradient that is lighter on the battery.
+- Springy buttons across the app: they squeeze under the finger and bounce back.
+- Player: previous and next push each other as you press them; a soft glow of the cover's colour
+  under the dots; pulled down, the player follows the finger as a card and glides into the mini player.
+- Lyrics: words light up one by one with a little hop, the lines around trail in a light wave, a
+  soft tick on each new line (can be turned off in the lyrics menu), duet lines on the right are
+  mirrored, and previous / next sit beside play/pause.
+- Local Files and the profile sheet in the M3spoti design.
+- Credits in Settings > Info: Myspoti, PixelPlayer (the inspiration for the shapes and the springy
+  buttons) and PixelMusic.
+
+**Fixed**
+- Spotify links to a song open its album page and play there (they played the song alone).
+- spotify.link / spoti.fi short links to songs, albums and artists open (they did nothing).
+- The player's colours follow the cover again after the screen is rebuilt.
+- What's AutoMix? says which songs it can blend.
+
 ## Unreleased (based on Myspoti 2.4.0)
 
 **Myspoti 2.4.0, in the new design**
