@@ -101,4 +101,5 @@
     <string name="about_credit_myspoti">应用本身：除设计外的一切</string>
     <string name="about_credit_pixelplayer">形状与弹性按钮的灵感来源</string>
     <string name="about_credit_pixelmusic">专辑配色与 Roboto Flex 字体</string>
+    <string name="link_open_failed">无法打开此 Spotify 链接</string>
 </resources>

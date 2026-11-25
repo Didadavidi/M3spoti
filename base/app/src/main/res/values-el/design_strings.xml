@@ -103,4 +103,5 @@
     <string name="about_credit_myspoti">Η ίδια η εφαρμογή: όλα εκτός από τον σχεδιασμό</string>
     <string name="about_credit_pixelplayer">Έμπνευση για τα σχήματα και τα ελαστικά κουμπιά</string>
     <string name="about_credit_pixelmusic">Χρώματα άλμπουμ και η γραμματοσειρά Roboto Flex</string>
+    <string name="link_open_failed">Δεν ήταν δυνατό να ανοίξει αυτός ο σύνδεσμος Spotify</string>
 </resources>

@@ -107,4 +107,5 @@
     <string name="about_credit_myspoti">Само приложение: всё, кроме дизайна</string>
     <string name="about_credit_pixelplayer">Вдохновение для форм и пружинящих кнопок</string>
     <string name="about_credit_pixelmusic">Цвета альбома и шрифт Roboto Flex</string>
+    <string name="link_open_failed">Не удалось открыть эту ссылку Spotify</string>
 </resources>

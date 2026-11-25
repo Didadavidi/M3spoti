@@ -105,4 +105,5 @@
     <string name="about_credit_myspoti">L\'app elle-même : tout sauf le design</string>
     <string name="about_credit_pixelplayer">Inspiration pour les formes et les boutons élastiques</string>
     <string name="about_credit_pixelmusic">Couleurs d\'album et la police Roboto Flex</string>
+    <string name="link_open_failed">Impossible d\'ouvrir ce lien Spotify</string>
 </resources>
