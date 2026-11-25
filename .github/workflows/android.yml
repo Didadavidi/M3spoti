@@ -7,6 +7,8 @@ on:
     branches: [master, main]
     tags: ["v*"]
   pull_request:
+  # The "Run workflow" button on the Actions tab: a build of any branch without a push.
+  workflow_dispatch:
 
 permissions:
   contents: read
