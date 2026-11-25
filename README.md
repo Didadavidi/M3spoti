@@ -52,7 +52,7 @@ support [Myspoti's developer](#support).
 
 ## Status
 
-A personal project, in beta. Signed APKs are on the [Releases](https://github.com/Didadavidi/myspoti-m3e-rebuild/releases)
+A personal project, in beta. Signed APKs are on the [Releases](https://github.com/Didadavidi/M3spoti/releases)
 page: `ARMv8` for almost every phone, `ARMv7` for older 32-bit ones, `universal` for both, `TV` for
 Android TV (a preview of the TV design). Builds from the Releases page tell you in the app when a new one is out. M3spoti installs
 next to the official [Myspoti](https://github.com/kota-zo/myspoti/releases/latest), as its own app.
@@ -95,7 +95,7 @@ see [`base/api-spotify/README.md`](base/api-spotify/README.md) and [`docs/api`](
 **Is it safe for my account?** It talks to Spotify the way its web player does, and you sign in on
 Spotify's own page. Blocking ads is still against Spotify's Terms of Use (see the disclaimer).
 
-**Something broke?** Open an [issue here](https://github.com/Didadavidi/myspoti-m3e-rebuild/issues),
+**Something broke?** Open an [issue here](https://github.com/Didadavidi/M3spoti/issues),
 not on Myspoti, unless it also happens in the official app. Settings → **Export a diagnostic report**
 gives the app's recent log and your phone's model, never your password or login tokens.
 
