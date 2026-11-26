@@ -92,7 +92,7 @@ object UpdateChecker {
         // Stable builds follow "latest", which never includes pre-releases. A beta build
         // reads the list: the newest beta, compared with [isNewer].
         val bust = if (force) "${if (isBeta) "&" else "?"}_=${System.currentTimeMillis()}" else ""
-        val url = (if (isBeta) "https://api.github.com/repos/$repo/releases?per_page=10" else "https://api.github.com/repos/$repo/releases/latest") + bust
+        val url = releasesUrl(repo, BuildConfig.UPDATE_REPO_ID, isBeta) + bust
         val request = Request.Builder().url(url).header("Accept", "application/vnd.github+json")
             .apply { if (force) { header("Cache-Control", "no-cache, no-store, max-age=0"); header("Pragma", "no-cache") } }.build()
         http.newCall(request).execute().use { r ->
@@ -106,6 +106,17 @@ object UpdateChecker {
                 .reduceOrNull { best, next -> if (isNewer(next.version, best.version)) next else best })
         }
     } catch (e: Exception) { Fetch.Err(false) }
+
+    /**
+     * The GitHub API address of the releases: by the repository's number when the build has it
+     * ([repoId], never changes), else by its name ([repo], "owner/name"; GitHub forwards an old
+     * name after a rename, as long as no new repository takes that name). Betas read the list,
+     * stable builds "latest".
+     */
+    internal fun releasesUrl(repo: String, repoId: String, beta: Boolean): String {
+        val base = if (repoId.isNotBlank()) "https://api.github.com/repositories/$repoId" else "https://api.github.com/repos/$repo"
+        return if (beta) "$base/releases?per_page=10" else "$base/releases/latest"
+    }
 
     /** The newer release last seen, dismissed or not (no request): what Settings > About shows. */
     fun known(context: Context): Release? =

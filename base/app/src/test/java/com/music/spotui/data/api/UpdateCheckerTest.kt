@@ -32,6 +32,15 @@ class UpdateCheckerTest {
         assertTrue(UpdateChecker.isNewer("2.1.0-beta.1", "2.0.9"))
         assertTrue(UpdateChecker.isNewer("2.0.2-beta.1", "2.0.1-beta.9"))
     }
+    @Test fun asksByRepositoryNumberSoARenameKeepsUpdates() {
+        assertEquals("https://api.github.com/repositories/1451749139/releases?per_page=10",
+            UpdateChecker.releasesUrl("Didadavidi/M3spoti", "1451749139", beta = true))
+        assertEquals("https://api.github.com/repositories/1451749139/releases/latest",
+            UpdateChecker.releasesUrl("Didadavidi/M3spoti", "1451749139", beta = false))
+        // Builds without the number (2.4.0-beta.2 and before): by name.
+        assertEquals("https://api.github.com/repos/Didadavidi/M3spoti/releases?per_page=10",
+            UpdateChecker.releasesUrl("Didadavidi/M3spoti", "", beta = true))
+    }
     @Test fun notesKeepTheChangelogSectionAsPlainLines() {
         val body = "- **Local Files**: a folder\n  - nested [link](https://x.y)\n\n**Full Changelog**: https://github.com/a/b/compare/v1...v2"
         assertEquals("• Local Files: a folder\n  • nested link", UpdateChecker.cleanNotes(body))

@@ -52,6 +52,9 @@ android {
         // GitHub "owner/repo" whose releases the app checks for updates; empty = off
         // (local builds). CI sets it to the repository it builds.
         buildConfigField("String", "UPDATE_REPO", "\"${(findProperty("updateRepo") as String?) ?: System.getenv("MYSPOTI_UPDATE_REPO") ?: ""}\"")
+        // The same repository's GitHub number (CI: GITHUB_REPOSITORY_ID). The update check asks
+        // for it, so renaming the repository never cuts installed apps off their updates.
+        buildConfigField("String", "UPDATE_REPO_ID", "\"${(findProperty("updateRepoId") as String?)?.filter(Char::isDigit) ?: ""}\"")
         // -Pabis=arm64-v8a: one APK for one phone (the test builds). Without it, the ABI splits below.
         (findProperty("abis") as String?)?.let { ndk { abiFilters += it.split(",") } }
         // On-device tests (codecs): ./gradlew connectedDebugAndroidTest
