@@ -1,16 +1,20 @@
 # M3spoti
 
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
-[![Based on Myspoti](https://img.shields.io/badge/based_on-Myspoti-1ED760)](https://github.com/kota-zo/myspoti)
+[![Based on Myspoti 2.4.0, now Orpheon](https://img.shields.io/badge/based_on-Myspoti_2.4.0_%28now_Orpheon%29-1ED760)](https://github.com/kota-zo/Orpheon)
 
-**A redesign of [Myspoti](https://github.com/kota-zo/myspoti), not the official app.** M3spoti is
+**A redesign of Myspoti 2.4.0, the app now called [Orpheon](https://github.com/kota-zo/Orpheon), not the official app.** M3spoti is
 Myspoti with a new UI: a Material 3 Expressive design built on halftone dot art. Every cover is
 printed as two-ink dots or wavy lines and moves while music plays, set in wide Roboto Flex, in your
 wallpaper colours, with album colours in the player, queue and lyrics.
 
 I designed the UI and had Claude apply it to Myspoti. Everything underneath (playback, Spotify,
 ad blocking, downloads, extensions) is Myspoti's work, unchanged. If you like the app, please
-support [Myspoti's developer](#support).
+support [its developer](#support).
+
+> **Myspoti is now Orpheon.** In November 2026 Myspoti was renamed [Orpheon](https://github.com/kota-zo/Orpheon), and
+> Orpheon no longer plays from Spotify: it plays your own files, Live Radio and what extensions
+> bring. M3spoti stays on Myspoti 2.4.0, the Spotify version, under its own name.
 
 <p align="center">
   <img src="docs/screenshots/m3spoti/m3spoti-banner.jpg" alt="M3spoti design mockups: Home, an album page, the player, lyrics and the queue" width="100%">
@@ -29,7 +33,7 @@ support [Myspoti's developer](#support).
 </p>
 <p align="center"><sub>The real app on a Pixel 9 Pro XL, rendered in Blender. Flowers: "Marguerite flowers" and "Red rose flower" from <a href="https://www.blenderkit.com">BlenderKit</a> (royalty free).</sub></p>
 
-## What's different from Myspoti
+## What's different from Myspoti 2.4.0
 
 - **Halftone covers everywhere.** Real covers become two-colour dots or wavy lines (whichever suits
   the picture), in shaped frames: cookies, pills, arches. They only animate while music plays, and
@@ -41,7 +45,7 @@ support [Myspoti's developer](#support).
 - **Spotify links open in the app**: `open.spotify.com`, `spotify:` links, `spotify.link` short
   links and shared text.
 - **Its own app ids** (`app.m3spoti`, `app.m3spoti.stable`, `app.m3spoti.dev`): it installs next to
-  the official Myspoti instead of clashing with it.
+  Myspoti and Orpheon instead of clashing with them.
 - **New logo:** an M printed in dots.
 - **Languages:** the new design is translated into all 11 of Myspoti's languages (English, German,
   French, Spanish, Italian, Portuguese, Brazilian Portuguese, Greek, Russian, Polish, Chinese).
@@ -55,9 +59,9 @@ support [Myspoti's developer](#support).
 A personal project, in beta. Signed APKs are on the [Releases](https://github.com/Didadavidi/M3spoti/releases)
 page: `ARMv8` for almost every phone, `ARMv7` for older 32-bit ones, `universal` for both, `TV` for
 Android TV (a preview of the TV design). Builds from the Releases page tell you in the app when a new one is out. M3spoti installs
-next to the official [Myspoti](https://github.com/kota-zo/myspoti/releases/latest), as its own app.
+next to Myspoti or [Orpheon](https://github.com/kota-zo/Orpheon/releases/latest), as its own app.
 
-## What Myspoti is
+## What's underneath: Myspoti 2.4.0
 
 A Spotify app for Android that you install yourself. You sign in with your usual Spotify account
 on Spotify's own login page, so the app never sees your password; a free account is enough. Under
@@ -69,7 +73,8 @@ What you get, all from Myspoti: no ads on a free account, Home, search, library,
 (create, edit, collaborative), podcasts and audiobooks, Spotify Connect and Jam, Android Auto,
 word-by-word lyrics with translation, song meanings from Genius, official music videos, offline
 downloads through extensions you install, an equalizer for downloaded and local songs, and your
-own recap. The full list is in [Myspoti's README](https://github.com/kota-zo/myspoti#readme).
+own recap. Every version's changes are in [Orpheon's changelog](https://github.com/kota-zo/Orpheon/blob/main/CHANGELOG.md)
+(up to 2.4.0, when it was still Myspoti).
 
 ## Build and install
 
@@ -96,12 +101,12 @@ see [`base/api-spotify/README.md`](base/api-spotify/README.md) and [`docs/api`](
 Spotify's own page. Blocking ads is still against Spotify's Terms of Use (see the disclaimer).
 
 **Something broke?** Open an [issue here](https://github.com/Didadavidi/M3spoti/issues),
-not on Myspoti, unless it also happens in the official app. Settings → **Export a diagnostic report**
+not on Orpheon: Orpheon no longer has the Spotify part. Settings → **Export a diagnostic report**
 gives the app's recent log and your phone's model, never your password or login tokens.
 
 **What leaves my phone?** Your plays go to Spotify. Lyrics are looked up on lyrics sites, song
 meanings on Genius, translations on Google Translate, music videos on YouTube, and downloads on the
-hosts your download-source extension names. Nothing is sent to me or to Myspoti's developer.
+hosts your download-source extension names. Nothing is sent to me or to Orpheon's developer.
 
 ## Not included
 
@@ -114,16 +119,17 @@ hosts your download-source extension names. Nothing is sent to me or to Myspoti'
 Blocking ads goes against Spotify's Terms of Use, and Spotify may suspend accounts that do it. Use
 this app at your own risk. If you can, support artists with Premium or by buying their music.
 
-Not affiliated with or endorsed by Spotify or by Myspoti. Spotify is a trademark of Spotify AB.
+Not affiliated with or endorsed by Spotify or by Myspoti / Orpheon. Spotify is a trademark of Spotify AB.
 
 ## Support
 
-The work in this app is Myspoti's. Support its developer on [Ko-fi](https://ko-fi.com/myspoti) or
+The work in this app is Myspoti's. Support its developer, kota-zo, who now makes
+[Orpheon](https://github.com/kota-zo/Orpheon), on [Ko-fi](https://ko-fi.com/myspoti) or
 [GitHub Sponsors](https://github.com/sponsors/kota-zo) (also from the profile menu in the app).
 
 ## Credits
 
-- Based on [Myspoti](https://github.com/kota-zo/myspoti) (GPL-3.0) by kota-zo: everything but the design.
+- Based on Myspoti 2.4.0 (GPL-3.0) by kota-zo, now [Orpheon](https://github.com/kota-zo/Orpheon): everything but the design.
 - **Design inspiration: [PixelPlayer](https://github.com/PixelPlayerHQ/PixelPlayer) by Theo Vilardo.** The shapes (the big rounded pills, the connected play/skip button group, the rounded cards) and the springy feel of the buttons are inspired by PixelPlayer. The halftone design on top is mine; Claude applied it to the code. None of PixelPlayer's code or assets are included, only the ideas.
 - The Roboto Flex font file and the album-colour approach came from [PixelMusic](https://github.com/ianshulyadav/PixelMusic) (GPL-3.0) by Ian Shulyadav; no PixelMusic code or assets are included.
 - UI derived from [Spotui](https://github.com/Spotui/Spotui) / [Metrolist](https://github.com/MetrolistGroup/Metrolist) (GPL-3.0); Spotui also gave the DASH-to-FLAC remux.
@@ -136,5 +142,5 @@ Full notices: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 ## License
 
-GPL-3.0, as Myspoti. If you reuse this code, you must credit Myspoti, keep the license notices and
+GPL-3.0, as Myspoti. If you reuse this code, you must credit Myspoti (now Orpheon), keep the license notices and
 publish your complete source under GPL-3.0. See also [`AGENTS.md`](AGENTS.md).

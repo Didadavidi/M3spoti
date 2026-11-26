@@ -1,7 +1,7 @@
 # Changelog
 
 M3spoti's changes. Everything up to Myspoti 2.4.0, which M3spoti is built on, is in
-[Myspoti's changelog](https://github.com/kota-zo/myspoti/blob/main/CHANGELOG.md)
+[Orpheon's changelog](https://github.com/kota-zo/Orpheon/blob/main/CHANGELOG.md) (Myspoti is now called Orpheon)
 (a copy of its detailed history: [docs/CHANGELOG-full.md](docs/CHANGELOG-full.md)).
 
 ## 2.4.0-beta.2
