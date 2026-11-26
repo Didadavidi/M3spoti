@@ -102,7 +102,8 @@ jobs:
 
       # Every APK of the release in one build, named by collectApks: M3spoti-Beta-2.4.0-beta.2-ARMv8.apk,
       # -ARMv7 and -universal (the app's update check picks the phone's own, UpdateChecker.apkAsset).
-      # updateRepo turns the in-app update check on, against this repository's releases.
+      # updateRepo turns the in-app update check on, against this repository's releases;
+      # updateRepoId (its number) keeps it working if the repository is renamed again.
       - name: Release APKs
         env:
           MYSPOTI_KEYSTORE: ${{ runner.temp }}/release.jks
@@ -111,7 +112,7 @@ jobs:
           MYSPOTI_KEY_PASSWORD: ${{ secrets.M3SPOTI_KEYSTORE_PASSWORD }}
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          ./gradlew assembleRelease collectApks             -PappVersionName="$VERSION"             -PappVersionCode="$((1000 + GITHUB_RUN_NUMBER))"             -PupdateRepo="$GITHUB_REPOSITORY"
+          ./gradlew assembleRelease collectApks             -PappVersionName="$VERSION"             -PappVersionCode="$((1000 + GITHUB_RUN_NUMBER))"             -PupdateRepo="$GITHUB_REPOSITORY"             -PupdateRepoId="$GITHUB_REPOSITORY_ID"
 
       # This version's section of CHANGELOG.md becomes the release description: "## 2.4.0-beta.2",
       # else the version it leads to ("## 2.4.0"), else "## Unreleased ...".

@@ -41,7 +41,8 @@ import com.music.spotui.data.api.SupportReminder
 import com.music.spotui.ui.theme.AppAccent
 
 const val DISCORD_URL = "https://discord.gg/jXKnGVFnGS"
-private val repo get() = BuildConfig.UPDATE_REPO.ifBlank { "kota-zo/myspoti" }
+/** M3spoti's own source (GPL-3.0); local builds have no [BuildConfig.UPDATE_REPO]. */
+private val repo get() = BuildConfig.UPDATE_REPO.ifBlank { "Didadavidi/M3spoti" }
 
 private fun openUrl(context: Context, url: String) {
     runCatching {
