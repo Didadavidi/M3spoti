@@ -4,6 +4,17 @@ M3spoti's changes. Everything up to Myspoti 2.4.0, which M3spoti is built on, is
 [Orpheon's changelog](https://github.com/kota-zo/Orpheon/blob/main/CHANGELOG.md) (Myspoti is now called Orpheon)
 (a copy of its detailed history: [docs/CHANGELOG-full.md](docs/CHANGELOG-full.md)).
 
+## 2.4.0-beta.3
+
+**Changed**
+- Myspoti is now called Orpheon: the support window, the donate button and the credits in Settings
+  say so, and the credit opens Orpheon's page.
+
+**Fixed**
+- The update check keeps working if the GitHub repository is renamed again (it asks GitHub by the
+  repository's number, not its name).
+- The source code link in About opens M3spoti's repository.
+
 ## 2.4.0-beta.2
 
 **New**
