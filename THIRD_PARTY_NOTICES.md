@@ -1,6 +1,7 @@
 # Third-party notices
 
-Myspoti is free software under the GNU General Public License v3.0 (see `LICENSE`).
+M3spoti, like Myspoti (now [Orpheon](https://github.com/kota-zo/Orpheon)), is free software under the GNU General Public
+License v3.0 (see `LICENSE`).
 It builds on the projects below; their licences are compatible with the GPL-3.0.
 
 ## PixelMusic — GPL-3.0
