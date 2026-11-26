@@ -137,7 +137,7 @@ fun SupportSheet(onDismiss: () -> Unit) {
 @Composable
 fun CreditRows() {
     val context = LocalContext.current
-    AboutRow("Myspoti · kota-zo", stringResource(R.string.about_credit_myspoti)) { openUrl(context, "https://github.com/kota-zo/myspoti") }
+    AboutRow("Myspoti, now Orpheon · kota-zo", stringResource(R.string.about_credit_myspoti)) { openUrl(context, "https://github.com/kota-zo/Orpheon") }
     AboutRow("PixelPlayer · Theo Vilardo", stringResource(R.string.about_credit_pixelplayer)) { openUrl(context, "https://github.com/PixelPlayerHQ/PixelPlayer") }
     AboutRow("PixelMusic · Ian Shulyadav", stringResource(R.string.about_credit_pixelmusic)) { openUrl(context, "https://github.com/ianshulyadav/PixelMusic") }
 }
