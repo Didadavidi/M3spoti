@@ -4,6 +4,20 @@ M3spoti's changes. Everything up to Myspoti 2.4.0, which M3spoti is built on, is
 [Orpheon's changelog](https://github.com/kota-zo/Orpheon/blob/main/CHANGELOG.md) (Myspoti is now called Orpheon)
 (a copy of its detailed history: [docs/CHANGELOG-full.md](docs/CHANGELOG-full.md)).
 
+## Unreleased
+
+**AutoMix, from Orpheon** (for songs from extensions, downloads and your own files; Spotify songs
+are not mixed)
+- A new planner: both songs change tempo a little on the way, so the next song ends the mix at its
+  own speed instead of sounding stretched for a minute after it.
+- No more crackles during a mix with the screen locked (a bigger audio buffer), and no off-key
+  pitch slides when the tempo is nudged.
+- A next song that loads late gets a short fade instead of a broken mix; a planned mix whose start
+  went by is dropped instead of played late.
+- Song analyses are kept in the app's files (up to 64 MB, oldest out first) instead of a cache
+  Android empties, and the third song ahead is only analysed while charging.
+- An analysis that runs out of memory is given up instead of closing the app.
+
 ## 2.4.0-beta.3
 
 **Changed**
